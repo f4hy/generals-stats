@@ -1,0 +1,59 @@
+syntax = "proto3";
+package matches;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/f4hy/generalsstats;generalsstats";
+
+enum General {
+  USA =0;
+  AIR=1;
+  LASER=2;
+  SUPER=3;
+  CHINA=4;
+  NUKE=5;
+  TANK=6;
+  INFANTRY=7;
+  GLA=8;
+  TOXIN=9;
+  STEALTH=10;
+  DEMO=11;
+}
+enum Team {
+  NONE=0;
+  ONE=1;
+  TWO=2;
+  THREE=3;
+  FOUR=4;
+}
+
+message Player {
+  string name = 1;
+  General general=2;
+  Team team = 3;
+}
+
+message MatchInfo {
+  int32 id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string map = 3;
+  Team winning_team = 4;
+}
+
+message SaveResponse {
+  bool success = 1;
+}
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+// service MatchStats {
+//   // Save a Match
+//   rpc SaveMatch (MatchInfo) returns (SaveResponse) {}
+//   rpc SayHello (HelloRequest) returns (HelloReply) {}
+// }
