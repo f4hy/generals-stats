@@ -5,7 +5,6 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import { Matches, MatchInfo, General } from "./proto/match"
 import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
@@ -37,7 +36,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
         (
           <ListItem>
             <ListItemIcon>
-              {p.team == props.match.winningTeam ? <EmojiEventsIcon /> : <ThumbDownIcon />}
+              {p.team === props.match.winningTeam ? <EmojiEventsIcon /> : <ThumbDownIcon />}
             </ListItemIcon>
             <ListItemText primary={`Player: ${p.name}:` + General[p.general] + " team:" + p.team} />
           </ListItem>

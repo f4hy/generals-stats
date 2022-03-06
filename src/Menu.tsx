@@ -20,7 +20,6 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import ListIcon from '@mui/icons-material/List';
 import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-import AddMatch from "./AddMatch"
 import DisplayMatches from "./Matches"
 
 const drawerWidth = 240;
