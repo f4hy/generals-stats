@@ -48,41 +48,24 @@ func main() {
 
         api := router.Group("/api")
         {
-                api.GET("/test", func(c *gin.Context) {
-                        response := &pb.HelloReply{
-                                Message: "Hello there",
-                        }
-                        b,err := protojson.Marshal(response)
-                        log.Error(err)
-                        fmt.Println(string(b))
-                        s,err := proto.Marshal(response)
-                        fmt.Println(string(s))
-                        c.ProtoBuf(http.StatusOK, response)
-                })
                 api.GET("/matches", func(c *gin.Context) {
 			example_matches := data.ExampleMatches()
 			c.ProtoBuf(http.StatusOK, &example_matches)
 		})
                 api.POST("/pbmsg", func(c *gin.Context) {
-                        request := &pb.HelloRequest{}
+                        request := &pb.MatchInfo{}
 			c.Bind(request)
-			// b,err := c.GetRawData()
+                        request2 := &pb.MatchInfo{}
+			b,err := c.GetRawData()
                         // fmt.Println(b)
 			// log.Error(err)
-			// proto.Unmarshal(b, request)
-                        fmt.Println("Wtf " + request.Name)
+			proto.Unmarshal(b, request2)
+                        fmt.Println("1 " + request.GetMap())
+                        fmt.Println("2 " + request2.GetMap())
                         j,err := protojson.Marshal(request)
-                        fmt.Println("Wtf " + request.Name)
                         fmt.Println("json?" + string(j))
 			log.Error(err)
-			response := &pb.Player{Name: request.GetName(),
-				General: pb.General_DEMO,
-				Team: pb.Team_THREE}
-                        // response := &pb.HelloReply{
-                        //         Message: "Hello " + request.Name,
-                        // }
-			c.ProtoBuf(http.StatusOK, response)
-                        // c.JSON(http.StatusOK, gin.H{"works":  request.Name })
+			c.ProtoBuf(http.StatusOK, request)
                 })
                 api.GET("/health", func(c *gin.Context) {
                         c.JSON(http.StatusOK, gin.H{"status": "ok"})
