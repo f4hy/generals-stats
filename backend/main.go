@@ -11,7 +11,9 @@ import (
         "github.com/golang/protobuf/proto"
         "google.golang.org/protobuf/encoding/protojson"
         pb "github.com/f4hy/generals-stats/backend/proto"
+        data "github.com/f4hy/generals-stats/backend/data"
 )
+
 
 func init() {
         flag.Usage = func() { flag.PrintDefaults() }
@@ -54,13 +56,17 @@ func main() {
                         fmt.Println(string(s))
                         c.ProtoBuf(http.StatusOK, response)
                 })
+                api.GET("/matches", func(c *gin.Context) {
+			example_matches := data.ExampleMatches()
+			c.ProtoBuf(http.StatusOK, &example_matches)
+		})
                 api.POST("/pbmsg", func(c *gin.Context) {
                         request := &pb.HelloRequest{}
-			b,err := c.GetRawData()
-                        fmt.Println(b)
-			log.Error(err)
-			// c.Bind(request)
-			proto.Unmarshal(b, request)
+			c.Bind(request)
+			// b,err := c.GetRawData()
+                        // fmt.Println(b)
+			// log.Error(err)
+			// proto.Unmarshal(b, request)
                         fmt.Println("Wtf " + request.Name)
                         j,err := protojson.Marshal(request)
                         fmt.Println("Wtf " + request.Name)

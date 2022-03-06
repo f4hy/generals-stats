@@ -9,11 +9,11 @@ export default function AddMatch() {
     const hr: HelloReply = {message: "new testasdf"}
 	const encoded = HelloReply.encode(hr).finish();
 	const hr2 = HelloReply.decode(encoded)
-	function test() {
-		fetch("http://localhost:5000/api/test").then(r => r.text().then(s => {
-                        setResponse(s)
-                }))
-        }
+  /* function test() {
+    fetch("http://localhost:5000/api/test").then(r => r.text().then(s => {
+*                 setResponse(s)
+*         }))
+* } */
         function test2() {
             const hreq: HelloRequest = {name: "owlbear"}
 	    const mybytes = HelloRequest.encode(hreq).finish()

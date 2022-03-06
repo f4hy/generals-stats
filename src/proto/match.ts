@@ -158,6 +158,11 @@ export interface MatchInfo {
   timestamp: Date | undefined;
   map: string;
   winningTeam: Team;
+  players: Player[];
+}
+
+export interface Matches {
+  matches: MatchInfo[];
 }
 
 export interface SaveResponse {
@@ -246,7 +251,7 @@ export const Player = {
 };
 
 function createBaseMatchInfo(): MatchInfo {
-  return { id: 0, timestamp: undefined, map: "", winningTeam: 0 };
+  return { id: 0, timestamp: undefined, map: "", winningTeam: 0, players: [] };
 }
 
 export const MatchInfo = {
@@ -268,6 +273,9 @@ export const MatchInfo = {
     }
     if (message.winningTeam !== 0) {
       writer.uint32(32).int32(message.winningTeam);
+    }
+    for (const v of message.players) {
+      Player.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -293,6 +301,9 @@ export const MatchInfo = {
         case 4:
           message.winningTeam = reader.int32() as any;
           break;
+        case 5:
+          message.players.push(Player.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -311,6 +322,9 @@ export const MatchInfo = {
       winningTeam: isSet(object.winningTeam)
         ? teamFromJSON(object.winningTeam)
         : 0,
+      players: Array.isArray(object?.players)
+        ? object.players.map((e: any) => Player.fromJSON(e))
+        : [],
     };
   },
 
@@ -322,6 +336,13 @@ export const MatchInfo = {
     message.map !== undefined && (obj.map = message.map);
     message.winningTeam !== undefined &&
       (obj.winningTeam = teamToJSON(message.winningTeam));
+    if (message.players) {
+      obj.players = message.players.map((e) =>
+        e ? Player.toJSON(e) : undefined
+      );
+    } else {
+      obj.players = [];
+    }
     return obj;
   },
 
@@ -333,6 +354,68 @@ export const MatchInfo = {
     message.timestamp = object.timestamp ?? undefined;
     message.map = object.map ?? "";
     message.winningTeam = object.winningTeam ?? 0;
+    message.players = object.players?.map((e) => Player.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMatches(): Matches {
+  return { matches: [] };
+}
+
+export const Matches = {
+  encode(
+    message: Matches,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.matches) {
+      MatchInfo.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Matches {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMatches();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.matches.push(MatchInfo.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Matches {
+    return {
+      matches: Array.isArray(object?.matches)
+        ? object.matches.map((e: any) => MatchInfo.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: Matches): unknown {
+    const obj: any = {};
+    if (message.matches) {
+      obj.matches = message.matches.map((e) =>
+        e ? MatchInfo.toJSON(e) : undefined
+      );
+    } else {
+      obj.matches = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<Matches>, I>>(object: I): Matches {
+    const message = createBaseMatches();
+    message.matches =
+      object.matches?.map((e) => MatchInfo.fromPartial(e)) || [];
     return message;
   },
 };

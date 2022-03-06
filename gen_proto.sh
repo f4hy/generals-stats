@@ -11,6 +11,7 @@ PROTOC_GEN_GRPC_PATH="$(npm bin)/grpc_tools_node_protoc_plugin"
 protoc \
     -I=${PWD} \
     --go_out=backend/ --go-grpc_out=backend/\
+    --go_opt=paths=source_relative \
     proto/match.proto
 
 

@@ -38,6 +38,11 @@ message MatchInfo {
   google.protobuf.Timestamp timestamp = 2;
   string map = 3;
   Team winning_team = 4;
+  repeated Player players = 5;
+}
+
+message Matches {
+  repeated MatchInfo matches = 1;
 }
 
 message SaveResponse {
