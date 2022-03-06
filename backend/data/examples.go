@@ -35,7 +35,7 @@ func ExampleMatches() pb.Matches {
         // Just provide a list of example matches for now
         timestamp := timestamppb.Now();
         var matches []*pb.MatchInfo;
-	for i:=1; i<6; i++ {
+	for i:=1; i<10; i++ {
 		var winner pb.Team;
 		if(rand.Intn(2) == 0){
 			winner = pb.Team_ONE;

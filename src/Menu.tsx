@@ -21,6 +21,7 @@ import ListIcon from '@mui/icons-material/List';
 import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import DisplayMatches from "./Matches"
+import DisplayPlayerStats from "./PlayerStats"
 
 const drawerWidth = 240;
 
@@ -109,6 +110,8 @@ function Main(props: { selection: Selection }) {
 *   return (<AddMatch />) */
     case "Matches":
       return (<DisplayMatches />)
+    case "PlayerStats":
+      return (<DisplayPlayerStats />)
     default:
       return (<div>{props.selection}</div>)
   }

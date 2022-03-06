@@ -165,6 +165,39 @@ export interface Matches {
   matches: MatchInfo[];
 }
 
+export interface WinLoss {
+  wins: number;
+  losses: number;
+}
+
+export interface PlayerStat {
+  playerName: string;
+  stats: PlayerStat_GeneralWL[];
+}
+
+export interface PlayerStat_GeneralWL {
+  general: General;
+  winLoss: WinLoss | undefined;
+}
+
+export interface PlayerStats {
+  playerStats: PlayerStat[];
+}
+
+export interface GeneralStat {
+  general: General;
+  stats: GeneralStat_PlayerWL[];
+}
+
+export interface GeneralStat_PlayerWL {
+  playerName: string;
+  winLoss: WinLoss | undefined;
+}
+
+export interface GeneralStats {
+  generalStats: GeneralStat[];
+}
+
 export interface SaveResponse {
   success: boolean;
 }
@@ -406,6 +439,493 @@ export const Matches = {
     const message = createBaseMatches();
     message.matches =
       object.matches?.map((e) => MatchInfo.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseWinLoss(): WinLoss {
+  return { wins: 0, losses: 0 };
+}
+
+export const WinLoss = {
+  encode(
+    message: WinLoss,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.wins !== 0) {
+      writer.uint32(8).int32(message.wins);
+    }
+    if (message.losses !== 0) {
+      writer.uint32(16).int32(message.losses);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): WinLoss {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWinLoss();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.wins = reader.int32();
+          break;
+        case 2:
+          message.losses = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WinLoss {
+    return {
+      wins: isSet(object.wins) ? Number(object.wins) : 0,
+      losses: isSet(object.losses) ? Number(object.losses) : 0,
+    };
+  },
+
+  toJSON(message: WinLoss): unknown {
+    const obj: any = {};
+    message.wins !== undefined && (obj.wins = Math.round(message.wins));
+    message.losses !== undefined && (obj.losses = Math.round(message.losses));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<WinLoss>, I>>(object: I): WinLoss {
+    const message = createBaseWinLoss();
+    message.wins = object.wins ?? 0;
+    message.losses = object.losses ?? 0;
+    return message;
+  },
+};
+
+function createBasePlayerStat(): PlayerStat {
+  return { playerName: "", stats: [] };
+}
+
+export const PlayerStat = {
+  encode(
+    message: PlayerStat,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName);
+    }
+    for (const v of message.stats) {
+      PlayerStat_GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PlayerStat {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerStat();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.playerName = reader.string();
+          break;
+        case 2:
+          message.stats.push(
+            PlayerStat_GeneralWL.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerStat {
+    return {
+      playerName: isSet(object.playerName) ? String(object.playerName) : "",
+      stats: Array.isArray(object?.stats)
+        ? object.stats.map((e: any) => PlayerStat_GeneralWL.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: PlayerStat): unknown {
+    const obj: any = {};
+    message.playerName !== undefined && (obj.playerName = message.playerName);
+    if (message.stats) {
+      obj.stats = message.stats.map((e) =>
+        e ? PlayerStat_GeneralWL.toJSON(e) : undefined
+      );
+    } else {
+      obj.stats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PlayerStat>, I>>(
+    object: I
+  ): PlayerStat {
+    const message = createBasePlayerStat();
+    message.playerName = object.playerName ?? "";
+    message.stats =
+      object.stats?.map((e) => PlayerStat_GeneralWL.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBasePlayerStat_GeneralWL(): PlayerStat_GeneralWL {
+  return { general: 0, winLoss: undefined };
+}
+
+export const PlayerStat_GeneralWL = {
+  encode(
+    message: PlayerStat_GeneralWL,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.general !== 0) {
+      writer.uint32(8).int32(message.general);
+    }
+    if (message.winLoss !== undefined) {
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): PlayerStat_GeneralWL {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerStat_GeneralWL();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.general = reader.int32() as any;
+          break;
+        case 2:
+          message.winLoss = WinLoss.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerStat_GeneralWL {
+    return {
+      general: isSet(object.general) ? generalFromJSON(object.general) : 0,
+      winLoss: isSet(object.winLoss)
+        ? WinLoss.fromJSON(object.winLoss)
+        : undefined,
+    };
+  },
+
+  toJSON(message: PlayerStat_GeneralWL): unknown {
+    const obj: any = {};
+    message.general !== undefined &&
+      (obj.general = generalToJSON(message.general));
+    message.winLoss !== undefined &&
+      (obj.winLoss = message.winLoss
+        ? WinLoss.toJSON(message.winLoss)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PlayerStat_GeneralWL>, I>>(
+    object: I
+  ): PlayerStat_GeneralWL {
+    const message = createBasePlayerStat_GeneralWL();
+    message.general = object.general ?? 0;
+    message.winLoss =
+      object.winLoss !== undefined && object.winLoss !== null
+        ? WinLoss.fromPartial(object.winLoss)
+        : undefined;
+    return message;
+  },
+};
+
+function createBasePlayerStats(): PlayerStats {
+  return { playerStats: [] };
+}
+
+export const PlayerStats = {
+  encode(
+    message: PlayerStats,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.playerStats) {
+      PlayerStat.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PlayerStats {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerStats();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.playerStats.push(PlayerStat.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerStats {
+    return {
+      playerStats: Array.isArray(object?.playerStats)
+        ? object.playerStats.map((e: any) => PlayerStat.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: PlayerStats): unknown {
+    const obj: any = {};
+    if (message.playerStats) {
+      obj.playerStats = message.playerStats.map((e) =>
+        e ? PlayerStat.toJSON(e) : undefined
+      );
+    } else {
+      obj.playerStats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PlayerStats>, I>>(
+    object: I
+  ): PlayerStats {
+    const message = createBasePlayerStats();
+    message.playerStats =
+      object.playerStats?.map((e) => PlayerStat.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseGeneralStat(): GeneralStat {
+  return { general: 0, stats: [] };
+}
+
+export const GeneralStat = {
+  encode(
+    message: GeneralStat,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.general !== 0) {
+      writer.uint32(8).int32(message.general);
+    }
+    for (const v of message.stats) {
+      GeneralStat_PlayerWL.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GeneralStat {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGeneralStat();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.general = reader.int32() as any;
+          break;
+        case 2:
+          message.stats.push(
+            GeneralStat_PlayerWL.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GeneralStat {
+    return {
+      general: isSet(object.general) ? generalFromJSON(object.general) : 0,
+      stats: Array.isArray(object?.stats)
+        ? object.stats.map((e: any) => GeneralStat_PlayerWL.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GeneralStat): unknown {
+    const obj: any = {};
+    message.general !== undefined &&
+      (obj.general = generalToJSON(message.general));
+    if (message.stats) {
+      obj.stats = message.stats.map((e) =>
+        e ? GeneralStat_PlayerWL.toJSON(e) : undefined
+      );
+    } else {
+      obj.stats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<GeneralStat>, I>>(
+    object: I
+  ): GeneralStat {
+    const message = createBaseGeneralStat();
+    message.general = object.general ?? 0;
+    message.stats =
+      object.stats?.map((e) => GeneralStat_PlayerWL.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseGeneralStat_PlayerWL(): GeneralStat_PlayerWL {
+  return { playerName: "", winLoss: undefined };
+}
+
+export const GeneralStat_PlayerWL = {
+  encode(
+    message: GeneralStat_PlayerWL,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName);
+    }
+    if (message.winLoss !== undefined) {
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GeneralStat_PlayerWL {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGeneralStat_PlayerWL();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.playerName = reader.string();
+          break;
+        case 2:
+          message.winLoss = WinLoss.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GeneralStat_PlayerWL {
+    return {
+      playerName: isSet(object.playerName) ? String(object.playerName) : "",
+      winLoss: isSet(object.winLoss)
+        ? WinLoss.fromJSON(object.winLoss)
+        : undefined,
+    };
+  },
+
+  toJSON(message: GeneralStat_PlayerWL): unknown {
+    const obj: any = {};
+    message.playerName !== undefined && (obj.playerName = message.playerName);
+    message.winLoss !== undefined &&
+      (obj.winLoss = message.winLoss
+        ? WinLoss.toJSON(message.winLoss)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<GeneralStat_PlayerWL>, I>>(
+    object: I
+  ): GeneralStat_PlayerWL {
+    const message = createBaseGeneralStat_PlayerWL();
+    message.playerName = object.playerName ?? "";
+    message.winLoss =
+      object.winLoss !== undefined && object.winLoss !== null
+        ? WinLoss.fromPartial(object.winLoss)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseGeneralStats(): GeneralStats {
+  return { generalStats: [] };
+}
+
+export const GeneralStats = {
+  encode(
+    message: GeneralStats,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.generalStats) {
+      GeneralStat.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GeneralStats {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGeneralStats();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.generalStats.push(
+            GeneralStat.decode(reader, reader.uint32())
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GeneralStats {
+    return {
+      generalStats: Array.isArray(object?.generalStats)
+        ? object.generalStats.map((e: any) => GeneralStat.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GeneralStats): unknown {
+    const obj: any = {};
+    if (message.generalStats) {
+      obj.generalStats = message.generalStats.map((e) =>
+        e ? GeneralStat.toJSON(e) : undefined
+      );
+    } else {
+      obj.generalStats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<GeneralStats>, I>>(
+    object: I
+  ): GeneralStats {
+    const message = createBaseGeneralStats();
+    message.generalStats =
+      object.generalStats?.map((e) => GeneralStat.fromPartial(e)) || [];
     return message;
   },
 };

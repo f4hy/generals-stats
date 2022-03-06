@@ -45,6 +45,38 @@ message Matches {
   repeated MatchInfo matches = 1;
 }
 
+message WinLoss {
+  int32 wins = 1;
+  int32 losses = 2;
+}
+
+message PlayerStat {
+  string player_name = 1;
+  message GeneralWL {
+    General general = 1;
+    WinLoss win_loss = 2;
+  }
+  repeated GeneralWL stats =2;
+}
+
+message PlayerStats {
+  repeated PlayerStat player_stats = 1;
+}
+
+message GeneralStat {
+  General general = 1;
+  message PlayerWL {
+    string player_name = 1;
+    WinLoss win_loss = 2;
+  }
+  repeated PlayerWL stats =2;
+}
+
+message GeneralStats {
+  repeated GeneralStat general_stats = 1;
+}
+
+
 message SaveResponse {
   bool success = 1;
 }

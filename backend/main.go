@@ -52,6 +52,10 @@ func main() {
 			example_matches := data.ExampleMatches()
 			c.ProtoBuf(http.StatusOK, &example_matches)
 		})
+                api.GET("/playerstats", func(c *gin.Context) {
+			player_stats := data.PlayerStats()
+			c.ProtoBuf(http.StatusOK, &player_stats)
+		})
                 api.POST("/pbmsg", func(c *gin.Context) {
                         request := &pb.MatchInfo{}
 			c.Bind(request)
