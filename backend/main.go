@@ -9,6 +9,7 @@ import (
         "github.com/gin-gonic/gin"
         log "github.com/golang/glog"
         "github.com/golang/protobuf/proto"
+	"github.com/gin-gonic/contrib/static"
         "google.golang.org/protobuf/encoding/protojson"
         pb "github.com/f4hy/generals-stats/backend/proto"
         data "github.com/f4hy/generals-stats/backend/data"
@@ -43,6 +44,8 @@ func main() {
                         "message": "pong",
                 })
         })
+	router.Use(static.Serve("/", static.LocalFile("build", true)))
+
         api := router.Group("/api")
         {
                 api.GET("/test", func(c *gin.Context) {
