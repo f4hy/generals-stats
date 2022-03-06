@@ -15,7 +15,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 
 function getMatches(callback: (m: Matches) => void) {
-  fetch("http://localhost:5000/api/matches",
+  fetch("/api/matches",
   ).then(r => r.blob().then(b => b.arrayBuffer())
     .then(j => {
       console.log(j)
