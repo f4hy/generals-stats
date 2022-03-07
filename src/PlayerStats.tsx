@@ -60,8 +60,8 @@ export default function DisplayPlayerStats() {
   }, []);
   return (<Paper>
 
-    <Button variant="contained" onClick={() => getPlayerStats(setPlayerStats)} >Get Matches</Button>
-    <Typography>Its just randomly generated matches for now.</Typography>
+    {/* <Button variant="contained" onClick={() => getPlayerStats(setPlayerStats)} >Get Matches</Button> */}
+    <Typography>Will make this graphs later.</Typography>
     {playerStats.playerStats.map(m => (<><DisplayPlayerStat stat={m} /><Divider /></>))}
   </Paper>);
 }

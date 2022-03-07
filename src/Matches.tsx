@@ -21,7 +21,8 @@ function getMatches(callback: (m: Matches) => void) {
     .then(j => {
       console.log(j)
       const a = new Uint8Array(j)
-      const matches = Matches.decode(a)
+	const matches = Matches.decode(a)
+      matches.matches.sort((m1,m2)=> m1.id - m2.id)
       callback(matches)
     }))
 }
@@ -61,8 +62,8 @@ export default function DisplayMatches() {
   }, []);
     return (<Paper>
       
-    <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button>
-    <Typography>Its just randomly generated matches for now.</Typography>
+      {/* <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button> */}
+    <Typography>Will display this better later.</Typography>
     {matchList.matches.map(m => (<><DisplayMatchInfo match={m} /><Divider /></>))}
   </Paper>);
 }

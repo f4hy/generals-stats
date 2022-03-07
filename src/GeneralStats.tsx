@@ -30,7 +30,8 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
 
 function DisplayGeneralStat(props: { stat: GeneralStat }) {
   const sorted = props.stat.stats.sort((s1,s2)=> s1.playerName.length - s2.playerName.length)
-  return (
+    const overall = props.stat.total
+    return (
     <Paper>
       <List>
         <ListItem>
@@ -39,6 +40,10 @@ function DisplayGeneralStat(props: { stat: GeneralStat }) {
           </ListItemAvatar>
           <ListItemText primary={General[props.stat.general]} />
         </ListItem>
+        <ListItem>
+          <ListItemText primary={`Total: (${overall?.wins ?? 0} : ${overall?.losses ?? 0}) ` } />
+        </ListItem>
+	<Divider/>
         {sorted.map(p =>
         (
           <ListItem>
@@ -61,8 +66,8 @@ export default function DisplayGeneralStats() {
   }, []);
   return (<Paper>
 
-    <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button>
-    <Typography>Its just randomly generated matches for now.</Typography>
+    {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
+    <Typography>Will make this graphs later.</Typography>
     {generalStats.generalStats.map(m => (<><DisplayGeneralStat stat={m} /><Divider /></>))}
   </Paper>);
 }

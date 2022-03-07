@@ -7,7 +7,7 @@ import (
 func PlayerStats() *pb.PlayerStats {
         var playerstats pb.PlayerStats;
 
-        matches := ExampleMatches() // get real matches later
+        matches, _ := GetMatches()
         player_stat_map := make(map[string]map[pb.General]*pb.WinLoss)
 
         for _, m := range matches.Matches {
@@ -51,7 +51,7 @@ func PlayerStats() *pb.PlayerStats {
 func GeneralStats() *pb.GeneralStats {
         var generalstats pb.GeneralStats;
 
-        matches := ExampleMatches() // get real matches later
+        matches, _ := GetMatches()
         general_stat_map := make(map[pb.General]map[string]*pb.WinLoss)
 	overall := make(map[pb.General]*pb.WinLoss)
         for _, m := range matches.Matches {
@@ -90,6 +90,7 @@ func GeneralStats() *pb.GeneralStats {
 		playerstat := pb.GeneralStat{
 			General: general,
 			Stats: playerWL,
+			Total: overall[general],
 		}
 		generalstats.GeneralStats = append(generalstats.GeneralStats, &playerstat)
 	}
