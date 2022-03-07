@@ -42,7 +42,7 @@ func AddDataToS3(filePath string, databuffer []byte) error {
 	return nil
 }
 
-func GetS3Data(filePath string) (*string, error) {
+func GetS3Data(filePath string) ([]byte, error) {
 	log.Infof("Retrieving data from S3 file (%s)", filePath)
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
 	if err != nil {
@@ -64,12 +64,12 @@ func GetS3Data(filePath string) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	asString := buf.String()
+	bytes := buf.Bytes()
 	if log.V(2) {
-		fmt.Printf("Fetched %s : %s \n", filePath, asString)
+		fmt.Printf("Fetched %s : %s \n", filePath, bytes)
 	}
 	log.Infof("Successfully retrieved data from S3 file (%s)", filePath)
-	return &asString, nil
+	return bytes, nil
 }
 
 // Gets an s3 presigned url from the bucket so that it can be accessed

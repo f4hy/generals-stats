@@ -70,6 +70,7 @@ message GeneralStat {
     WinLoss win_loss = 2;
   }
   repeated PlayerWL stats =2;
+  WinLoss total=3;
 }
 
 message GeneralStats {

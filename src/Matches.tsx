@@ -7,10 +7,11 @@ import { Matches, MatchInfo, General } from "./proto/match"
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 import List from '@mui/material/List';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-
+import DisplayGeneral from "./Generals"
 
 
 
@@ -34,11 +35,14 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
         </ListItem>
         {props.match.players.map(p =>
         (
-          <ListItem>
+          <ListItem sx={{color:  p.team === props.match.winningTeam ? 'success.main' : 'error.main'}}>
             <ListItemIcon>
               {p.team === props.match.winningTeam ? <EmojiEventsIcon /> : <ThumbDownIcon />}
             </ListItemIcon>
-            <ListItemText primary={`Player: ${p.name}:` + General[p.general] + " team:" + p.team} />
+	    <ListItemAvatar>
+            <DisplayGeneral general={p.general} />
+	    </ListItemAvatar>
+            <ListItemText primary={` Player: ${p.name.padEnd(50, ' ')}:` + General[p.general] + " team:" + p.team} />
           </ListItem>
         )
         )}

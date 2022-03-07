@@ -8,9 +8,7 @@ import (
         "github.com/gin-contrib/cors"
         "github.com/gin-gonic/gin"
         log "github.com/golang/glog"
-        "github.com/golang/protobuf/proto"
 	"github.com/gin-gonic/contrib/static"
-        "google.golang.org/protobuf/encoding/protojson"
         pb "github.com/f4hy/generals-stats/backend/proto"
         data "github.com/f4hy/generals-stats/backend/data"
 )
@@ -45,31 +43,46 @@ func main() {
                 })
         })
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
-
+	
         api := router.Group("/api")
         {
                 api.GET("/matches", func(c *gin.Context) {
-			example_matches := data.ExampleMatches()
-			c.ProtoBuf(http.StatusOK, &example_matches)
+			matches, err := data.GetMatches()
+			if err != nil {
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.ProtoBuf(http.StatusOK, matches)
 		})
                 api.GET("/playerstats", func(c *gin.Context) {
 			player_stats := data.PlayerStats()
-			c.ProtoBuf(http.StatusOK, &player_stats)
+			c.ProtoBuf(http.StatusOK, player_stats)
 		})
-                api.POST("/pbmsg", func(c *gin.Context) {
-                        request := &pb.MatchInfo{}
-			c.Bind(request)
-                        request2 := &pb.MatchInfo{}
-			b,err := c.GetRawData()
-                        // fmt.Println(b)
+                api.GET("/generalstats", func(c *gin.Context) {
+			general := data.GeneralStats()
+			c.ProtoBuf(http.StatusOK, general)
+		})
+                api.POST("/saveMatch", func(c *gin.Context) {
+                        match := &pb.MatchInfo{}
+			c.Bind(match)
+			err := data.SaveMatch(match)
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, "Saved Match")
+                        // request2 := &pb.MatchInfo{}
+			// b,err := c.GetRawData()
+                        // // fmt.Println(b)
+			// // log.Error(err)
+			// proto.Unmarshal(b, request2)
+                        // fmt.Println("1 " + request.GetMap())
+                        // fmt.Println("2 " + request2.GetMap())
+                        // j,err := protojson.Marshal(request)
+                        // fmt.Println("json?" + string(j))
 			// log.Error(err)
-			proto.Unmarshal(b, request2)
-                        fmt.Println("1 " + request.GetMap())
-                        fmt.Println("2 " + request2.GetMap())
-                        j,err := protojson.Marshal(request)
-                        fmt.Println("json?" + string(j))
-			log.Error(err)
-			c.ProtoBuf(http.StatusOK, request)
+			// c.ProtoBuf(http.StatusOK, request)
                 })
                 api.GET("/health", func(c *gin.Context) {
                         c.JSON(http.StatusOK, gin.H{"status": "ok"})

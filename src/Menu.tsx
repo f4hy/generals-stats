@@ -22,6 +22,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import DisplayMatches from "./Matches"
 import DisplayPlayerStats from "./PlayerStats"
+import DisplayGeneralStats from "./GeneralStats"
+import AddMatch from "./AddMatch"
 
 const drawerWidth = 240;
 
@@ -94,7 +96,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-type Selection = "AddMatch" | "Matches" | "GeneralsStats" | "PlayerStats"
+type Selection = "AddMatch" | "Matches" | "GeneralStats" | "PlayerStats"
 
 interface MenuItemProps {
   open: boolean;
@@ -112,6 +114,10 @@ function Main(props: { selection: Selection }) {
       return (<DisplayMatches />)
     case "PlayerStats":
       return (<DisplayPlayerStats />)
+    case "GeneralStats":
+      return (<DisplayGeneralStats />)
+    case "AddMatch":
+      return (<AddMatch />)
     default:
       return (<div>{props.selection}</div>)
   }
@@ -189,7 +195,7 @@ export default function Menu() {
         <List>
           <MenuItem value="Matches" text="Matches" open={open} icon={<ListIcon />} callback={setSelection} />
           <MenuItem value="PlayerStats" text="Player Stats" open={open} icon={<PersonIcon />} callback={setSelection} />
-          <MenuItem value="GeneralsStats" text="General Stats" open={open} icon={<MilitaryTechIcon />} callback={setSelection} />
+          <MenuItem value="GeneralStats" text="General Stats" open={open} icon={<MilitaryTechIcon />} callback={setSelection} />
         </List>
         <Divider />
         <List>

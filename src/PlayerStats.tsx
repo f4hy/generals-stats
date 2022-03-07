@@ -8,8 +8,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import DisplayGeneral from "./Generals"
 
 
 
@@ -26,16 +28,20 @@ function getPlayerStats(callback: (m: PlayerStats) => void) {
 }
 
 function DisplayPlayerStat(props: { stat: PlayerStat }) {
+  const sorted = props.stat.stats.sort((s1,s2)=> s1.general - s2.general)
   return (
     <Paper>
       <List>
         <ListItem>
           <ListItemText primary={"Player Name: " + props.stat.playerName} />
         </ListItem>
-        {props.stat.stats.map(p =>
+        {sorted.map(p =>
         (
           <ListItem>
-            <ListItemText primary={`General: ${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0})` } />
+            <ListItemAvatar>
+              <DisplayGeneral general={p.general} />
+            </ListItemAvatar>
+            <ListItemText primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0})`} />
           </ListItem>
         )
         )}

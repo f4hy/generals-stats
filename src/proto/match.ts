@@ -187,6 +187,7 @@ export interface PlayerStats {
 export interface GeneralStat {
   general: General;
   stats: GeneralStat_PlayerWL[];
+  total: WinLoss | undefined;
 }
 
 export interface GeneralStat_PlayerWL {
@@ -717,7 +718,7 @@ export const PlayerStats = {
 };
 
 function createBaseGeneralStat(): GeneralStat {
-  return { general: 0, stats: [] };
+  return { general: 0, stats: [], total: undefined };
 }
 
 export const GeneralStat = {
@@ -730,6 +731,9 @@ export const GeneralStat = {
     }
     for (const v of message.stats) {
       GeneralStat_PlayerWL.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.total !== undefined) {
+      WinLoss.encode(message.total, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -749,6 +753,9 @@ export const GeneralStat = {
             GeneralStat_PlayerWL.decode(reader, reader.uint32())
           );
           break;
+        case 3:
+          message.total = WinLoss.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -763,6 +770,7 @@ export const GeneralStat = {
       stats: Array.isArray(object?.stats)
         ? object.stats.map((e: any) => GeneralStat_PlayerWL.fromJSON(e))
         : [],
+      total: isSet(object.total) ? WinLoss.fromJSON(object.total) : undefined,
     };
   },
 
@@ -777,6 +785,8 @@ export const GeneralStat = {
     } else {
       obj.stats = [];
     }
+    message.total !== undefined &&
+      (obj.total = message.total ? WinLoss.toJSON(message.total) : undefined);
     return obj;
   },
 
@@ -787,6 +797,10 @@ export const GeneralStat = {
     message.general = object.general ?? 0;
     message.stats =
       object.stats?.map((e) => GeneralStat_PlayerWL.fromPartial(e)) || [];
+    message.total =
+      object.total !== undefined && object.total !== null
+        ? WinLoss.fromPartial(object.total)
+        : undefined;
     return message;
   },
 };
