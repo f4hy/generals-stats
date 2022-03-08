@@ -1,17 +1,16 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import { Matches, MatchInfo, General } from "./proto/match"
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import List from '@mui/material/List';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import DisplayGeneral from "./Generals"
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import DisplayGeneral from "./Generals";
+import { General, Matches, MatchInfo } from "./proto/match";
 
 
 
@@ -31,19 +30,19 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
   return (
     <Paper>
       <List>
-        <ListItem>
-          <ListItemText primary={"Match Id" + props.match.id + " on Map: " + props.match.map + "  winner:" + props.match.winningTeam} />
+        <ListItem key="match">
+          <ListItemText key="match-text" primary={"Match Id" + props.match.id + " on Map: " + props.match.map + "  winner:" + props.match.winningTeam} />
         </ListItem>
         {props.match.players.map(p =>
         (
-          <ListItem sx={{color:  p.team === props.match.winningTeam ? 'success.main' : 'error.main'}}>
-            <ListItemIcon>
+          <ListItem key={p.name +'-' + p.general} sx={{color:  p.team === props.match.winningTeam ? 'success.main' : 'error.main'}}>
+            <ListItemIcon key={p.name +'-' + p.general + '-icon'}>
               {p.team === props.match.winningTeam ? <EmojiEventsIcon /> : <ThumbDownIcon />}
             </ListItemIcon>
-	    <ListItemAvatar>
-            <DisplayGeneral general={p.general} />
+	    <ListItemAvatar key={p.name +'-' + p.general + '-avatar'}>
+            <DisplayGeneral general={p.general} key={p.name +'-' + p.general + '-general'} />
 	    </ListItemAvatar>
-            <ListItemText primary={` Player: ${p.name.padEnd(50, ' ')}:` + General[p.general] + " team:" + p.team} />
+            <ListItemText primary={` Player: ${p.name.padEnd(50, ' ')}:` + General[p.general] + " team:" + p.team} key={p.name +'-' + p.general + '-text'} />
           </ListItem>
         )
         )}
@@ -64,6 +63,6 @@ export default function DisplayMatches() {
       
       {/* <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button> */}
     <Typography>Will display this better later.</Typography>
-    {matchList.matches.map(m => (<><DisplayMatchInfo match={m} /><Divider /></>))}
+    {matchList.matches.map(m => (<><DisplayMatchInfo match={m} key={m.id} /><Divider /></>))}
   </Paper>);
 }

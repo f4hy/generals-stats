@@ -143,7 +143,7 @@ function MenuItem(props: MenuItemProps) {
     >
       {props.icon}
     </ListItemIcon>
-    <ListItemText primary={props.text + " " + props.value} sx={{ opacity: open ? 1 : 0 }} />
+    <ListItemText primary={props.text} sx={{ opacity: open ? 1 : 0 }} />
   </ListItemButton>
   )
 

@@ -1,17 +1,13 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import { Matches, MatchInfo, General, PlayerStats, PlayerStat } from "./proto/match"
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import DisplayGeneral from "./Generals"
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import DisplayGeneral from "./Generals";
+import { General, PlayerStat, PlayerStats } from "./proto/match";
 
 
 

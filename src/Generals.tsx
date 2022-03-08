@@ -1,9 +1,8 @@
-import Typography from '@mui/material/Typography';
-import { General, generalToJSON } from "./proto/match"
-import gla from "./img/Gla.webp"
-import china from "./img/Gen_China_Logo.webp"
-import usa from "./img/Gen_USA_Logo.webp"
 import Avatar from '@mui/material/Avatar';
+import china from "./img/Gen_China_Logo.webp";
+import usa from "./img/Gen_USA_Logo.webp";
+import gla from "./img/Gla.webp";
+import { General } from "./proto/match";
 
 type Side = | "GLA" | "CHINA" | "USA"
 
@@ -39,7 +38,7 @@ function generalToSide(general: General): Side {
 export default function DisplayGeneral(props: { general: General }) {
   return (
     <>
-      <Avatar src={sideImg[generalToSide(props.general)]} />
+      <Avatar key={props.general} src={sideImg[generalToSide(props.general)]} />
       {/* <Typography>{generalToJSON(props.general)}</Typography> */}
     </>
   )

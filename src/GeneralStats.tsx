@@ -1,17 +1,13 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import { Matches, MatchInfo, General, GeneralStats, GeneralStat } from "./proto/match"
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import DisplayGeneral from "./Generals"
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import DisplayGeneral from "./Generals";
+import { General, GeneralStat, GeneralStats } from "./proto/match";
 
 
 
@@ -41,13 +37,13 @@ function DisplayGeneralStat(props: { stat: GeneralStat }) {
           <ListItemText primary={General[props.stat.general]} />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Total: (${overall?.wins ?? 0} : ${overall?.losses ?? 0}) ` } />
+          <ListItemText primary={`Total: (${overall?.wins ?? 0} : ${overall?.losses ?? 0}) `} />
         </ListItem>
-	<Divider/>
+        <Divider />
         {sorted.map(p =>
         (
-          <ListItem>
-            <ListItemText primary={`${p.playerName}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0})`} />
+          <ListItem key={p.playerName}>
+            <ListItemText key={p.playerName + "-text"} primary={`${p.playerName}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0})`} />
           </ListItem>
         )
         )}

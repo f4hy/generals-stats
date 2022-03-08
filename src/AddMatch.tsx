@@ -1,33 +1,23 @@
-import * as React from 'react';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import { MatchInfo, Player, General, Team, generalFromJSON } from "./proto/match"
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import List from '@mui/material/List';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import DisplayGeneral from "./Generals"
-import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormLabel from '@mui/material/FormLabel';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import FormLabel from '@mui/material/FormLabel';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import { Timestamp } from "./google/protobuf/timestamp";
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import enLocale from 'date-fns/locale/en-US';
+import * as React from 'react';
+import { General, generalFromJSON, MatchInfo, Player, Team } from "./proto/match";
+
 
 function saveMatch(match: MatchInfo) {
   const mybytes = MatchInfo.encode(match).finish()
@@ -48,7 +38,7 @@ export default function AddMatch() {
   const [players, setPlayers] = React.useState<string[]>(["Brendan", "Jared", "Sean", "Bill"]);
   const [teams, setTeams] = React.useState<(Team)[]>([1, 1, 3, 3]);
   const [generals, setGenerals] = React.useState<(General | undefined)[]>([undefined, undefined, undefined, undefined]);
-  const [date, setDate] = React.useState<Date|null >(
+  const [date, setDate] = React.useState<Date | null>(
     new Date(),
   );
   const [winner, setWinner] = React.useState<1 | 2 | 3 | 4>(1);
@@ -59,10 +49,10 @@ export default function AddMatch() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (passcode !== "qwer1234") {
-	alert("must have the pass code to save")
-	return
+      alert("must have the pass code to save")
+      return
     }
-      if(!date){
+    if (!date) {
       alert("date unset")
       return
 
@@ -193,7 +183,7 @@ export default function AddMatch() {
           />
         </FormControl>
         <Divider />
-	<Typography>{"id set to " + id}</Typography>
+        <Typography>{"id set to " + id}</Typography>
         <Button variant="contained" type="submit">Submit</Button>
 
       </form>
