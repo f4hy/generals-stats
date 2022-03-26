@@ -23,6 +23,7 @@ func SaveMatch(match *pb.MatchInfo) error {
 
 func GetMatches() (*pb.Matches, error) {
 	listing, err :=s3.List("matches/")
+	log.Infof("Found %d matchs", len(listing))
 	if err!=nil{
 		return nil, err
 	}

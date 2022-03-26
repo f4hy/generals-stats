@@ -20,29 +20,34 @@ function getMatches(callback: (m: Matches) => void) {
     .then(j => {
       console.log(j)
       const a = new Uint8Array(j)
-	const matches = Matches.decode(a)
-      matches.matches.sort((m1,m2)=> m1.id - m2.id)
+      const matches = Matches.decode(a)
+      matches.matches.sort((m1, m2) => m1.id - m2.id)
       callback(matches)
     }))
 }
 
 function DisplayMatchInfo(props: { match: MatchInfo }) {
+  const date: string = props.match.timestamp ? props.match.timestamp.toDateString() : "unknown"
+  const header = ("Match Id" + props.match.id
+    + " Date: " + date
+    + " on Map: " + props.match.map
+    + "  winner:" + props.match.winningTeam)
   return (
     <Paper>
       <List>
         <ListItem key="match">
-          <ListItemText key="match-text" primary={"Match Id" + props.match.id + " on Map: " + props.match.map + "  winner:" + props.match.winningTeam} />
+          <ListItemText key="match-text" primary={header} />
         </ListItem>
         {props.match.players.map(p =>
         (
-          <ListItem key={p.name +'-' + p.general} sx={{color:  p.team === props.match.winningTeam ? 'success.main' : 'error.main'}}>
-            <ListItemIcon key={p.name +'-' + p.general + '-icon'}>
+          <ListItem key={p.name + '-' + p.general} sx={{ color: p.team === props.match.winningTeam ? 'success.main' : 'error.main' }}>
+            <ListItemIcon key={p.name + '-' + p.general + '-icon'}>
               {p.team === props.match.winningTeam ? <EmojiEventsIcon /> : <ThumbDownIcon />}
             </ListItemIcon>
-	    <ListItemAvatar key={p.name +'-' + p.general + '-avatar'}>
-            <DisplayGeneral general={p.general} key={p.name +'-' + p.general + '-general'} />
-	    </ListItemAvatar>
-            <ListItemText primary={` Player: ${p.name.padEnd(50, ' ')}:` + General[p.general] + " team:" + p.team} key={p.name +'-' + p.general + '-text'} />
+            <ListItemAvatar key={p.name + '-' + p.general + '-avatar'}>
+              <DisplayGeneral general={p.general} key={p.name + '-' + p.general + '-general'} />
+            </ListItemAvatar>
+            <ListItemText primary={` Player: ${p.name.padEnd(50, ' ')}:` + General[p.general] + " team:" + p.team} key={p.name + '-' + p.general + '-text'} />
           </ListItem>
         )
         )}
@@ -59,9 +64,9 @@ export default function DisplayMatches() {
     getMatches(setMatchList)
 
   }, []);
-    return (<Paper>
-      
-      {/* <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button> */}
+  return (<Paper>
+
+    {/* <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button> */}
     <Typography>Will display this better later.</Typography>
     {matchList.matches.map(m => (<><DisplayMatchInfo match={m} key={m.id} /><Divider /></>))}
   </Paper>);
