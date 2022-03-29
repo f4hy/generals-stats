@@ -2,6 +2,7 @@ import { Stack } from '@devexpress/dx-react-chart';
 import {
   ArgumentAxis, BarSeries, Chart, ValueAxis
 } from '@devexpress/dx-react-chart-material-ui';
+import { ValueScale } from '@devexpress/dx-react-chart';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -29,7 +30,7 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
     }))
 }
 
-function DisplayGeneralStat(props: { stat: GeneralStat }) {
+function DisplayGeneralStat(props: { stat: GeneralStat , max: number}) {
   const sorted = props.stat.stats.sort((s1, s2) => s1.playerName.length - s2.playerName.length)
   const overall = props.stat.total
   let data = sorted.map(s => ({ name: s.playerName, wins: s.winLoss?.wins ?? 0, losses: s.winLoss?.losses ?? 0 }))
@@ -63,6 +64,8 @@ function DisplayGeneralStat(props: { stat: GeneralStat }) {
           <Chart data={data}>
             <ArgumentAxis />
             <ValueAxis />
+            <ValueScale modifyDomain={x => [0, props.max]} />
+
             <BarSeries valueField="wins" argumentField="name" name="wins" />
             <BarSeries valueField="losses" argumentField="name" name="losses" />
             <Stack />
@@ -73,18 +76,24 @@ function DisplayGeneralStat(props: { stat: GeneralStat }) {
     </Box>
   )
 }
+function roundUpNearest5(num: number) {
+  console.log("ceil is for " + num + ":" + Math.ceil(num / 5))
+  return Math.ceil(num / 5) * 5;
+}
 
 const empty = { generalStats: [] }
 
 export default function DisplayGeneralStats() {
   const [generalStats, setGeneralStats] = React.useState<GeneralStats>(empty);
+  const [maxWinLoss, setMaxWinLoss] = React.useState<number>(0);
   React.useEffect(() => {
     getGeneralStats(setGeneralStats)
-
+    const maxwl = generalStats.generalStats.reduce((acc, s) => Math.max(acc, s.total?.wins ?? 0 , s.total?.losses ?? 0), 0)
+    setMaxWinLoss(roundUpNearest5((maxwl) + 1))
   }, []);
   return (<Paper>
 
     {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
-    {generalStats.generalStats.map(m => (<><DisplayGeneralStat stat={m} /><Divider /></>))}
+    {generalStats.generalStats.map(m => (<><DisplayGeneralStat stat={m} max={maxWinLoss} /><Divider /></>))}
   </Paper>);
 }
