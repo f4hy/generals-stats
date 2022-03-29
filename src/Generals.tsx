@@ -1,8 +1,9 @@
 import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
 import china from "./img/Gen_China_Logo.webp";
 import usa from "./img/Gen_USA_Logo.webp";
 import gla from "./img/Gla.webp";
-import { General } from "./proto/match";
+import { General, generalToJSON } from "./proto/match";
 
 type Side = | "GLA" | "CHINA" | "USA"
 
@@ -38,7 +39,9 @@ function generalToSide(general: General): Side {
 export default function DisplayGeneral(props: { general: General }) {
   return (
     <>
-      <Avatar key={props.general} src={sideImg[generalToSide(props.general)]} />
+      <Badge badgeContent={General[props.general]} color="primary">
+        <Avatar key={props.general} src={sideImg[generalToSide(props.general)]} />
+      </Badge>
       {/* <Typography>{generalToJSON(props.general)}</Typography> */}
     </>
   )
