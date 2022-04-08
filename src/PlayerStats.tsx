@@ -1,11 +1,10 @@
-import { Stack } from "@devexpress/dx-react-chart";
+import { Stack, ValueScale } from "@devexpress/dx-react-chart";
 import {
   ArgumentAxis,
   BarSeries,
   Chart,
   ValueAxis,
 } from "@devexpress/dx-react-chart-material-ui";
-import { ValueScale } from "@devexpress/dx-react-chart";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
@@ -87,27 +86,23 @@ const empty = { playerStats: [] };
 
 export default function DisplayPlayerStats() {
   const [playerStats, setPlayerStats] = React.useState<PlayerStats>(empty);
-  const [maxWinLoss, setMaxWinLoss] = React.useState<number>(0);
   React.useEffect(() => {
     getPlayerStats(setPlayerStats);
-    const maxwl = playerStats.playerStats.reduce(
-      (acc, s) =>
-        Math.max(
-          acc,
-          s.stats.reduce(
-            (ac, x) =>
-              Math.max(ac, x.winLoss?.wins ?? 0, x.winLoss?.losses ?? 0),
-            0
-          )
-        ),
-      0
-    );
-    setMaxWinLoss(roundUpNearest10(maxwl + 1));
   }, []);
+  const maxwl = playerStats.playerStats.reduce(
+    (acc, s) =>
+      Math.max(
+        acc,
+        s.stats.reduce(
+          (ac, x) => Math.max(ac, x.winLoss?.wins ?? 0, x.winLoss?.losses ?? 0),
+          0
+        )
+      ),
+    0
+  );
+  const maxWinLoss = roundUpNearest10(maxwl + 1);
   return (
     <Paper>
-      {/* <Button variant="contained" onClick={() => getPlayerStats(setPlayerStats)} >Get Matches</Button> */}
-
       {playerStats.playerStats.map((m) => (
         <>
           <DisplayPlayerStat stat={m} max={maxWinLoss} />

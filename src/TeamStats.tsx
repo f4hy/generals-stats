@@ -1,13 +1,16 @@
 import { scaleBand } from "@devexpress/dx-chart-core";
 import {
   ArgumentScale,
-  EventTracker, ValueScale
+  EventTracker,
+  ValueScale,
 } from "@devexpress/dx-react-chart";
 import {
   ArgumentAxis,
   BarSeries,
-  Chart, Title,
-  Tooltip, ValueAxis
+  Chart,
+  Title,
+  Tooltip,
+  ValueAxis,
 } from "@devexpress/dx-react-chart-material-ui";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -71,7 +74,7 @@ export default function DisplayTeamStats() {
   }, []);
   const max = teamStats.teamStats.reduce((max, s) => Math.max(max, s.wins), 0);
   function reducer(totals: TeamStat[], next: TeamStat) {
-    const existing = totals.find((t) => t.team == next.team);
+    const existing = totals.find((t) => t.team === next.team);
     if (existing) {
       existing.wins += next.wins;
     } else {

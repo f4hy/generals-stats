@@ -1,11 +1,10 @@
-import { Stack } from "@devexpress/dx-react-chart";
+import { Stack, ValueScale } from "@devexpress/dx-react-chart";
 import {
   ArgumentAxis,
   BarSeries,
   Chart,
   ValueAxis,
 } from "@devexpress/dx-react-chart-material-ui";
-import { ValueScale } from "@devexpress/dx-react-chart";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
@@ -102,15 +101,14 @@ const empty = { generalStats: [] };
 
 export default function DisplayGeneralStats() {
   const [generalStats, setGeneralStats] = React.useState<GeneralStats>(empty);
-  const [maxWinLoss, setMaxWinLoss] = React.useState<number>(0);
   React.useEffect(() => {
     getGeneralStats(setGeneralStats);
-    const maxwl = generalStats.generalStats.reduce(
-      (acc, s) => Math.max(acc, s.total?.wins ?? 0, s.total?.losses ?? 0),
-      0
-    );
-    setMaxWinLoss(roundUpNearest5(maxwl + 1));
   }, []);
+  const maxwl = generalStats.generalStats.reduce(
+    (acc, s) => Math.max(acc, s.total?.wins ?? 0, s.total?.losses ?? 0),
+    0
+  );
+  const maxWinLoss = roundUpNearest5(maxwl + 1);
   return (
     <Paper>
       {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
