@@ -77,6 +77,22 @@ message GeneralStats {
   repeated GeneralStat general_stats = 1;
 }
 
+message Date {
+  int32 Year = 1;
+  int32 Month = 2;
+  int32 Day = 3;
+}
+
+message TeamStat {
+  Date date = 1;
+  Team team = 2;
+  int32 wins =3;
+}
+
+message TeamStats {
+  repeated TeamStat team_stats=1;
+}
+
 
 message SaveResponse {
   bool success = 1;

@@ -199,6 +199,22 @@ export interface GeneralStats {
   generalStats: GeneralStat[];
 }
 
+export interface DateMessage {
+  Year: number;
+  Month: number;
+  Day: number;
+}
+
+export interface TeamStat {
+  date: DateMessage | undefined;
+  team: Team;
+  wins: number;
+}
+
+export interface TeamStats {
+  teamStats: TeamStat[];
+}
+
 export interface SaveResponse {
   success: boolean;
 }
@@ -940,6 +956,215 @@ export const GeneralStats = {
     const message = createBaseGeneralStats();
     message.generalStats =
       object.generalStats?.map((e) => GeneralStat.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseDateMessage(): DateMessage {
+  return { Year: 0, Month: 0, Day: 0 };
+}
+
+export const DateMessage = {
+  encode(
+    message: DateMessage,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.Year !== 0) {
+      writer.uint32(8).int32(message.Year);
+    }
+    if (message.Month !== 0) {
+      writer.uint32(16).int32(message.Month);
+    }
+    if (message.Day !== 0) {
+      writer.uint32(24).int32(message.Day);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): DateMessage {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDateMessage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.Year = reader.int32();
+          break;
+        case 2:
+          message.Month = reader.int32();
+          break;
+        case 3:
+          message.Day = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DateMessage {
+    return {
+      Year: isSet(object.Year) ? Number(object.Year) : 0,
+      Month: isSet(object.Month) ? Number(object.Month) : 0,
+      Day: isSet(object.Day) ? Number(object.Day) : 0,
+    };
+  },
+
+  toJSON(message: DateMessage): unknown {
+    const obj: any = {};
+    message.Year !== undefined && (obj.Year = Math.round(message.Year));
+    message.Month !== undefined && (obj.Month = Math.round(message.Month));
+    message.Day !== undefined && (obj.Day = Math.round(message.Day));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<DateMessage>, I>>(
+    object: I
+  ): DateMessage {
+    const message = createBaseDateMessage();
+    message.Year = object.Year ?? 0;
+    message.Month = object.Month ?? 0;
+    message.Day = object.Day ?? 0;
+    return message;
+  },
+};
+
+function createBaseTeamStat(): TeamStat {
+  return { date: undefined, team: 0, wins: 0 };
+}
+
+export const TeamStat = {
+  encode(
+    message: TeamStat,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.date !== undefined) {
+      DateMessage.encode(message.date, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.team !== 0) {
+      writer.uint32(16).int32(message.team);
+    }
+    if (message.wins !== 0) {
+      writer.uint32(24).int32(message.wins);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TeamStat {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTeamStat();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.date = DateMessage.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.team = reader.int32() as any;
+          break;
+        case 3:
+          message.wins = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TeamStat {
+    return {
+      date: isSet(object.date) ? DateMessage.fromJSON(object.date) : undefined,
+      team: isSet(object.team) ? teamFromJSON(object.team) : 0,
+      wins: isSet(object.wins) ? Number(object.wins) : 0,
+    };
+  },
+
+  toJSON(message: TeamStat): unknown {
+    const obj: any = {};
+    message.date !== undefined &&
+      (obj.date = message.date ? DateMessage.toJSON(message.date) : undefined);
+    message.team !== undefined && (obj.team = teamToJSON(message.team));
+    message.wins !== undefined && (obj.wins = Math.round(message.wins));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<TeamStat>, I>>(object: I): TeamStat {
+    const message = createBaseTeamStat();
+    message.date =
+      object.date !== undefined && object.date !== null
+        ? DateMessage.fromPartial(object.date)
+        : undefined;
+    message.team = object.team ?? 0;
+    message.wins = object.wins ?? 0;
+    return message;
+  },
+};
+
+function createBaseTeamStats(): TeamStats {
+  return { teamStats: [] };
+}
+
+export const TeamStats = {
+  encode(
+    message: TeamStats,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.teamStats) {
+      TeamStat.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): TeamStats {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTeamStats();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.teamStats.push(TeamStat.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TeamStats {
+    return {
+      teamStats: Array.isArray(object?.teamStats)
+        ? object.teamStats.map((e: any) => TeamStat.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: TeamStats): unknown {
+    const obj: any = {};
+    if (message.teamStats) {
+      obj.teamStats = message.teamStats.map((e) =>
+        e ? TeamStat.toJSON(e) : undefined
+      );
+    } else {
+      obj.teamStats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<TeamStats>, I>>(
+    object: I
+  ): TeamStats {
+    const message = createBaseTeamStats();
+    message.teamStats =
+      object.teamStats?.map((e) => TeamStat.fromPartial(e)) || [];
     return message;
   },
 };
