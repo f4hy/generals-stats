@@ -1,6 +1,6 @@
 /* eslint-disable */
 import Long from "long";
-import _m0 from "protobufjs/minimal";
+import * as _m0 from "protobufjs/minimal";
 import { Timestamp } from "../google/protobuf/timestamp";
 
 export const protobufPackage = "matches";
@@ -97,6 +97,44 @@ export function generalToJSON(object: General): string {
   }
 }
 
+export enum Faction {
+  ANYUSA = 0,
+  ANYCHINA = 1,
+  ANYGLA = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function factionFromJSON(object: any): Faction {
+  switch (object) {
+    case 0:
+    case "ANYUSA":
+      return Faction.ANYUSA;
+    case 1:
+    case "ANYCHINA":
+      return Faction.ANYCHINA;
+    case 2:
+    case "ANYGLA":
+      return Faction.ANYGLA;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Faction.UNRECOGNIZED;
+  }
+}
+
+export function factionToJSON(object: Faction): string {
+  switch (object) {
+    case Faction.ANYUSA:
+      return "ANYUSA";
+    case Faction.ANYCHINA:
+      return "ANYCHINA";
+    case Faction.ANYGLA:
+      return "ANYGLA";
+    default:
+      return "UNKNOWN";
+  }
+}
+
 export enum Team {
   NONE = 0,
   ONE = 1,
@@ -173,10 +211,16 @@ export interface WinLoss {
 export interface PlayerStat {
   playerName: string;
   stats: PlayerStat_GeneralWL[];
+  factionStats: PlayerStat_FactionWL[];
 }
 
 export interface PlayerStat_GeneralWL {
   general: General;
+  winLoss: WinLoss | undefined;
+}
+
+export interface PlayerStat_FactionWL {
+  faction: Faction;
   winLoss: WinLoss | undefined;
 }
 
@@ -522,7 +566,7 @@ export const WinLoss = {
 };
 
 function createBasePlayerStat(): PlayerStat {
-  return { playerName: "", stats: [] };
+  return { playerName: "", stats: [], factionStats: [] };
 }
 
 export const PlayerStat = {
@@ -535,6 +579,9 @@ export const PlayerStat = {
     }
     for (const v of message.stats) {
       PlayerStat_GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.factionStats) {
+      PlayerStat_FactionWL.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -554,6 +601,11 @@ export const PlayerStat = {
             PlayerStat_GeneralWL.decode(reader, reader.uint32())
           );
           break;
+        case 3:
+          message.factionStats.push(
+            PlayerStat_FactionWL.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -568,6 +620,9 @@ export const PlayerStat = {
       stats: Array.isArray(object?.stats)
         ? object.stats.map((e: any) => PlayerStat_GeneralWL.fromJSON(e))
         : [],
+      factionStats: Array.isArray(object?.factionStats)
+        ? object.factionStats.map((e: any) => PlayerStat_FactionWL.fromJSON(e))
+        : [],
     };
   },
 
@@ -581,6 +636,13 @@ export const PlayerStat = {
     } else {
       obj.stats = [];
     }
+    if (message.factionStats) {
+      obj.factionStats = message.factionStats.map((e) =>
+        e ? PlayerStat_FactionWL.toJSON(e) : undefined
+      );
+    } else {
+      obj.factionStats = [];
+    }
     return obj;
   },
 
@@ -591,6 +653,9 @@ export const PlayerStat = {
     message.playerName = object.playerName ?? "";
     message.stats =
       object.stats?.map((e) => PlayerStat_GeneralWL.fromPartial(e)) || [];
+    message.factionStats =
+      object.factionStats?.map((e) => PlayerStat_FactionWL.fromPartial(e)) ||
+      [];
     return message;
   },
 };
@@ -662,6 +727,81 @@ export const PlayerStat_GeneralWL = {
   ): PlayerStat_GeneralWL {
     const message = createBasePlayerStat_GeneralWL();
     message.general = object.general ?? 0;
+    message.winLoss =
+      object.winLoss !== undefined && object.winLoss !== null
+        ? WinLoss.fromPartial(object.winLoss)
+        : undefined;
+    return message;
+  },
+};
+
+function createBasePlayerStat_FactionWL(): PlayerStat_FactionWL {
+  return { faction: 0, winLoss: undefined };
+}
+
+export const PlayerStat_FactionWL = {
+  encode(
+    message: PlayerStat_FactionWL,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.faction !== 0) {
+      writer.uint32(8).int32(message.faction);
+    }
+    if (message.winLoss !== undefined) {
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): PlayerStat_FactionWL {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerStat_FactionWL();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.faction = reader.int32() as any;
+          break;
+        case 2:
+          message.winLoss = WinLoss.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerStat_FactionWL {
+    return {
+      faction: isSet(object.faction) ? factionFromJSON(object.faction) : 0,
+      winLoss: isSet(object.winLoss)
+        ? WinLoss.fromJSON(object.winLoss)
+        : undefined,
+    };
+  },
+
+  toJSON(message: PlayerStat_FactionWL): unknown {
+    const obj: any = {};
+    message.faction !== undefined &&
+      (obj.faction = factionToJSON(message.faction));
+    message.winLoss !== undefined &&
+      (obj.winLoss = message.winLoss
+        ? WinLoss.toJSON(message.winLoss)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PlayerStat_FactionWL>, I>>(
+    object: I
+  ): PlayerStat_FactionWL {
+    const message = createBasePlayerStat_FactionWL();
+    message.faction = object.faction ?? 0;
     message.winLoss =
       object.winLoss !== undefined && object.winLoss !== null
         ? WinLoss.fromPartial(object.winLoss)

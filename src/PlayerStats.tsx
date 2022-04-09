@@ -1,4 +1,5 @@
-import { Stack, ValueScale } from "@devexpress/dx-react-chart";
+import { ValueScale } from "@devexpress/dx-react-chart";
+import { Stack as ChartStack } from "@devexpress/dx-react-chart";
 import {
   ArgumentAxis,
   BarSeries,
@@ -8,6 +9,7 @@ import {
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -15,7 +17,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import DisplayGeneral from "./Generals";
-import { General, PlayerStat, PlayerStats } from "./proto/match";
+import { General, Faction, PlayerStat, PlayerStats } from "./proto/match";
 
 function getPlayerStats(callback: (m: PlayerStats) => void) {
   fetch("/api/playerstats").then((r) =>
@@ -30,14 +32,20 @@ function getPlayerStats(callback: (m: PlayerStats) => void) {
   );
 }
 
-function roundUpNearest10(num: number) {
-  return Math.ceil(num / 10) * 10;
+function roundUpNearestN(num: number, N: number) {
+  return Math.ceil(num / N) * N;
 }
 
 function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
   const sorted = props.stat.stats.sort((s1, s2) => s1.general - s2.general);
   const data = sorted.map((p) => ({
     general: General[p.general],
+    wins: p.winLoss?.wins ?? 0,
+    losses: p.winLoss?.losses ?? 0,
+  }));
+  const faction_sorted = props.stat.factionStats.sort((s1, s2) => s1.faction - s2.faction);
+  const faction_data = faction_sorted.map((p) => ({
+    faction: Faction[p.faction],
     wins: p.winLoss?.wins ?? 0,
     losses: p.winLoss?.losses ?? 0,
   }));
@@ -55,30 +63,41 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
                   <DisplayGeneral general={p.general} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${
-                    p.winLoss?.losses ?? 0
-                  })`}
+                  primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0
+                    })`}
                 />
               </ListItem>
             ))}
           </List>
         </Grid>
-        <Grid item xs={9}>
-          <Chart data={data}>
+        <Grid item xs={9} >
+          <Chart data={faction_data} >
             <ArgumentAxis />
             <ValueAxis />
             <ValueScale modifyDomain={(x) => [0, props.max]} />
-            <BarSeries valueField="wins" argumentField="general" name="wins" />
+            <BarSeries valueField="wins" argumentField="faction" name="wins" />
             <BarSeries
               valueField="losses"
-              argumentField="general"
+              argumentField="faction"
               name="losses"
             />
-            <Stack />
+            <ChartStack />
           </Chart>
+            <Chart data={data}>
+              <ArgumentAxis />
+              <ValueAxis />
+              <ValueScale modifyDomain={(x) => [0, props.max]} />
+              <BarSeries valueField="wins" argumentField="general" name="wins" />
+              <BarSeries
+                valueField="losses"
+                argumentField="general"
+                name="losses"
+              />
+              <ChartStack />
+            </Chart>
         </Grid>
-      </Grid>
-    </Box>
+    </Grid>
+    </Box >
   );
 }
 
@@ -93,14 +112,14 @@ export default function DisplayPlayerStats() {
     (acc, s) =>
       Math.max(
         acc,
-        s.stats.reduce(
+        s.factionStats.reduce(
           (ac, x) => Math.max(ac, x.winLoss?.wins ?? 0, x.winLoss?.losses ?? 0),
           0
         )
       ),
     0
   );
-  const maxWinLoss = roundUpNearest10(maxwl + 1);
+  const maxWinLoss = roundUpNearestN(maxwl + 1, 2);
   return (
     <Paper>
       {playerStats.playerStats.map((m) => (

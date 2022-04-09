@@ -19,6 +19,12 @@ enum General {
   STEALTH=10;
   DEMO=11;
 }
+enum Faction {
+  ANYUSA=0;
+  ANYCHINA=1;
+  ANYGLA=2;
+}
+
 enum Team {
   NONE=0;
   ONE=1;
@@ -57,6 +63,11 @@ message PlayerStat {
     WinLoss win_loss = 2;
   }
   repeated GeneralWL stats =2;
+  message FactionWL {
+    Faction faction = 1;
+    WinLoss win_loss = 2;
+  }
+  repeated FactionWL faction_stats =3;
 }
 
 message PlayerStats {

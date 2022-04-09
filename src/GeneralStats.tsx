@@ -34,7 +34,7 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
 
 function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
   const sorted = props.stat.stats.sort(
-    (s1, s2) => s1.playerName.length - s2.playerName.length
+    (s1, s2) => s1.playerName.localeCompare(s2.playerName, 'en')
   );
   const overall = props.stat.total;
   let data = sorted.map((s) => ({

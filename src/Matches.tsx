@@ -19,8 +19,8 @@ function getMatches(callback: (m: Matches) => void) {
       .then((b) => b.arrayBuffer())
       .then((j) => {
         const a = new Uint8Array(j);
-        const matches = Matches.decode(a);
-        matches.matches.sort((m1, m2) => m1.id - m2.id);
+          const matches = Matches.decode(a);
+        matches.matches.sort((m1, m2) => (m1.timestamp?.getTime() ??0) - (m2.timestamp?.getTime() ?? 0 ));
         callback(matches);
       })
   );
