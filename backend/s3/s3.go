@@ -96,7 +96,7 @@ func List(path string) ([]string, error) {
 	input := &s3.ListObjectsV2Input{
 		Bucket:  aws.String(S3_BUCKET),
 		Prefix:  aws.String(path),
-		MaxKeys: aws.Int64(50),
+		MaxKeys: aws.Int64(1000),
 	}
 	results, err := svc.ListObjectsV2(input)
 	if err != nil {
