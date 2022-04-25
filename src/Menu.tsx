@@ -99,11 +99,11 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 type Selection =
-  | "AddMatch"
   | "Matches"
   | "GeneralStats"
   | "PlayerStats"
-  | "TeamStats";
+  | "TeamStats"
+/* | "AddMatch" */
 
 interface MenuItemProps {
   open: boolean;
@@ -125,8 +125,8 @@ function Main(props: { selection: Selection }) {
       return <DisplayGeneralStats />;
     case "TeamStats":
       return <DisplayTeamStats />;
-    case "AddMatch":
-      return <AddMatch />;
+    /* case "AddMatch":
+*   return <AddMatch />; */
     default:
       return <div>{props.selection}</div>;
   }
@@ -160,7 +160,7 @@ function MenuItem(props: MenuItemProps) {
 
 export default function Menu() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [selection, setSelection] = React.useState<Selection>("Matches");
 
   const handleDrawerOpen = () => {
@@ -234,7 +234,7 @@ export default function Menu() {
             callback={setSelection}
           />
         </List>
-        <Divider />
+        {/* <Divider />
         <List>
           <MenuItem
             value="AddMatch"
@@ -243,7 +243,7 @@ export default function Menu() {
             icon={<AddBoxIcon />}
             callback={setSelection}
           />
-        </List>
+        </List> */}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
