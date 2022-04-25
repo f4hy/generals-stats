@@ -10,7 +10,7 @@ import (
 )
 
 func SaveMatch(match *pb.MatchInfo) error {
-	path := fmt.Sprintf("matches/%d.json", match.GetId())
+	path := fmt.Sprintf("parsed-matches/%d.json", match.GetId())
 	dataToSave, err := proto.Marshal(match)
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func getMatch(c chan *pb.MatchInfo, matchpath string) {
 }
 
 func GetMatches() (*pb.Matches, error) {
-	listing, err := s3.List("matches/")
+	listing, err := s3.List("parsed-matches/")
 	log.Infof("Found %d matchs", len(listing))
 	if err != nil {
 		return nil, err
