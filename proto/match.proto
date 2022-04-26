@@ -104,11 +104,16 @@ message TeamStats {
   repeated TeamStat team_stats=1;
 }
 
+message MapStat {
+  string map = 1;
+  Team team = 2;
+  int32 wins =3;
+}
+
+message MapStats {
+  repeated MapStat map_stats=1;
+}
 
 message SaveResponse {
   bool success = 1;
 }
-// service MatchStats {
-//   // Save a Match
-//   rpc SaveMatch (MatchInfo) returns (SaveResponse) {}
-// }

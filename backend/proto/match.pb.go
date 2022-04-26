@@ -838,6 +838,116 @@ func (x *TeamStats) GetTeamStats() []*TeamStat {
 	return nil
 }
 
+type MapStat struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Map  string `protobuf:"bytes,1,opt,name=map,proto3" json:"map,omitempty"`
+	Team Team   `protobuf:"varint,2,opt,name=team,proto3,enum=matches.Team" json:"team,omitempty"`
+	Wins int32  `protobuf:"varint,3,opt,name=wins,proto3" json:"wins,omitempty"`
+}
+
+func (x *MapStat) Reset() {
+	*x = MapStat{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_match_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStat) ProtoMessage() {}
+
+func (x *MapStat) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_match_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStat.ProtoReflect.Descriptor instead.
+func (*MapStat) Descriptor() ([]byte, []int) {
+	return file_proto_match_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *MapStat) GetMap() string {
+	if x != nil {
+		return x.Map
+	}
+	return ""
+}
+
+func (x *MapStat) GetTeam() Team {
+	if x != nil {
+		return x.Team
+	}
+	return Team_NONE
+}
+
+func (x *MapStat) GetWins() int32 {
+	if x != nil {
+		return x.Wins
+	}
+	return 0
+}
+
+type MapStats struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	MapStats []*MapStat `protobuf:"bytes,1,rep,name=map_stats,json=mapStats,proto3" json:"map_stats,omitempty"`
+}
+
+func (x *MapStats) Reset() {
+	*x = MapStats{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_match_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStats) ProtoMessage() {}
+
+func (x *MapStats) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_match_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStats.ProtoReflect.Descriptor instead.
+func (*MapStats) Descriptor() ([]byte, []int) {
+	return file_proto_match_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *MapStats) GetMapStats() []*MapStat {
+	if x != nil {
+		return x.MapStats
+	}
+	return nil
+}
+
 type SaveResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -849,7 +959,7 @@ type SaveResponse struct {
 func (x *SaveResponse) Reset() {
 	*x = SaveResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_match_proto_msgTypes[11]
+		mi := &file_proto_match_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -862,7 +972,7 @@ func (x *SaveResponse) String() string {
 func (*SaveResponse) ProtoMessage() {}
 
 func (x *SaveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_match_proto_msgTypes[11]
+	mi := &file_proto_match_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -875,7 +985,7 @@ func (x *SaveResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveResponse.ProtoReflect.Descriptor instead.
 func (*SaveResponse) Descriptor() ([]byte, []int) {
-	return file_proto_match_proto_rawDescGZIP(), []int{11}
+	return file_proto_match_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SaveResponse) GetSuccess() bool {
@@ -897,7 +1007,7 @@ type PlayerStat_GeneralWL struct {
 func (x *PlayerStat_GeneralWL) Reset() {
 	*x = PlayerStat_GeneralWL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_match_proto_msgTypes[12]
+		mi := &file_proto_match_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -910,7 +1020,7 @@ func (x *PlayerStat_GeneralWL) String() string {
 func (*PlayerStat_GeneralWL) ProtoMessage() {}
 
 func (x *PlayerStat_GeneralWL) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_match_proto_msgTypes[12]
+	mi := &file_proto_match_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -952,7 +1062,7 @@ type PlayerStat_FactionWL struct {
 func (x *PlayerStat_FactionWL) Reset() {
 	*x = PlayerStat_FactionWL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_match_proto_msgTypes[13]
+		mi := &file_proto_match_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -965,7 +1075,7 @@ func (x *PlayerStat_FactionWL) String() string {
 func (*PlayerStat_FactionWL) ProtoMessage() {}
 
 func (x *PlayerStat_FactionWL) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_match_proto_msgTypes[13]
+	mi := &file_proto_match_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1007,7 +1117,7 @@ type GeneralStat_PlayerWL struct {
 func (x *GeneralStat_PlayerWL) Reset() {
 	*x = GeneralStat_PlayerWL{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_match_proto_msgTypes[14]
+		mi := &file_proto_match_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1020,7 +1130,7 @@ func (x *GeneralStat_PlayerWL) String() string {
 func (*GeneralStat_PlayerWL) ProtoMessage() {}
 
 func (x *GeneralStat_PlayerWL) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_match_proto_msgTypes[14]
+	mi := &file_proto_match_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1145,28 +1255,37 @@ var file_proto_match_proto_rawDesc = []byte{
 	0x74, 0x73, 0x12, 0x30, 0x0a, 0x0a, 0x74, 0x65, 0x61, 0x6d, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x73,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x65, 0x73,
 	0x2e, 0x54, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74, 0x52, 0x09, 0x74, 0x65, 0x61, 0x6d, 0x53,
-	0x74, 0x61, 0x74, 0x73, 0x22, 0x28, 0x0a, 0x0c, 0x53, 0x61, 0x76, 0x65, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x2a, 0x89,
-	0x01, 0x0a, 0x07, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x12, 0x07, 0x0a, 0x03, 0x55, 0x53,
-	0x41, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x49, 0x52, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05,
-	0x4c, 0x41, 0x53, 0x45, 0x52, 0x10, 0x02, 0x12, 0x09, 0x0a, 0x05, 0x53, 0x55, 0x50, 0x45, 0x52,
-	0x10, 0x03, 0x12, 0x09, 0x0a, 0x05, 0x43, 0x48, 0x49, 0x4e, 0x41, 0x10, 0x04, 0x12, 0x08, 0x0a,
-	0x04, 0x4e, 0x55, 0x4b, 0x45, 0x10, 0x05, 0x12, 0x08, 0x0a, 0x04, 0x54, 0x41, 0x4e, 0x4b, 0x10,
-	0x06, 0x12, 0x0c, 0x0a, 0x08, 0x49, 0x4e, 0x46, 0x41, 0x4e, 0x54, 0x52, 0x59, 0x10, 0x07, 0x12,
-	0x07, 0x0a, 0x03, 0x47, 0x4c, 0x41, 0x10, 0x08, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x4f, 0x58, 0x49,
-	0x4e, 0x10, 0x09, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x54, 0x45, 0x41, 0x4c, 0x54, 0x48, 0x10, 0x0a,
-	0x12, 0x08, 0x0a, 0x04, 0x44, 0x45, 0x4d, 0x4f, 0x10, 0x0b, 0x2a, 0x2f, 0x0a, 0x07, 0x46, 0x61,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x4e, 0x59, 0x55, 0x53, 0x41, 0x10,
-	0x00, 0x12, 0x0c, 0x0a, 0x08, 0x41, 0x4e, 0x59, 0x43, 0x48, 0x49, 0x4e, 0x41, 0x10, 0x01, 0x12,
-	0x0a, 0x0a, 0x06, 0x41, 0x4e, 0x59, 0x47, 0x4c, 0x41, 0x10, 0x02, 0x2a, 0x37, 0x0a, 0x04, 0x54,
-	0x65, 0x61, 0x6d, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x00, 0x12, 0x07, 0x0a,
-	0x03, 0x4f, 0x4e, 0x45, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x57, 0x4f, 0x10, 0x02, 0x12,
-	0x09, 0x0a, 0x05, 0x54, 0x48, 0x52, 0x45, 0x45, 0x10, 0x03, 0x12, 0x08, 0x0a, 0x04, 0x46, 0x4f,
-	0x55, 0x52, 0x10, 0x04, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x66, 0x34, 0x68, 0x79, 0x2f, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x73,
-	0x73, 0x74, 0x61, 0x74, 0x73, 0x3b, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x73, 0x74,
-	0x61, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x61, 0x74, 0x73, 0x22, 0x52, 0x0a, 0x07, 0x4d, 0x61, 0x70, 0x53, 0x74, 0x61, 0x74, 0x12,
+	0x10, 0x0a, 0x03, 0x6d, 0x61, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x61,
+	0x70, 0x12, 0x21, 0x0a, 0x04, 0x74, 0x65, 0x61, 0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x0d, 0x2e, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x65, 0x73, 0x2e, 0x54, 0x65, 0x61, 0x6d, 0x52, 0x04,
+	0x74, 0x65, 0x61, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x77, 0x69, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x05, 0x52, 0x04, 0x77, 0x69, 0x6e, 0x73, 0x22, 0x39, 0x0a, 0x08, 0x4d, 0x61, 0x70, 0x53,
+	0x74, 0x61, 0x74, 0x73, 0x12, 0x2d, 0x0a, 0x09, 0x6d, 0x61, 0x70, 0x5f, 0x73, 0x74, 0x61, 0x74,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x65,
+	0x73, 0x2e, 0x4d, 0x61, 0x70, 0x53, 0x74, 0x61, 0x74, 0x52, 0x08, 0x6d, 0x61, 0x70, 0x53, 0x74,
+	0x61, 0x74, 0x73, 0x22, 0x28, 0x0a, 0x0c, 0x53, 0x61, 0x76, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x2a, 0x89, 0x01,
+	0x0a, 0x07, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x12, 0x07, 0x0a, 0x03, 0x55, 0x53, 0x41,
+	0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x49, 0x52, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x4c,
+	0x41, 0x53, 0x45, 0x52, 0x10, 0x02, 0x12, 0x09, 0x0a, 0x05, 0x53, 0x55, 0x50, 0x45, 0x52, 0x10,
+	0x03, 0x12, 0x09, 0x0a, 0x05, 0x43, 0x48, 0x49, 0x4e, 0x41, 0x10, 0x04, 0x12, 0x08, 0x0a, 0x04,
+	0x4e, 0x55, 0x4b, 0x45, 0x10, 0x05, 0x12, 0x08, 0x0a, 0x04, 0x54, 0x41, 0x4e, 0x4b, 0x10, 0x06,
+	0x12, 0x0c, 0x0a, 0x08, 0x49, 0x4e, 0x46, 0x41, 0x4e, 0x54, 0x52, 0x59, 0x10, 0x07, 0x12, 0x07,
+	0x0a, 0x03, 0x47, 0x4c, 0x41, 0x10, 0x08, 0x12, 0x09, 0x0a, 0x05, 0x54, 0x4f, 0x58, 0x49, 0x4e,
+	0x10, 0x09, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x54, 0x45, 0x41, 0x4c, 0x54, 0x48, 0x10, 0x0a, 0x12,
+	0x08, 0x0a, 0x04, 0x44, 0x45, 0x4d, 0x4f, 0x10, 0x0b, 0x2a, 0x2f, 0x0a, 0x07, 0x46, 0x61, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x4e, 0x59, 0x55, 0x53, 0x41, 0x10, 0x00,
+	0x12, 0x0c, 0x0a, 0x08, 0x41, 0x4e, 0x59, 0x43, 0x48, 0x49, 0x4e, 0x41, 0x10, 0x01, 0x12, 0x0a,
+	0x0a, 0x06, 0x41, 0x4e, 0x59, 0x47, 0x4c, 0x41, 0x10, 0x02, 0x2a, 0x37, 0x0a, 0x04, 0x54, 0x65,
+	0x61, 0x6d, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03,
+	0x4f, 0x4e, 0x45, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x57, 0x4f, 0x10, 0x02, 0x12, 0x09,
+	0x0a, 0x05, 0x54, 0x48, 0x52, 0x45, 0x45, 0x10, 0x03, 0x12, 0x08, 0x0a, 0x04, 0x46, 0x4f, 0x55,
+	0x52, 0x10, 0x04, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x66, 0x34, 0x68, 0x79, 0x2f, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x73,
+	0x74, 0x61, 0x74, 0x73, 0x3b, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x73, 0x74, 0x61,
+	0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1182,7 +1301,7 @@ func file_proto_match_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_match_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_proto_match_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_proto_match_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_proto_match_proto_goTypes = []interface{}{
 	(General)(0),                  // 0: matches.General
 	(Faction)(0),                  // 1: matches.Faction
@@ -1198,39 +1317,43 @@ var file_proto_match_proto_goTypes = []interface{}{
 	(*Date)(nil),                  // 11: matches.Date
 	(*TeamStat)(nil),              // 12: matches.TeamStat
 	(*TeamStats)(nil),             // 13: matches.TeamStats
-	(*SaveResponse)(nil),          // 14: matches.SaveResponse
-	(*PlayerStat_GeneralWL)(nil),  // 15: matches.PlayerStat.GeneralWL
-	(*PlayerStat_FactionWL)(nil),  // 16: matches.PlayerStat.FactionWL
-	(*GeneralStat_PlayerWL)(nil),  // 17: matches.GeneralStat.PlayerWL
-	(*timestamppb.Timestamp)(nil), // 18: google.protobuf.Timestamp
+	(*MapStat)(nil),               // 14: matches.MapStat
+	(*MapStats)(nil),              // 15: matches.MapStats
+	(*SaveResponse)(nil),          // 16: matches.SaveResponse
+	(*PlayerStat_GeneralWL)(nil),  // 17: matches.PlayerStat.GeneralWL
+	(*PlayerStat_FactionWL)(nil),  // 18: matches.PlayerStat.FactionWL
+	(*GeneralStat_PlayerWL)(nil),  // 19: matches.GeneralStat.PlayerWL
+	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
 }
 var file_proto_match_proto_depIdxs = []int32{
 	0,  // 0: matches.Player.general:type_name -> matches.General
 	2,  // 1: matches.Player.team:type_name -> matches.Team
-	18, // 2: matches.MatchInfo.timestamp:type_name -> google.protobuf.Timestamp
+	20, // 2: matches.MatchInfo.timestamp:type_name -> google.protobuf.Timestamp
 	2,  // 3: matches.MatchInfo.winning_team:type_name -> matches.Team
 	3,  // 4: matches.MatchInfo.players:type_name -> matches.Player
 	4,  // 5: matches.Matches.matches:type_name -> matches.MatchInfo
-	15, // 6: matches.PlayerStat.stats:type_name -> matches.PlayerStat.GeneralWL
-	16, // 7: matches.PlayerStat.faction_stats:type_name -> matches.PlayerStat.FactionWL
+	17, // 6: matches.PlayerStat.stats:type_name -> matches.PlayerStat.GeneralWL
+	18, // 7: matches.PlayerStat.faction_stats:type_name -> matches.PlayerStat.FactionWL
 	7,  // 8: matches.PlayerStats.player_stats:type_name -> matches.PlayerStat
 	0,  // 9: matches.GeneralStat.general:type_name -> matches.General
-	17, // 10: matches.GeneralStat.stats:type_name -> matches.GeneralStat.PlayerWL
+	19, // 10: matches.GeneralStat.stats:type_name -> matches.GeneralStat.PlayerWL
 	6,  // 11: matches.GeneralStat.total:type_name -> matches.WinLoss
 	9,  // 12: matches.GeneralStats.general_stats:type_name -> matches.GeneralStat
 	11, // 13: matches.TeamStat.date:type_name -> matches.Date
 	2,  // 14: matches.TeamStat.team:type_name -> matches.Team
 	12, // 15: matches.TeamStats.team_stats:type_name -> matches.TeamStat
-	0,  // 16: matches.PlayerStat.GeneralWL.general:type_name -> matches.General
-	6,  // 17: matches.PlayerStat.GeneralWL.win_loss:type_name -> matches.WinLoss
-	1,  // 18: matches.PlayerStat.FactionWL.faction:type_name -> matches.Faction
-	6,  // 19: matches.PlayerStat.FactionWL.win_loss:type_name -> matches.WinLoss
-	6,  // 20: matches.GeneralStat.PlayerWL.win_loss:type_name -> matches.WinLoss
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	2,  // 16: matches.MapStat.team:type_name -> matches.Team
+	14, // 17: matches.MapStats.map_stats:type_name -> matches.MapStat
+	0,  // 18: matches.PlayerStat.GeneralWL.general:type_name -> matches.General
+	6,  // 19: matches.PlayerStat.GeneralWL.win_loss:type_name -> matches.WinLoss
+	1,  // 20: matches.PlayerStat.FactionWL.faction:type_name -> matches.Faction
+	6,  // 21: matches.PlayerStat.FactionWL.win_loss:type_name -> matches.WinLoss
+	6,  // 22: matches.GeneralStat.PlayerWL.win_loss:type_name -> matches.WinLoss
+	23, // [23:23] is the sub-list for method output_type
+	23, // [23:23] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_proto_match_proto_init() }
@@ -1372,7 +1495,7 @@ func file_proto_match_proto_init() {
 			}
 		}
 		file_proto_match_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SaveResponse); i {
+			switch v := v.(*MapStat); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1384,7 +1507,7 @@ func file_proto_match_proto_init() {
 			}
 		}
 		file_proto_match_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PlayerStat_GeneralWL); i {
+			switch v := v.(*MapStats); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1396,7 +1519,7 @@ func file_proto_match_proto_init() {
 			}
 		}
 		file_proto_match_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PlayerStat_FactionWL); i {
+			switch v := v.(*SaveResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1408,6 +1531,30 @@ func file_proto_match_proto_init() {
 			}
 		}
 		file_proto_match_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PlayerStat_GeneralWL); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_match_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PlayerStat_FactionWL); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_match_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GeneralStat_PlayerWL); i {
 			case 0:
 				return &v.state
@@ -1426,7 +1573,7 @@ func file_proto_match_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_match_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

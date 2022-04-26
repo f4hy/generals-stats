@@ -13,6 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MapIcon from '@mui/icons-material/Map';
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -24,6 +25,7 @@ import DisplayMatches from "./Matches";
 import DisplayPlayerStats from "./PlayerStats";
 import DisplayGeneralStats from "./GeneralStats";
 import DisplayTeamStats from "./TeamStats";
+import DisplayMapStats from "./MapStats";
 import PeopleIcon from "@mui/icons-material/People";
 import AddMatch from "./AddMatch";
 
@@ -103,6 +105,7 @@ type Selection =
   | "GeneralStats"
   | "PlayerStats"
   | "TeamStats"
+  | "MapStats"
 /* | "AddMatch" */
 
 interface MenuItemProps {
@@ -125,6 +128,8 @@ function Main(props: { selection: Selection }) {
       return <DisplayGeneralStats />;
     case "TeamStats":
       return <DisplayTeamStats />;
+    case "MapStats":
+      return <DisplayMapStats />;
     /* case "AddMatch":
 *   return <AddMatch />; */
     default:
@@ -231,6 +236,13 @@ export default function Menu() {
             text="General Stats"
             open={open}
             icon={<MilitaryTechIcon />}
+            callback={setSelection}
+          />
+          <MenuItem
+            value="MapStats"
+            text="Map Stats"
+            open={open}
+            icon={<MapIcon />}
             callback={setSelection}
           />
         </List>

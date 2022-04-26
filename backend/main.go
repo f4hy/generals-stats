@@ -66,6 +66,10 @@ func main() {
                         ts := data.TeamStats()
                         c.ProtoBuf(http.StatusOK, ts)
                 })
+                api.GET("/mapstats", func(c *gin.Context) {
+                        ts := data.MapStats()
+                        c.ProtoBuf(http.StatusOK, ts)
+                })
                 api.POST("/saveMatch", func(c *gin.Context) {
                         match := &pb.MatchInfo{}
                         c.Bind(match)

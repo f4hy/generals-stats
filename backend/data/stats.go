@@ -173,3 +173,28 @@ func TeamStats() *pb.TeamStats {
 	})
 	return &teamstats
 }
+
+type team_and_map struct{
+	team pb.Team;
+	played_map string;
+}
+
+func MapStats() *pb.MapStats {
+	var teamstats pb.MapStats
+	team_map_map := make(map[team_and_map]int)
+
+	matches, _ := GetMatches()
+	for _, m := range matches.Matches {
+		tam := team_and_map{team: m.WinningTeam, played_map: m.Map}
+		team_map_map[tam] += 1
+	}
+	for t_and_m, wins := range team_map_map {
+		mapstats := &pb.MapStat{
+			Map: t_and_m.played_map,
+			Team: t_and_m.team,
+			Wins: int32(wins),
+		}
+		teamstats.MapStats = append(teamstats.MapStats, mapstats)
+	}
+	return &teamstats
+}

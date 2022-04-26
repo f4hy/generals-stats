@@ -259,6 +259,16 @@ export interface TeamStats {
   teamStats: TeamStat[];
 }
 
+export interface MapStat {
+  map: string;
+  team: Team;
+  wins: number;
+}
+
+export interface MapStats {
+  mapStats: MapStat[];
+}
+
 export interface SaveResponse {
   success: boolean;
 }
@@ -1305,6 +1315,137 @@ export const TeamStats = {
     const message = createBaseTeamStats();
     message.teamStats =
       object.teamStats?.map((e) => TeamStat.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMapStat(): MapStat {
+  return { map: "", team: 0, wins: 0 };
+}
+
+export const MapStat = {
+  encode(
+    message: MapStat,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.map !== "") {
+      writer.uint32(10).string(message.map);
+    }
+    if (message.team !== 0) {
+      writer.uint32(16).int32(message.team);
+    }
+    if (message.wins !== 0) {
+      writer.uint32(24).int32(message.wins);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MapStat {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMapStat();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.map = reader.string();
+          break;
+        case 2:
+          message.team = reader.int32() as any;
+          break;
+        case 3:
+          message.wins = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MapStat {
+    return {
+      map: isSet(object.map) ? String(object.map) : "",
+      team: isSet(object.team) ? teamFromJSON(object.team) : 0,
+      wins: isSet(object.wins) ? Number(object.wins) : 0,
+    };
+  },
+
+  toJSON(message: MapStat): unknown {
+    const obj: any = {};
+    message.map !== undefined && (obj.map = message.map);
+    message.team !== undefined && (obj.team = teamToJSON(message.team));
+    message.wins !== undefined && (obj.wins = Math.round(message.wins));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MapStat>, I>>(object: I): MapStat {
+    const message = createBaseMapStat();
+    message.map = object.map ?? "";
+    message.team = object.team ?? 0;
+    message.wins = object.wins ?? 0;
+    return message;
+  },
+};
+
+function createBaseMapStats(): MapStats {
+  return { mapStats: [] };
+}
+
+export const MapStats = {
+  encode(
+    message: MapStats,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.mapStats) {
+      MapStat.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MapStats {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMapStats();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.mapStats.push(MapStat.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MapStats {
+    return {
+      mapStats: Array.isArray(object?.mapStats)
+        ? object.mapStats.map((e: any) => MapStat.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: MapStats): unknown {
+    const obj: any = {};
+    if (message.mapStats) {
+      obj.mapStats = message.mapStats.map((e) =>
+        e ? MapStat.toJSON(e) : undefined
+      );
+    } else {
+      obj.mapStats = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MapStats>, I>>(object: I): MapStats {
+    const message = createBaseMapStats();
+    message.mapStats =
+      object.mapStats?.map((e) => MapStat.fromPartial(e)) || [];
     return message;
   },
 };
