@@ -69,8 +69,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
   const data = props.stats.teamStats.reduce(reducer, (initial))
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Container>
-        <ResponsiveContainer width="95%" height={500}>
+        <ResponsiveContainer width="90%" height={500}>
           <LineChart
             height={300}
             data={data}
@@ -86,11 +85,10 @@ function RecordOverTime(props: { stats: TeamStats }) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line dataKey="team1" stroke="#8884d8" strokeWidth={3}/>
-            <Line dataKey="team3" stroke="#82ca9d" strokeWidth={3}/>
+            <Line dataKey="team1" stroke="#82ca9d" strokeWidth={3}/>
+            <Line dataKey="team3" stroke="#8884d8" strokeWidth={3}/>
           </LineChart>
         </ResponsiveContainer>
-      </Container>
     </Box>
 
   )
@@ -107,16 +105,14 @@ function DisplayTeamStat(props: {
 
     <Box sx={{ flexGrow: 1 }}>
       <h3>{props.title}</h3>
-      <Container>
-        <ResponsiveContainer width="95%" height={300}>
+        <ResponsiveContainer width="90%" height={300}>
           <BarChart data={data} layout="horizontal">
             <Bar dataKey="wins" fill="#8884d8" />
             <XAxis dataKey="team" label="team" />
-            <YAxis domain={[0, props.max]} />
+            <YAxis domain={[0, props.max]} label="wins" />
             <Tooltip cursor={false} />
           </BarChart>
         </ResponsiveContainer>
-      </Container>
     </Box>
   );
 }
