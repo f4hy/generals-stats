@@ -11,10 +11,10 @@ import (
 
 	"github.com/bill-rich/cncstats/pkg/zhreplay"
 	"github.com/bill-rich/cncstats/pkg/zhreplay/object"
+	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/samber/lo"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-        data "github.com/f4hy/generals-stats/backend/data"
 )
 
 func general_parse(generalstr string) pb.General {
@@ -41,47 +41,81 @@ func general_parse(generalstr string) pb.General {
 }
 
 func player_parse(playername string) string {
-	if(playername == "Modus"){return "Brendan"}
-	if(playername == "OneThree111"){return "Bill"}
-	if(playername == "jbb"){return "Jared"}
-	if(playername == "Ye_Ole_Seans"){return "Sean"}
+	if playername == "Modus" {
+		return "Brendan"
+	}
+	if playername == "OneThree111" {
+		return "Bill"
+	}
+	if playername == "jbb" {
+		return "Jared"
+	}
+	if playername == "Ye_Ole_Seans" {
+		return "Sean"
+	}
 	log.Fatal("unkown player" + playername)
 	return ""
 }
 
-func parse_file(filename string) (*pb.MatchInfo, error) {
+func parse_file(filename string) (*pb.MatchInfo, *pb.AllCosts, error) {
 	data, err := ioutil.ReadFile(filename)
 	replay := zhreplay.Replay{}
 	err = json.Unmarshal(data, &replay)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 	}
 	h := replay.Header
 	date := time.Date(h.Year, time.Month(h.Month), h.Day, h.Hour, h.Minute, h.Second, h.Millisecond, time.UTC)
 	timestamp := timestamppb.New(date)
-	fmt.Println("data:", replay.Header.Metadata.MapFile)
+	match_id := int64(timestamp.Seconds)
+	costs := pb.AllCosts{
+		MatchId: match_id,
+	}
+	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	winner, found := lo.Find(replay.Summary, func(p *object.PlayerSummary) bool {
 		return p.Win
 	})
 	if !found {
 		log.Println("no winnner??")
-		return &pb.MatchInfo{}, errors.New("Could not determine winner")
+		return &pb.MatchInfo{}, &costs, errors.New("Could not determine winner")
 	}
 	match := pb.MatchInfo{
-		Id:          int32(timestamp.Seconds),
+		Id:          match_id,
 		Timestamp:   timestamp,
 		Map:         replay.Header.Metadata.MapFile,
 		WinningTeam: pb.Team(winner.Team),
 	}
 	for _, i := range replay.Summary {
 		// fmt.Printf("Name: %s : %s: %t %d\n", i.Name, i.Side, i.Win, i.Team)
-		match.Players = append(match.Players, &pb.Player{
+		player := &pb.Player{
 			Name:    player_parse(i.Name),
 			General: general_parse(i.Side),
 			Team:    pb.Team(i.Team),
-		})
+		}
+		match.Players = append(match.Players, player)
+		cost := &pb.Costs{
+			Player: player,
+		}
+		for bname, building := range i.BuildingsBuilt {
+			built := pb.Costs_BuiltObject{
+				Name:       bname,
+				Count:      int32(building.Count),
+				TotalSpent: int32(building.TotalSpent),
+			}
+			cost.Buildings = append(cost.Buildings, &built)
+
+		}
+		for uname, unit := range i.UnitsCreated {
+			created_unit := pb.Costs_BuiltObject{
+				Name:       uname,
+				Count:      int32(unit.Count),
+				TotalSpent: int32(unit.TotalSpent),
+			}
+			cost.Units = append(cost.Units, &created_unit)
+		}
+		costs.Costs = append(costs.Costs, cost)
 	}
-	return &match, nil
+	return &match, &costs, nil
 }
 
 func main() {
@@ -94,15 +128,19 @@ func main() {
 	for _, file := range files {
 		fmt.Println(file.Name(), file.IsDir())
 		if strings.Contains(file.Name(), ".json") && strings.Contains(file.Name(), "2v2") && strings.Contains(file.Name(), "jbb") {
-			fmt.Println("parsing!! ", file.Name())
-			result, err := parse_file("./jsons/" + file.Name())
+			// fmt.Println("parsing!! ", file.Name())
+			result, costs, err := parse_file("./jsons/" + file.Name())
 			if err != nil {
 				fmt.Println("could not parse file", file.Name())
 			} else {
-				fmt.Println("Match result:", result.Timestamp.AsTime())
+				// fmt.Println("Match result:", result.Timestamp.AsTime())
+				_ = result
+				_ = costs
+				fmt.Println("costs :", costs)
 				data.SaveMatch(result)
+				data.SaveCosts(costs)
 			}
-			
+
 		}
 	}
 }

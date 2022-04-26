@@ -4,7 +4,7 @@ import (
         "fmt"
         "net/http"
         "os"
-
+	"strconv"
         "github.com/gin-contrib/cors"
         "github.com/gin-gonic/gin"
         log "github.com/golang/glog"
@@ -70,6 +70,17 @@ func main() {
                         ts := data.MapStats()
                         c.ProtoBuf(http.StatusOK, ts)
                 })
+                api.GET("/costs/:matchid", func(c *gin.Context) {
+			matchidstr:= c.Param("matchid")
+			matchid, err := strconv.ParseInt(matchidstr, 10, 0)
+                        if err != nil {
+                                log.Error(err)
+                                c.AbortWithError(http.StatusInternalServerError, err)
+                                return
+                        }
+                        ts, err := data.GetCosts(matchid)
+                        c.ProtoBuf(http.StatusOK, ts)
+                })
                 api.POST("/saveMatch", func(c *gin.Context) {
                         match := &pb.MatchInfo{}
                         c.Bind(match)
@@ -80,17 +91,6 @@ func main() {
                                 return
                         }
                         c.String(http.StatusOK, "Saved Match")
-                        // request2 := &pb.MatchInfo{}
-                        // b,err := c.GetRawData()
-                        // // fmt.Println(b)
-                        // // log.Error(err)
-                        // proto.Unmarshal(b, request2)
-                        // fmt.Println("1 " + request.GetMap())
-                        // fmt.Println("2 " + request2.GetMap())
-                        // j,err := protojson.Marshal(request)
-                        // fmt.Println("json?" + string(j))
-                        // log.Error(err)
-                        // c.ProtoBuf(http.StatusOK, request)
                 })
                 api.GET("/health", func(c *gin.Context) {
                         c.JSON(http.StatusOK, gin.H{"status": "ok"})

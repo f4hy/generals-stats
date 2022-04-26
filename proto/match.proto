@@ -40,7 +40,7 @@ message Player {
 }
 
 message MatchInfo {
-  int32 id = 1;
+  int64 id = 1;
   google.protobuf.Timestamp timestamp = 2;
   string map = 3;
   Team winning_team = 4;
@@ -116,4 +116,21 @@ message MapStats {
 
 message SaveResponse {
   bool success = 1;
+}
+
+
+message Costs {
+  Player player = 2;
+  message BuiltObject {
+    string name = 1;
+    int32 count = 2;
+    int32 total_spent = 3;
+  }
+  repeated BuiltObject buildings = 3;
+  repeated BuiltObject units = 4;
+}
+
+message AllCosts {
+  int64 match_id = 1;
+  repeated Costs costs = 2;
 }

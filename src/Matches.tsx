@@ -7,10 +7,13 @@ import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import DisplayGeneral from "./Generals";
 import { Matches, MatchInfo } from "./proto/match";
+import CostBreakdown from "./CostBreakdown";
+
 
 function getMatches(callback: (m: Matches) => void) {
   fetch("/api/matches").then((r) =>
@@ -27,6 +30,7 @@ function getMatches(callback: (m: Matches) => void) {
 }
 
 function DisplayMatchInfo(props: { match: MatchInfo }) {
+  const [details, setDetails] = React.useState<boolean>(false);
   const date: string = props.match.timestamp
     ? props.match.timestamp.toDateString()
     : "unknown";
@@ -119,6 +123,8 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
           </Grid>
         ))}
       </Grid>
+      <Button variant="contained" onClick={() => setDetails(!details)}>Match Details</Button>
+      {details ? (<CostBreakdown id={props.match.id} />) : (<Divider />)}
     </Paper>
   );
 }
@@ -134,9 +140,9 @@ export default function DisplayMatches() {
     <Paper>
       {/* <Button variant="contained" onClick={() => getMatches(setMatchList)} >Get Matches</Button> */}
       <Typography>Will display this better later.</Typography>
-      {matchList.matches.map((m) => (
+      {matchList.matches.map((m,i) => (
         <>
-          <DisplayMatchInfo match={m} key={m.id} />
+            <DisplayMatchInfo match={m} key={m.id} />
           <Divider />
         </>
       ))}

@@ -9,6 +9,18 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+func SaveCosts(costs *pb.AllCosts) error {
+	path := fmt.Sprintf("match-costs/%d.json", costs.MatchId)
+	dataToSave, err := proto.Marshal(costs)
+	if err != nil {
+		return err
+	}
+	log.Infof("Saving costs to %s", path)
+	err = s3.AddDataToS3(path, dataToSave)
+	return err
+}
+
+
 func SaveMatch(match *pb.MatchInfo) error {
 	path := fmt.Sprintf("parsed-matches/%d.json", match.GetId())
 	dataToSave, err := proto.Marshal(match)
@@ -48,4 +60,16 @@ func GetMatches() (*pb.Matches, error) {
 	return &pb.Matches{
 		Matches: matches,
 	}, nil
+}
+
+func GetCosts(match_id int64) (*pb.AllCosts, error){
+	path := fmt.Sprintf("match-costs/%d.json", match_id)
+	log.Infof("fetching match %s", path)
+	costs := &pb.AllCosts{}
+	costdata, err := s3.GetS3Data(path)
+	if(err != nil){
+		return costs, err
+	}
+	proto.Unmarshal(costdata, costs)
+	return costs, nil
 }

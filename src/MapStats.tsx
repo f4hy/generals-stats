@@ -9,6 +9,7 @@ import _ from "lodash";
 import * as React from "react";
 import { DateMessage, MapStats, MapStat } from "./proto/match";
 
+
 function getMapStats(callback: (m: MapStats) => void) {
   fetch("/api/mapstats").then((r) =>
     r
@@ -73,21 +74,21 @@ export default function DisplayMapstats() {
     function reducer(reds: Red[], next: MapStat) {
 	const nmap = next.map.split("/").pop()
 	if(!nmap){return reds}
-    const found = reds.find(r => r.map == nmap)
+    const found = reds.find(r => r.map === nmap)
 
     if (found) {
-      if (next.team == 1) {
+      if (next.team === 1) {
         found.team1 += next.wins
       }
-      if (next.team == 3) {
+      if (next.team === 3) {
         found.team3 += next.wins
       }
       return reds
     }
     const n: Red = {
       map: nmap,
-      team1: next.team == 1 ? next.wins : 0,
-      team3: next.team == 3 ? next.wins : 0,
+      team1: next.team === 1 ? next.wins : 0,
+      team3: next.team === 3 ? next.wins : 0,
     }
     return [...reds, n]
 

@@ -1,13 +1,10 @@
-import { scaleBand } from "@devexpress/dx-chart-core";
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { LineChart, Line } from 'recharts';
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import _ from "lodash";
 import * as React from "react";
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { DateMessage, TeamStat, TeamStats } from "./proto/match";
 
 function getTeamStats(callback: (m: TeamStats) => void) {
@@ -56,10 +53,10 @@ function RecordOverTime(props: { stats: TeamStats }) {
       toAdd.team1 += last.team1
       toAdd.team3 += last.team3
     }
-    if (next.team == 1) {
+    if (next.team === 1) {
       toAdd.team1 += next.wins
     }
-    if (next.team == 3) {
+    if (next.team === 3) {
       toAdd.team3 += next.wins
     }
     return [...acc, toAdd]
@@ -125,17 +122,6 @@ export default function DisplayTeamStats() {
     getTeamStats(setTeamStats);
   }, []);
   const max = teamStats.teamStats.reduce((max, s) => Math.max(max, s.wins), 0);
-  function reducer(totals: TeamStat[], next: TeamStat) {
-    const existing = totals.find((t) => t.team === next.team);
-    if (existing) {
-      existing.wins += next.wins;
-    } else {
-      totals.push({ ...next });
-    }
-    return totals;
-  }
-  const total = teamStats.teamStats.reduce(reducer, []);
-  /* const total_max = total.reduce((max, s) => Math.max(max, s.wins), 0); */
   const grouped = Object.entries(
     _.groupBy(
       teamStats.teamStats,
@@ -146,13 +132,7 @@ export default function DisplayTeamStats() {
   return (
     <Paper>
       <Typography variant="h2">Team Records by session.</Typography>
-      {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
       <RecordOverTime stats={teamStats} />
-      {/* <DisplayTeamStat
-        stats={total}
-        title="Total"
-        max={roundUpNearest5(total_max)}
-      /> */}
       {grouped.map(([date, m]) => (
         <>
           <DisplayTeamStat stats={m} title={date} max={roundUpNearest5(max)} />

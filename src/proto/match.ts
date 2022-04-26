@@ -273,6 +273,23 @@ export interface SaveResponse {
   success: boolean;
 }
 
+export interface Costs {
+  player: Player | undefined;
+  buildings: Costs_BuiltObject[];
+  units: Costs_BuiltObject[];
+}
+
+export interface Costs_BuiltObject {
+  name: string;
+  count: number;
+  totalSpent: number;
+}
+
+export interface AllCosts {
+  matchId: number;
+  costs: Costs[];
+}
+
 function createBasePlayer(): Player {
   return { name: "", general: 0, team: 0 };
 }
@@ -354,7 +371,7 @@ export const MatchInfo = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== 0) {
-      writer.uint32(8).int32(message.id);
+      writer.uint32(8).int64(message.id);
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(
@@ -382,7 +399,7 @@ export const MatchInfo = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.int32();
+          message.id = longToNumber(reader.int64() as Long);
           break;
         case 2:
           message.timestamp = fromTimestamp(
@@ -1504,6 +1521,249 @@ export const SaveResponse = {
   },
 };
 
+function createBaseCosts(): Costs {
+  return { player: undefined, buildings: [], units: [] };
+}
+
+export const Costs = {
+  encode(message: Costs, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.player !== undefined) {
+      Player.encode(message.player, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.buildings) {
+      Costs_BuiltObject.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.units) {
+      Costs_BuiltObject.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Costs {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCosts();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          message.player = Player.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.buildings.push(
+            Costs_BuiltObject.decode(reader, reader.uint32())
+          );
+          break;
+        case 4:
+          message.units.push(Costs_BuiltObject.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Costs {
+    return {
+      player: isSet(object.player) ? Player.fromJSON(object.player) : undefined,
+      buildings: Array.isArray(object?.buildings)
+        ? object.buildings.map((e: any) => Costs_BuiltObject.fromJSON(e))
+        : [],
+      units: Array.isArray(object?.units)
+        ? object.units.map((e: any) => Costs_BuiltObject.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: Costs): unknown {
+    const obj: any = {};
+    message.player !== undefined &&
+      (obj.player = message.player ? Player.toJSON(message.player) : undefined);
+    if (message.buildings) {
+      obj.buildings = message.buildings.map((e) =>
+        e ? Costs_BuiltObject.toJSON(e) : undefined
+      );
+    } else {
+      obj.buildings = [];
+    }
+    if (message.units) {
+      obj.units = message.units.map((e) =>
+        e ? Costs_BuiltObject.toJSON(e) : undefined
+      );
+    } else {
+      obj.units = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<Costs>, I>>(object: I): Costs {
+    const message = createBaseCosts();
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? Player.fromPartial(object.player)
+        : undefined;
+    message.buildings =
+      object.buildings?.map((e) => Costs_BuiltObject.fromPartial(e)) || [];
+    message.units =
+      object.units?.map((e) => Costs_BuiltObject.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCosts_BuiltObject(): Costs_BuiltObject {
+  return { name: "", count: 0, totalSpent: 0 };
+}
+
+export const Costs_BuiltObject = {
+  encode(
+    message: Costs_BuiltObject,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.count !== 0) {
+      writer.uint32(16).int32(message.count);
+    }
+    if (message.totalSpent !== 0) {
+      writer.uint32(24).int32(message.totalSpent);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Costs_BuiltObject {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCosts_BuiltObject();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        case 2:
+          message.count = reader.int32();
+          break;
+        case 3:
+          message.totalSpent = reader.int32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Costs_BuiltObject {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      count: isSet(object.count) ? Number(object.count) : 0,
+      totalSpent: isSet(object.totalSpent) ? Number(object.totalSpent) : 0,
+    };
+  },
+
+  toJSON(message: Costs_BuiltObject): unknown {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.count !== undefined && (obj.count = Math.round(message.count));
+    message.totalSpent !== undefined &&
+      (obj.totalSpent = Math.round(message.totalSpent));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<Costs_BuiltObject>, I>>(
+    object: I
+  ): Costs_BuiltObject {
+    const message = createBaseCosts_BuiltObject();
+    message.name = object.name ?? "";
+    message.count = object.count ?? 0;
+    message.totalSpent = object.totalSpent ?? 0;
+    return message;
+  },
+};
+
+function createBaseAllCosts(): AllCosts {
+  return { matchId: 0, costs: [] };
+}
+
+export const AllCosts = {
+  encode(
+    message: AllCosts,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.matchId !== 0) {
+      writer.uint32(8).int64(message.matchId);
+    }
+    for (const v of message.costs) {
+      Costs.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): AllCosts {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAllCosts();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.matchId = longToNumber(reader.int64() as Long);
+          break;
+        case 2:
+          message.costs.push(Costs.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AllCosts {
+    return {
+      matchId: isSet(object.matchId) ? Number(object.matchId) : 0,
+      costs: Array.isArray(object?.costs)
+        ? object.costs.map((e: any) => Costs.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: AllCosts): unknown {
+    const obj: any = {};
+    message.matchId !== undefined &&
+      (obj.matchId = Math.round(message.matchId));
+    if (message.costs) {
+      obj.costs = message.costs.map((e) => (e ? Costs.toJSON(e) : undefined));
+    } else {
+      obj.costs = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<AllCosts>, I>>(object: I): AllCosts {
+    const message = createBaseAllCosts();
+    message.matchId = object.matchId ?? 0;
+    message.costs = object.costs?.map((e) => Costs.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
 type Builtin =
   | Date
   | Function
@@ -1551,6 +1811,13 @@ function fromJsonTimestamp(o: any): Date {
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }
+}
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
 }
 
 if (_m0.util.Long !== Long) {
