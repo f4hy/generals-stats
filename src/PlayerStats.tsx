@@ -15,7 +15,7 @@ import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
 import * as React from "react"
 import DisplayGeneral from "./Generals"
-import { Faction, General, PlayerStat, PlayerStats } from "./proto/match"
+import { Faction, General, PlayerStat, PlayerStats, PlayerStat_GeneralWL } from "./proto/match"
 
 function getPlayerStats(callback: (m: PlayerStats) => void) {
   fetch("/api/playerstats").then((r) =>
@@ -32,6 +32,21 @@ function getPlayerStats(callback: (m: PlayerStats) => void) {
 
 function roundUpNearestN(num: number, N: number) {
   return Math.ceil(num / N) * N
+}
+
+function PlayerListItem(props: { playerStatWL: PlayerStat_GeneralWL }){
+    const p = props.playerStatWL
+    return (
+    <ListItem>
+      <ListItemAvatar>
+        <DisplayGeneral general={p.general} />
+      </ListItemAvatar>
+      <ListItemText
+        primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0
+          })`}
+      />
+    </ListItem>
+  )
 }
 
 function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
@@ -57,18 +72,7 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
             <ListItem>
               <ListItemText primary={"Player Name: " + props.stat.playerName} />
             </ListItem>
-            {sorted.map((p) => (
-              <ListItem>
-                <ListItemAvatar>
-                  <DisplayGeneral general={p.general} />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${
-                    p.winLoss?.losses ?? 0
-                  })`}
-                />
-              </ListItem>
-            ))}
+            {sorted.map((p) => (<PlayerListItem playerStatWL={p} />))}
           </List>
         </Grid>
         <Grid item xs={9}>

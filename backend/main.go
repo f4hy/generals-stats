@@ -58,7 +58,7 @@ func main() {
 		})
 	})
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
-	matches, last_updated := updateMatches(&pb.Matches{}, time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC))
+	matches, last_updated := updateMatches(&pb.Matches{}, time.Date(2000, time.November, 10, 23, 0, 0, 0, time.UTC))
 
 	maxAge := "max-age=5000"
 	api := router.Group("/api")

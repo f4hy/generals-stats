@@ -5,6 +5,7 @@ go 1.18
 
 require (
 	github.com/aws/aws-sdk-go v1.43.7
+	github.com/bill-rich/cncstats v0.0.0-20220421225346-f5a06d3283ed
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.7.7
@@ -15,7 +16,6 @@ require (
 )
 
 require (
-	github.com/bill-rich/cncstats v0.0.0-20220421225346-f5a06d3283ed // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -32,6 +32,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
-	gopkg.in/go-playground/validator.v9 v9.29.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
