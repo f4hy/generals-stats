@@ -1,10 +1,3 @@
-import { Stack as ChartStack, ValueScale } from "@devexpress/dx-react-chart"
-import {
-  ArgumentAxis,
-  BarSeries,
-  Chart,
-  ValueAxis,
-} from "@devexpress/dx-react-chart-material-ui"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -14,8 +7,23 @@ import ListItemAvatar from "@mui/material/ListItemAvatar"
 import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
 import * as React from "react"
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  CartesianGrid,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 import DisplayGeneral from "./Generals"
-import { Faction, General, PlayerStat, PlayerStats, PlayerStat_GeneralWL } from "./proto/match"
+import {
+  Faction,
+  General,
+  PlayerStat,
+  PlayerStats,
+  PlayerStat_GeneralWL,
+} from "./proto/match"
 
 function getPlayerStats(callback: (m: PlayerStats) => void) {
   fetch("/api/playerstats").then((r) =>
@@ -34,16 +42,17 @@ function roundUpNearestN(num: number, N: number) {
   return Math.ceil(num / N) * N
 }
 
-function PlayerListItem(props: { playerStatWL: PlayerStat_GeneralWL }){
-    const p = props.playerStatWL
-    return (
+function PlayerListItem(props: { playerStatWL: PlayerStat_GeneralWL }) {
+  const p = props.playerStatWL
+  return (
     <ListItem>
       <ListItemAvatar>
         <DisplayGeneral general={p.general} />
       </ListItemAvatar>
       <ListItemText
-        primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${p.winLoss?.losses ?? 0
-          })`}
+        primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${
+          p.winLoss?.losses ?? 0
+        })`}
       />
     </ListItem>
   )
@@ -72,34 +81,32 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
             <ListItem>
               <ListItemText primary={"Player Name: " + props.stat.playerName} />
             </ListItem>
-            {sorted.map((p) => (<PlayerListItem playerStatWL={p} />))}
+            {sorted.map((p) => (
+              <PlayerListItem playerStatWL={p} />
+            ))}
           </List>
         </Grid>
         <Grid item xs={9}>
-          <Chart data={faction_data}>
-            <ArgumentAxis />
-            <ValueAxis />
-            <ValueScale modifyDomain={(x) => [0, props.max]} />
-            <BarSeries valueField="wins" argumentField="faction" name="wins" />
-            <BarSeries
-              valueField="losses"
-              argumentField="faction"
-              name="losses"
-            />
-            <ChartStack />
-          </Chart>
-          <Chart data={data}>
-            <ArgumentAxis />
-            <ValueAxis />
-            <ValueScale modifyDomain={(x) => [0, props.max]} />
-            <BarSeries valueField="wins" argumentField="general" name="wins" />
-            <BarSeries
-              valueField="losses"
-              argumentField="general"
-              name="losses"
-            />
-            <ChartStack />
-          </Chart>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={faction_data} layout="horizontal">
+              <CartesianGrid strokeDasharray="5 5" vertical={false} />
+              <Bar dataKey="wins" fill="#42A5F5" />
+              <Bar dataKey="losses" fill="#FF7043" />
+              <XAxis dataKey="faction" />
+              <YAxis domain={[0, props.max]} />
+              <Tooltip cursor={false} />
+            </BarChart>
+          </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={data} layout="horizontal">
+              <CartesianGrid strokeDasharray="5 5" vertical={false} />
+              <Bar dataKey="wins" fill="#42A5F5" />
+              <Bar dataKey="losses" fill="#FF7043" />
+              <XAxis dataKey="general" />
+              <YAxis domain={[0, props.max]} />
+              <Tooltip cursor={false} />
+            </BarChart>
+          </ResponsiveContainer>
         </Grid>
       </Grid>
     </Box>

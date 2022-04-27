@@ -1,10 +1,3 @@
-import { Stack, ValueScale } from "@devexpress/dx-react-chart"
-import {
-  ArgumentAxis,
-  BarSeries,
-  Chart,
-  ValueAxis,
-} from "@devexpress/dx-react-chart-material-ui"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -14,6 +7,15 @@ import ListItemAvatar from "@mui/material/ListItemAvatar"
 import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
 import * as React from "react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 import DisplayGeneral from "./Generals"
 import { General, GeneralStat, GeneralStats } from "./proto/match"
 
@@ -77,15 +79,16 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
           </List>
         </Grid>
         <Grid item xs={9}>
-          <Chart data={data}>
-            <ArgumentAxis />
-            <ValueAxis />
-            <ValueScale modifyDomain={(x) => [0, props.max]} />
-
-            <BarSeries valueField="wins" argumentField="name" name="wins" />
-            <BarSeries valueField="losses" argumentField="name" name="losses" />
-            <Stack />
-          </Chart>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={data} layout="horizontal">
+              <CartesianGrid strokeDasharray="5 5" vertical={false} />
+              <Bar dataKey="wins" fill="#42A5F5" />
+              <Bar dataKey="losses" fill="#FF7043" />
+              <XAxis dataKey="name" />
+              <YAxis domain={["auto", props.max]} />
+              <Tooltip cursor={false} />
+            </BarChart>
+          </ResponsiveContainer>
         </Grid>
       </Grid>
     </Box>
