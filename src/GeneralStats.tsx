@@ -1,21 +1,21 @@
-import { Stack, ValueScale } from "@devexpress/dx-react-chart";
+import { Stack, ValueScale } from "@devexpress/dx-react-chart"
 import {
   ArgumentAxis,
   BarSeries,
   Chart,
   ValueAxis,
-} from "@devexpress/dx-react-chart-material-ui";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
-import * as React from "react";
-import DisplayGeneral from "./Generals";
-import { General, GeneralStat, GeneralStats } from "./proto/match";
+} from "@devexpress/dx-react-chart-material-ui"
+import Box from "@mui/material/Box"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemAvatar from "@mui/material/ListItemAvatar"
+import ListItemText from "@mui/material/ListItemText"
+import Paper from "@mui/material/Paper"
+import * as React from "react"
+import DisplayGeneral from "./Generals"
+import { General, GeneralStat, GeneralStats } from "./proto/match"
 
 function getGeneralStats(callback: (m: GeneralStats) => void) {
   fetch("/api/generalstats").then((r) =>
@@ -23,29 +23,29 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
       .blob()
       .then((b) => b.arrayBuffer())
       .then((j) => {
-        console.log(j);
-        const a = new Uint8Array(j);
-        const generalStats = GeneralStats.decode(a);
-        generalStats.generalStats.sort((s1, s2) => s1.general - s2.general);
-        callback(generalStats);
+        console.log(j)
+        const a = new Uint8Array(j)
+        const generalStats = GeneralStats.decode(a)
+        generalStats.generalStats.sort((s1, s2) => s1.general - s2.general)
+        callback(generalStats)
       })
-  );
+  )
 }
 
 function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
-  const sorted = props.stat.stats.sort(
-    (s1, s2) => s1.playerName.localeCompare(s2.playerName, 'en')
-  );
-  const overall = props.stat.total;
+  const sorted = props.stat.stats.sort((s1, s2) =>
+    s1.playerName.localeCompare(s2.playerName, "en")
+  )
+  const overall = props.stat.total
   let data = sorted.map((s) => ({
     name: s.playerName,
     wins: s.winLoss?.wins ?? 0,
     losses: s.winLoss?.losses ?? 0,
-  }));
+  }))
   data = [
     { name: "overall", wins: overall?.wins ?? 0, losses: overall?.losses ?? 0 },
     ...data,
-  ];
+  ]
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2} m={1}>
@@ -90,25 +90,25 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
         </Grid>
       </Grid>
     </Box>
-  );
+  )
 }
 function roundUpNearest5(num: number) {
-  console.log("ceil is for " + num + ":" + Math.ceil(num / 5));
-  return Math.ceil(num / 5) * 5;
+  console.log("ceil is for " + num + ":" + Math.ceil(num / 5))
+  return Math.ceil(num / 5) * 5
 }
 
-const empty = { generalStats: [] };
+const empty = { generalStats: [] }
 
 export default function DisplayGeneralStats() {
-  const [generalStats, setGeneralStats] = React.useState<GeneralStats>(empty);
+  const [generalStats, setGeneralStats] = React.useState<GeneralStats>(empty)
   React.useEffect(() => {
-    getGeneralStats(setGeneralStats);
-  }, []);
+    getGeneralStats(setGeneralStats)
+  }, [])
   const maxwl = generalStats.generalStats.reduce(
     (acc, s) => Math.max(acc, s.total?.wins ?? 0, s.total?.losses ?? 0),
     0
-  );
-  const maxWinLoss = roundUpNearest5(maxwl + 1);
+  )
+  const maxWinLoss = roundUpNearest5(maxwl + 1)
   return (
     <Paper>
       {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
@@ -119,5 +119,5 @@ export default function DisplayGeneralStats() {
         </>
       ))}
     </Paper>
-  );
+  )
 }

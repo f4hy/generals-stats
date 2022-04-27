@@ -1,9 +1,9 @@
 /* eslint-disable */
-import Long from "long";
-import * as _m0 from "protobufjs/minimal";
-import { Timestamp } from "../google/protobuf/timestamp";
+import Long from "long"
+import * as _m0 from "protobufjs/minimal"
+import { Timestamp } from "../google/protobuf/timestamp"
 
-export const protobufPackage = "matches";
+export const protobufPackage = "matches"
 
 export enum General {
   USA = 0,
@@ -25,75 +25,75 @@ export function generalFromJSON(object: any): General {
   switch (object) {
     case 0:
     case "USA":
-      return General.USA;
+      return General.USA
     case 1:
     case "AIR":
-      return General.AIR;
+      return General.AIR
     case 2:
     case "LASER":
-      return General.LASER;
+      return General.LASER
     case 3:
     case "SUPER":
-      return General.SUPER;
+      return General.SUPER
     case 4:
     case "CHINA":
-      return General.CHINA;
+      return General.CHINA
     case 5:
     case "NUKE":
-      return General.NUKE;
+      return General.NUKE
     case 6:
     case "TANK":
-      return General.TANK;
+      return General.TANK
     case 7:
     case "INFANTRY":
-      return General.INFANTRY;
+      return General.INFANTRY
     case 8:
     case "GLA":
-      return General.GLA;
+      return General.GLA
     case 9:
     case "TOXIN":
-      return General.TOXIN;
+      return General.TOXIN
     case 10:
     case "STEALTH":
-      return General.STEALTH;
+      return General.STEALTH
     case 11:
     case "DEMO":
-      return General.DEMO;
+      return General.DEMO
     case -1:
     case "UNRECOGNIZED":
     default:
-      return General.UNRECOGNIZED;
+      return General.UNRECOGNIZED
   }
 }
 
 export function generalToJSON(object: General): string {
   switch (object) {
     case General.USA:
-      return "USA";
+      return "USA"
     case General.AIR:
-      return "AIR";
+      return "AIR"
     case General.LASER:
-      return "LASER";
+      return "LASER"
     case General.SUPER:
-      return "SUPER";
+      return "SUPER"
     case General.CHINA:
-      return "CHINA";
+      return "CHINA"
     case General.NUKE:
-      return "NUKE";
+      return "NUKE"
     case General.TANK:
-      return "TANK";
+      return "TANK"
     case General.INFANTRY:
-      return "INFANTRY";
+      return "INFANTRY"
     case General.GLA:
-      return "GLA";
+      return "GLA"
     case General.TOXIN:
-      return "TOXIN";
+      return "TOXIN"
     case General.STEALTH:
-      return "STEALTH";
+      return "STEALTH"
     case General.DEMO:
-      return "DEMO";
+      return "DEMO"
     default:
-      return "UNKNOWN";
+      return "UNKNOWN"
   }
 }
 
@@ -108,30 +108,30 @@ export function factionFromJSON(object: any): Faction {
   switch (object) {
     case 0:
     case "ANYUSA":
-      return Faction.ANYUSA;
+      return Faction.ANYUSA
     case 1:
     case "ANYCHINA":
-      return Faction.ANYCHINA;
+      return Faction.ANYCHINA
     case 2:
     case "ANYGLA":
-      return Faction.ANYGLA;
+      return Faction.ANYGLA
     case -1:
     case "UNRECOGNIZED":
     default:
-      return Faction.UNRECOGNIZED;
+      return Faction.UNRECOGNIZED
   }
 }
 
 export function factionToJSON(object: Faction): string {
   switch (object) {
     case Faction.ANYUSA:
-      return "ANYUSA";
+      return "ANYUSA"
     case Faction.ANYCHINA:
-      return "ANYCHINA";
+      return "ANYCHINA"
     case Faction.ANYGLA:
-      return "ANYGLA";
+      return "ANYGLA"
     default:
-      return "UNKNOWN";
+      return "UNKNOWN"
   }
 }
 
@@ -148,150 +148,150 @@ export function teamFromJSON(object: any): Team {
   switch (object) {
     case 0:
     case "NONE":
-      return Team.NONE;
+      return Team.NONE
     case 1:
     case "ONE":
-      return Team.ONE;
+      return Team.ONE
     case 2:
     case "TWO":
-      return Team.TWO;
+      return Team.TWO
     case 3:
     case "THREE":
-      return Team.THREE;
+      return Team.THREE
     case 4:
     case "FOUR":
-      return Team.FOUR;
+      return Team.FOUR
     case -1:
     case "UNRECOGNIZED":
     default:
-      return Team.UNRECOGNIZED;
+      return Team.UNRECOGNIZED
   }
 }
 
 export function teamToJSON(object: Team): string {
   switch (object) {
     case Team.NONE:
-      return "NONE";
+      return "NONE"
     case Team.ONE:
-      return "ONE";
+      return "ONE"
     case Team.TWO:
-      return "TWO";
+      return "TWO"
     case Team.THREE:
-      return "THREE";
+      return "THREE"
     case Team.FOUR:
-      return "FOUR";
+      return "FOUR"
     default:
-      return "UNKNOWN";
+      return "UNKNOWN"
   }
 }
 
 export interface Player {
-  name: string;
-  general: General;
-  team: Team;
+  name: string
+  general: General
+  team: Team
 }
 
 export interface MatchInfo {
-  id: number;
-  timestamp: Date | undefined;
-  map: string;
-  winningTeam: Team;
-  players: Player[];
+  id: number
+  timestamp: Date | undefined
+  map: string
+  winningTeam: Team
+  players: Player[]
 }
 
 export interface Matches {
-  matches: MatchInfo[];
+  matches: MatchInfo[]
 }
 
 export interface WinLoss {
-  wins: number;
-  losses: number;
+  wins: number
+  losses: number
 }
 
 export interface PlayerStat {
-  playerName: string;
-  stats: PlayerStat_GeneralWL[];
-  factionStats: PlayerStat_FactionWL[];
+  playerName: string
+  stats: PlayerStat_GeneralWL[]
+  factionStats: PlayerStat_FactionWL[]
 }
 
 export interface PlayerStat_GeneralWL {
-  general: General;
-  winLoss: WinLoss | undefined;
+  general: General
+  winLoss: WinLoss | undefined
 }
 
 export interface PlayerStat_FactionWL {
-  faction: Faction;
-  winLoss: WinLoss | undefined;
+  faction: Faction
+  winLoss: WinLoss | undefined
 }
 
 export interface PlayerStats {
-  playerStats: PlayerStat[];
+  playerStats: PlayerStat[]
 }
 
 export interface GeneralStat {
-  general: General;
-  stats: GeneralStat_PlayerWL[];
-  total: WinLoss | undefined;
+  general: General
+  stats: GeneralStat_PlayerWL[]
+  total: WinLoss | undefined
 }
 
 export interface GeneralStat_PlayerWL {
-  playerName: string;
-  winLoss: WinLoss | undefined;
+  playerName: string
+  winLoss: WinLoss | undefined
 }
 
 export interface GeneralStats {
-  generalStats: GeneralStat[];
+  generalStats: GeneralStat[]
 }
 
 export interface DateMessage {
-  Year: number;
-  Month: number;
-  Day: number;
+  Year: number
+  Month: number
+  Day: number
 }
 
 export interface TeamStat {
-  date: DateMessage | undefined;
-  team: Team;
-  wins: number;
+  date: DateMessage | undefined
+  team: Team
+  wins: number
 }
 
 export interface TeamStats {
-  teamStats: TeamStat[];
+  teamStats: TeamStat[]
 }
 
 export interface MapStat {
-  map: string;
-  team: Team;
-  wins: number;
+  map: string
+  team: Team
+  wins: number
 }
 
 export interface MapStats {
-  mapStats: MapStat[];
+  mapStats: MapStat[]
 }
 
 export interface SaveResponse {
-  success: boolean;
+  success: boolean
 }
 
 export interface Costs {
-  player: Player | undefined;
-  buildings: Costs_BuiltObject[];
-  units: Costs_BuiltObject[];
+  player: Player | undefined
+  buildings: Costs_BuiltObject[]
+  units: Costs_BuiltObject[]
 }
 
 export interface Costs_BuiltObject {
-  name: string;
-  count: number;
-  totalSpent: number;
+  name: string
+  count: number
+  totalSpent: number
 }
 
 export interface AllCosts {
-  matchId: number;
-  costs: Costs[];
+  matchId: number
+  costs: Costs[]
 }
 
 function createBasePlayer(): Player {
-  return { name: "", general: 0, team: 0 };
+  return { name: "", general: 0, team: 0 }
 }
 
 export const Player = {
@@ -300,39 +300,39 @@ export const Player = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+      writer.uint32(10).string(message.name)
     }
     if (message.general !== 0) {
-      writer.uint32(16).int32(message.general);
+      writer.uint32(16).int32(message.general)
     }
     if (message.team !== 0) {
-      writer.uint32(24).int32(message.team);
+      writer.uint32(24).int32(message.team)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Player {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayer();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayer()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.name = reader.string();
-          break;
+          message.name = reader.string()
+          break
         case 2:
-          message.general = reader.int32() as any;
-          break;
+          message.general = reader.int32() as any
+          break
         case 3:
-          message.team = reader.int32() as any;
-          break;
+          message.team = reader.int32() as any
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): Player {
@@ -340,29 +340,29 @@ export const Player = {
       name: isSet(object.name) ? String(object.name) : "",
       general: isSet(object.general) ? generalFromJSON(object.general) : 0,
       team: isSet(object.team) ? teamFromJSON(object.team) : 0,
-    };
+    }
   },
 
   toJSON(message: Player): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
+    const obj: any = {}
+    message.name !== undefined && (obj.name = message.name)
     message.general !== undefined &&
-      (obj.general = generalToJSON(message.general));
-    message.team !== undefined && (obj.team = teamToJSON(message.team));
-    return obj;
+      (obj.general = generalToJSON(message.general))
+    message.team !== undefined && (obj.team = teamToJSON(message.team))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<Player>, I>>(object: I): Player {
-    const message = createBasePlayer();
-    message.name = object.name ?? "";
-    message.general = object.general ?? 0;
-    message.team = object.team ?? 0;
-    return message;
+    const message = createBasePlayer()
+    message.name = object.name ?? ""
+    message.general = object.general ?? 0
+    message.team = object.team ?? 0
+    return message
   },
-};
+}
 
 function createBaseMatchInfo(): MatchInfo {
-  return { id: 0, timestamp: undefined, map: "", winningTeam: 0, players: [] };
+  return { id: 0, timestamp: undefined, map: "", winningTeam: 0, players: [] }
 }
 
 export const MatchInfo = {
@@ -371,56 +371,56 @@ export const MatchInfo = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== 0) {
-      writer.uint32(8).int64(message.id);
+      writer.uint32(8).int64(message.id)
     }
     if (message.timestamp !== undefined) {
       Timestamp.encode(
         toTimestamp(message.timestamp),
         writer.uint32(18).fork()
-      ).ldelim();
+      ).ldelim()
     }
     if (message.map !== "") {
-      writer.uint32(26).string(message.map);
+      writer.uint32(26).string(message.map)
     }
     if (message.winningTeam !== 0) {
-      writer.uint32(32).int32(message.winningTeam);
+      writer.uint32(32).int32(message.winningTeam)
     }
     for (const v of message.players) {
-      Player.encode(v!, writer.uint32(42).fork()).ldelim();
+      Player.encode(v!, writer.uint32(42).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MatchInfo {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMatchInfo();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMatchInfo()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.id = longToNumber(reader.int64() as Long);
-          break;
+          message.id = longToNumber(reader.int64() as Long)
+          break
         case 2:
           message.timestamp = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
-          );
-          break;
+          )
+          break
         case 3:
-          message.map = reader.string();
-          break;
+          message.map = reader.string()
+          break
         case 4:
-          message.winningTeam = reader.int32() as any;
-          break;
+          message.winningTeam = reader.int32() as any
+          break
         case 5:
-          message.players.push(Player.decode(reader, reader.uint32()));
-          break;
+          message.players.push(Player.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): MatchInfo {
@@ -436,42 +436,42 @@ export const MatchInfo = {
       players: Array.isArray(object?.players)
         ? object.players.map((e: any) => Player.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: MatchInfo): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = Math.round(message.id));
+    const obj: any = {}
+    message.id !== undefined && (obj.id = Math.round(message.id))
     message.timestamp !== undefined &&
-      (obj.timestamp = message.timestamp.toISOString());
-    message.map !== undefined && (obj.map = message.map);
+      (obj.timestamp = message.timestamp.toISOString())
+    message.map !== undefined && (obj.map = message.map)
     message.winningTeam !== undefined &&
-      (obj.winningTeam = teamToJSON(message.winningTeam));
+      (obj.winningTeam = teamToJSON(message.winningTeam))
     if (message.players) {
       obj.players = message.players.map((e) =>
         e ? Player.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.players = [];
+      obj.players = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<MatchInfo>, I>>(
     object: I
   ): MatchInfo {
-    const message = createBaseMatchInfo();
-    message.id = object.id ?? 0;
-    message.timestamp = object.timestamp ?? undefined;
-    message.map = object.map ?? "";
-    message.winningTeam = object.winningTeam ?? 0;
-    message.players = object.players?.map((e) => Player.fromPartial(e)) || [];
-    return message;
+    const message = createBaseMatchInfo()
+    message.id = object.id ?? 0
+    message.timestamp = object.timestamp ?? undefined
+    message.map = object.map ?? ""
+    message.winningTeam = object.winningTeam ?? 0
+    message.players = object.players?.map((e) => Player.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseMatches(): Matches {
-  return { matches: [] };
+  return { matches: [] }
 }
 
 export const Matches = {
@@ -480,27 +480,27 @@ export const Matches = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.matches) {
-      MatchInfo.encode(v!, writer.uint32(10).fork()).ldelim();
+      MatchInfo.encode(v!, writer.uint32(10).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Matches {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMatches();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMatches()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.matches.push(MatchInfo.decode(reader, reader.uint32()));
-          break;
+          message.matches.push(MatchInfo.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): Matches {
@@ -508,31 +508,30 @@ export const Matches = {
       matches: Array.isArray(object?.matches)
         ? object.matches.map((e: any) => MatchInfo.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: Matches): unknown {
-    const obj: any = {};
+    const obj: any = {}
     if (message.matches) {
       obj.matches = message.matches.map((e) =>
         e ? MatchInfo.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.matches = [];
+      obj.matches = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<Matches>, I>>(object: I): Matches {
-    const message = createBaseMatches();
-    message.matches =
-      object.matches?.map((e) => MatchInfo.fromPartial(e)) || [];
-    return message;
+    const message = createBaseMatches()
+    message.matches = object.matches?.map((e) => MatchInfo.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseWinLoss(): WinLoss {
-  return { wins: 0, losses: 0 };
+  return { wins: 0, losses: 0 }
 }
 
 export const WinLoss = {
@@ -541,59 +540,59 @@ export const WinLoss = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.wins !== 0) {
-      writer.uint32(8).int32(message.wins);
+      writer.uint32(8).int32(message.wins)
     }
     if (message.losses !== 0) {
-      writer.uint32(16).int32(message.losses);
+      writer.uint32(16).int32(message.losses)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): WinLoss {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWinLoss();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseWinLoss()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.wins = reader.int32();
-          break;
+          message.wins = reader.int32()
+          break
         case 2:
-          message.losses = reader.int32();
-          break;
+          message.losses = reader.int32()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): WinLoss {
     return {
       wins: isSet(object.wins) ? Number(object.wins) : 0,
       losses: isSet(object.losses) ? Number(object.losses) : 0,
-    };
+    }
   },
 
   toJSON(message: WinLoss): unknown {
-    const obj: any = {};
-    message.wins !== undefined && (obj.wins = Math.round(message.wins));
-    message.losses !== undefined && (obj.losses = Math.round(message.losses));
-    return obj;
+    const obj: any = {}
+    message.wins !== undefined && (obj.wins = Math.round(message.wins))
+    message.losses !== undefined && (obj.losses = Math.round(message.losses))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<WinLoss>, I>>(object: I): WinLoss {
-    const message = createBaseWinLoss();
-    message.wins = object.wins ?? 0;
-    message.losses = object.losses ?? 0;
-    return message;
+    const message = createBaseWinLoss()
+    message.wins = object.wins ?? 0
+    message.losses = object.losses ?? 0
+    return message
   },
-};
+}
 
 function createBasePlayerStat(): PlayerStat {
-  return { playerName: "", stats: [], factionStats: [] };
+  return { playerName: "", stats: [], factionStats: [] }
 }
 
 export const PlayerStat = {
@@ -602,43 +601,43 @@ export const PlayerStat = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.playerName !== "") {
-      writer.uint32(10).string(message.playerName);
+      writer.uint32(10).string(message.playerName)
     }
     for (const v of message.stats) {
-      PlayerStat_GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim();
+      PlayerStat_GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim()
     }
     for (const v of message.factionStats) {
-      PlayerStat_FactionWL.encode(v!, writer.uint32(26).fork()).ldelim();
+      PlayerStat_FactionWL.encode(v!, writer.uint32(26).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PlayerStat {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayerStat();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayerStat()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.playerName = reader.string();
-          break;
+          message.playerName = reader.string()
+          break
         case 2:
           message.stats.push(
             PlayerStat_GeneralWL.decode(reader, reader.uint32())
-          );
-          break;
+          )
+          break
         case 3:
           message.factionStats.push(
             PlayerStat_FactionWL.decode(reader, reader.uint32())
-          );
-          break;
+          )
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): PlayerStat {
@@ -650,45 +649,44 @@ export const PlayerStat = {
       factionStats: Array.isArray(object?.factionStats)
         ? object.factionStats.map((e: any) => PlayerStat_FactionWL.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: PlayerStat): unknown {
-    const obj: any = {};
-    message.playerName !== undefined && (obj.playerName = message.playerName);
+    const obj: any = {}
+    message.playerName !== undefined && (obj.playerName = message.playerName)
     if (message.stats) {
       obj.stats = message.stats.map((e) =>
         e ? PlayerStat_GeneralWL.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.stats = [];
+      obj.stats = []
     }
     if (message.factionStats) {
       obj.factionStats = message.factionStats.map((e) =>
         e ? PlayerStat_FactionWL.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.factionStats = [];
+      obj.factionStats = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<PlayerStat>, I>>(
     object: I
   ): PlayerStat {
-    const message = createBasePlayerStat();
-    message.playerName = object.playerName ?? "";
+    const message = createBasePlayerStat()
+    message.playerName = object.playerName ?? ""
     message.stats =
-      object.stats?.map((e) => PlayerStat_GeneralWL.fromPartial(e)) || [];
+      object.stats?.map((e) => PlayerStat_GeneralWL.fromPartial(e)) || []
     message.factionStats =
-      object.factionStats?.map((e) => PlayerStat_FactionWL.fromPartial(e)) ||
-      [];
-    return message;
+      object.factionStats?.map((e) => PlayerStat_FactionWL.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBasePlayerStat_GeneralWL(): PlayerStat_GeneralWL {
-  return { general: 0, winLoss: undefined };
+  return { general: 0, winLoss: undefined }
 }
 
 export const PlayerStat_GeneralWL = {
@@ -697,36 +695,36 @@ export const PlayerStat_GeneralWL = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.general !== 0) {
-      writer.uint32(8).int32(message.general);
+      writer.uint32(8).int32(message.general)
     }
     if (message.winLoss !== undefined) {
-      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
   ): PlayerStat_GeneralWL {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayerStat_GeneralWL();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayerStat_GeneralWL()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.general = reader.int32() as any;
-          break;
+          message.general = reader.int32() as any
+          break
         case 2:
-          message.winLoss = WinLoss.decode(reader, reader.uint32());
-          break;
+          message.winLoss = WinLoss.decode(reader, reader.uint32())
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): PlayerStat_GeneralWL {
@@ -735,35 +733,35 @@ export const PlayerStat_GeneralWL = {
       winLoss: isSet(object.winLoss)
         ? WinLoss.fromJSON(object.winLoss)
         : undefined,
-    };
+    }
   },
 
   toJSON(message: PlayerStat_GeneralWL): unknown {
-    const obj: any = {};
+    const obj: any = {}
     message.general !== undefined &&
-      (obj.general = generalToJSON(message.general));
+      (obj.general = generalToJSON(message.general))
     message.winLoss !== undefined &&
       (obj.winLoss = message.winLoss
         ? WinLoss.toJSON(message.winLoss)
-        : undefined);
-    return obj;
+        : undefined)
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<PlayerStat_GeneralWL>, I>>(
     object: I
   ): PlayerStat_GeneralWL {
-    const message = createBasePlayerStat_GeneralWL();
-    message.general = object.general ?? 0;
+    const message = createBasePlayerStat_GeneralWL()
+    message.general = object.general ?? 0
     message.winLoss =
       object.winLoss !== undefined && object.winLoss !== null
         ? WinLoss.fromPartial(object.winLoss)
-        : undefined;
-    return message;
+        : undefined
+    return message
   },
-};
+}
 
 function createBasePlayerStat_FactionWL(): PlayerStat_FactionWL {
-  return { faction: 0, winLoss: undefined };
+  return { faction: 0, winLoss: undefined }
 }
 
 export const PlayerStat_FactionWL = {
@@ -772,36 +770,36 @@ export const PlayerStat_FactionWL = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.faction !== 0) {
-      writer.uint32(8).int32(message.faction);
+      writer.uint32(8).int32(message.faction)
     }
     if (message.winLoss !== undefined) {
-      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
   ): PlayerStat_FactionWL {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayerStat_FactionWL();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayerStat_FactionWL()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.faction = reader.int32() as any;
-          break;
+          message.faction = reader.int32() as any
+          break
         case 2:
-          message.winLoss = WinLoss.decode(reader, reader.uint32());
-          break;
+          message.winLoss = WinLoss.decode(reader, reader.uint32())
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): PlayerStat_FactionWL {
@@ -810,35 +808,35 @@ export const PlayerStat_FactionWL = {
       winLoss: isSet(object.winLoss)
         ? WinLoss.fromJSON(object.winLoss)
         : undefined,
-    };
+    }
   },
 
   toJSON(message: PlayerStat_FactionWL): unknown {
-    const obj: any = {};
+    const obj: any = {}
     message.faction !== undefined &&
-      (obj.faction = factionToJSON(message.faction));
+      (obj.faction = factionToJSON(message.faction))
     message.winLoss !== undefined &&
       (obj.winLoss = message.winLoss
         ? WinLoss.toJSON(message.winLoss)
-        : undefined);
-    return obj;
+        : undefined)
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<PlayerStat_FactionWL>, I>>(
     object: I
   ): PlayerStat_FactionWL {
-    const message = createBasePlayerStat_FactionWL();
-    message.faction = object.faction ?? 0;
+    const message = createBasePlayerStat_FactionWL()
+    message.faction = object.faction ?? 0
     message.winLoss =
       object.winLoss !== undefined && object.winLoss !== null
         ? WinLoss.fromPartial(object.winLoss)
-        : undefined;
-    return message;
+        : undefined
+    return message
   },
-};
+}
 
 function createBasePlayerStats(): PlayerStats {
-  return { playerStats: [] };
+  return { playerStats: [] }
 }
 
 export const PlayerStats = {
@@ -847,27 +845,27 @@ export const PlayerStats = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.playerStats) {
-      PlayerStat.encode(v!, writer.uint32(10).fork()).ldelim();
+      PlayerStat.encode(v!, writer.uint32(10).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PlayerStats {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayerStats();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayerStats()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.playerStats.push(PlayerStat.decode(reader, reader.uint32()));
-          break;
+          message.playerStats.push(PlayerStat.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): PlayerStats {
@@ -875,33 +873,33 @@ export const PlayerStats = {
       playerStats: Array.isArray(object?.playerStats)
         ? object.playerStats.map((e: any) => PlayerStat.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: PlayerStats): unknown {
-    const obj: any = {};
+    const obj: any = {}
     if (message.playerStats) {
       obj.playerStats = message.playerStats.map((e) =>
         e ? PlayerStat.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.playerStats = [];
+      obj.playerStats = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<PlayerStats>, I>>(
     object: I
   ): PlayerStats {
-    const message = createBasePlayerStats();
+    const message = createBasePlayerStats()
     message.playerStats =
-      object.playerStats?.map((e) => PlayerStat.fromPartial(e)) || [];
-    return message;
+      object.playerStats?.map((e) => PlayerStat.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseGeneralStat(): GeneralStat {
-  return { general: 0, stats: [], total: undefined };
+  return { general: 0, stats: [], total: undefined }
 }
 
 export const GeneralStat = {
@@ -910,41 +908,41 @@ export const GeneralStat = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.general !== 0) {
-      writer.uint32(8).int32(message.general);
+      writer.uint32(8).int32(message.general)
     }
     for (const v of message.stats) {
-      GeneralStat_PlayerWL.encode(v!, writer.uint32(18).fork()).ldelim();
+      GeneralStat_PlayerWL.encode(v!, writer.uint32(18).fork()).ldelim()
     }
     if (message.total !== undefined) {
-      WinLoss.encode(message.total, writer.uint32(26).fork()).ldelim();
+      WinLoss.encode(message.total, writer.uint32(26).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GeneralStat {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGeneralStat();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseGeneralStat()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.general = reader.int32() as any;
-          break;
+          message.general = reader.int32() as any
+          break
         case 2:
           message.stats.push(
             GeneralStat_PlayerWL.decode(reader, reader.uint32())
-          );
-          break;
+          )
+          break
         case 3:
-          message.total = WinLoss.decode(reader, reader.uint32());
-          break;
+          message.total = WinLoss.decode(reader, reader.uint32())
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): GeneralStat {
@@ -954,42 +952,42 @@ export const GeneralStat = {
         ? object.stats.map((e: any) => GeneralStat_PlayerWL.fromJSON(e))
         : [],
       total: isSet(object.total) ? WinLoss.fromJSON(object.total) : undefined,
-    };
+    }
   },
 
   toJSON(message: GeneralStat): unknown {
-    const obj: any = {};
+    const obj: any = {}
     message.general !== undefined &&
-      (obj.general = generalToJSON(message.general));
+      (obj.general = generalToJSON(message.general))
     if (message.stats) {
       obj.stats = message.stats.map((e) =>
         e ? GeneralStat_PlayerWL.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.stats = [];
+      obj.stats = []
     }
     message.total !== undefined &&
-      (obj.total = message.total ? WinLoss.toJSON(message.total) : undefined);
-    return obj;
+      (obj.total = message.total ? WinLoss.toJSON(message.total) : undefined)
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<GeneralStat>, I>>(
     object: I
   ): GeneralStat {
-    const message = createBaseGeneralStat();
-    message.general = object.general ?? 0;
+    const message = createBaseGeneralStat()
+    message.general = object.general ?? 0
     message.stats =
-      object.stats?.map((e) => GeneralStat_PlayerWL.fromPartial(e)) || [];
+      object.stats?.map((e) => GeneralStat_PlayerWL.fromPartial(e)) || []
     message.total =
       object.total !== undefined && object.total !== null
         ? WinLoss.fromPartial(object.total)
-        : undefined;
-    return message;
+        : undefined
+    return message
   },
-};
+}
 
 function createBaseGeneralStat_PlayerWL(): GeneralStat_PlayerWL {
-  return { playerName: "", winLoss: undefined };
+  return { playerName: "", winLoss: undefined }
 }
 
 export const GeneralStat_PlayerWL = {
@@ -998,36 +996,36 @@ export const GeneralStat_PlayerWL = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.playerName !== "") {
-      writer.uint32(10).string(message.playerName);
+      writer.uint32(10).string(message.playerName)
     }
     if (message.winLoss !== undefined) {
-      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim();
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
   ): GeneralStat_PlayerWL {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGeneralStat_PlayerWL();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseGeneralStat_PlayerWL()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.playerName = reader.string();
-          break;
+          message.playerName = reader.string()
+          break
         case 2:
-          message.winLoss = WinLoss.decode(reader, reader.uint32());
-          break;
+          message.winLoss = WinLoss.decode(reader, reader.uint32())
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): GeneralStat_PlayerWL {
@@ -1036,34 +1034,34 @@ export const GeneralStat_PlayerWL = {
       winLoss: isSet(object.winLoss)
         ? WinLoss.fromJSON(object.winLoss)
         : undefined,
-    };
+    }
   },
 
   toJSON(message: GeneralStat_PlayerWL): unknown {
-    const obj: any = {};
-    message.playerName !== undefined && (obj.playerName = message.playerName);
+    const obj: any = {}
+    message.playerName !== undefined && (obj.playerName = message.playerName)
     message.winLoss !== undefined &&
       (obj.winLoss = message.winLoss
         ? WinLoss.toJSON(message.winLoss)
-        : undefined);
-    return obj;
+        : undefined)
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<GeneralStat_PlayerWL>, I>>(
     object: I
   ): GeneralStat_PlayerWL {
-    const message = createBaseGeneralStat_PlayerWL();
-    message.playerName = object.playerName ?? "";
+    const message = createBaseGeneralStat_PlayerWL()
+    message.playerName = object.playerName ?? ""
     message.winLoss =
       object.winLoss !== undefined && object.winLoss !== null
         ? WinLoss.fromPartial(object.winLoss)
-        : undefined;
-    return message;
+        : undefined
+    return message
   },
-};
+}
 
 function createBaseGeneralStats(): GeneralStats {
-  return { generalStats: [] };
+  return { generalStats: [] }
 }
 
 export const GeneralStats = {
@@ -1072,29 +1070,27 @@ export const GeneralStats = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.generalStats) {
-      GeneralStat.encode(v!, writer.uint32(10).fork()).ldelim();
+      GeneralStat.encode(v!, writer.uint32(10).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GeneralStats {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGeneralStats();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseGeneralStats()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.generalStats.push(
-            GeneralStat.decode(reader, reader.uint32())
-          );
-          break;
+          message.generalStats.push(GeneralStat.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): GeneralStats {
@@ -1102,33 +1098,33 @@ export const GeneralStats = {
       generalStats: Array.isArray(object?.generalStats)
         ? object.generalStats.map((e: any) => GeneralStat.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: GeneralStats): unknown {
-    const obj: any = {};
+    const obj: any = {}
     if (message.generalStats) {
       obj.generalStats = message.generalStats.map((e) =>
         e ? GeneralStat.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.generalStats = [];
+      obj.generalStats = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<GeneralStats>, I>>(
     object: I
   ): GeneralStats {
-    const message = createBaseGeneralStats();
+    const message = createBaseGeneralStats()
     message.generalStats =
-      object.generalStats?.map((e) => GeneralStat.fromPartial(e)) || [];
-    return message;
+      object.generalStats?.map((e) => GeneralStat.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseDateMessage(): DateMessage {
-  return { Year: 0, Month: 0, Day: 0 };
+  return { Year: 0, Month: 0, Day: 0 }
 }
 
 export const DateMessage = {
@@ -1137,39 +1133,39 @@ export const DateMessage = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.Year !== 0) {
-      writer.uint32(8).int32(message.Year);
+      writer.uint32(8).int32(message.Year)
     }
     if (message.Month !== 0) {
-      writer.uint32(16).int32(message.Month);
+      writer.uint32(16).int32(message.Month)
     }
     if (message.Day !== 0) {
-      writer.uint32(24).int32(message.Day);
+      writer.uint32(24).int32(message.Day)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): DateMessage {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDateMessage();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseDateMessage()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.Year = reader.int32();
-          break;
+          message.Year = reader.int32()
+          break
         case 2:
-          message.Month = reader.int32();
-          break;
+          message.Month = reader.int32()
+          break
         case 3:
-          message.Day = reader.int32();
-          break;
+          message.Day = reader.int32()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): DateMessage {
@@ -1177,30 +1173,30 @@ export const DateMessage = {
       Year: isSet(object.Year) ? Number(object.Year) : 0,
       Month: isSet(object.Month) ? Number(object.Month) : 0,
       Day: isSet(object.Day) ? Number(object.Day) : 0,
-    };
+    }
   },
 
   toJSON(message: DateMessage): unknown {
-    const obj: any = {};
-    message.Year !== undefined && (obj.Year = Math.round(message.Year));
-    message.Month !== undefined && (obj.Month = Math.round(message.Month));
-    message.Day !== undefined && (obj.Day = Math.round(message.Day));
-    return obj;
+    const obj: any = {}
+    message.Year !== undefined && (obj.Year = Math.round(message.Year))
+    message.Month !== undefined && (obj.Month = Math.round(message.Month))
+    message.Day !== undefined && (obj.Day = Math.round(message.Day))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<DateMessage>, I>>(
     object: I
   ): DateMessage {
-    const message = createBaseDateMessage();
-    message.Year = object.Year ?? 0;
-    message.Month = object.Month ?? 0;
-    message.Day = object.Day ?? 0;
-    return message;
+    const message = createBaseDateMessage()
+    message.Year = object.Year ?? 0
+    message.Month = object.Month ?? 0
+    message.Day = object.Day ?? 0
+    return message
   },
-};
+}
 
 function createBaseTeamStat(): TeamStat {
-  return { date: undefined, team: 0, wins: 0 };
+  return { date: undefined, team: 0, wins: 0 }
 }
 
 export const TeamStat = {
@@ -1209,39 +1205,39 @@ export const TeamStat = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.date !== undefined) {
-      DateMessage.encode(message.date, writer.uint32(10).fork()).ldelim();
+      DateMessage.encode(message.date, writer.uint32(10).fork()).ldelim()
     }
     if (message.team !== 0) {
-      writer.uint32(16).int32(message.team);
+      writer.uint32(16).int32(message.team)
     }
     if (message.wins !== 0) {
-      writer.uint32(24).int32(message.wins);
+      writer.uint32(24).int32(message.wins)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): TeamStat {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTeamStat();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseTeamStat()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.date = DateMessage.decode(reader, reader.uint32());
-          break;
+          message.date = DateMessage.decode(reader, reader.uint32())
+          break
         case 2:
-          message.team = reader.int32() as any;
-          break;
+          message.team = reader.int32() as any
+          break
         case 3:
-          message.wins = reader.int32();
-          break;
+          message.wins = reader.int32()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): TeamStat {
@@ -1249,32 +1245,32 @@ export const TeamStat = {
       date: isSet(object.date) ? DateMessage.fromJSON(object.date) : undefined,
       team: isSet(object.team) ? teamFromJSON(object.team) : 0,
       wins: isSet(object.wins) ? Number(object.wins) : 0,
-    };
+    }
   },
 
   toJSON(message: TeamStat): unknown {
-    const obj: any = {};
+    const obj: any = {}
     message.date !== undefined &&
-      (obj.date = message.date ? DateMessage.toJSON(message.date) : undefined);
-    message.team !== undefined && (obj.team = teamToJSON(message.team));
-    message.wins !== undefined && (obj.wins = Math.round(message.wins));
-    return obj;
+      (obj.date = message.date ? DateMessage.toJSON(message.date) : undefined)
+    message.team !== undefined && (obj.team = teamToJSON(message.team))
+    message.wins !== undefined && (obj.wins = Math.round(message.wins))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<TeamStat>, I>>(object: I): TeamStat {
-    const message = createBaseTeamStat();
+    const message = createBaseTeamStat()
     message.date =
       object.date !== undefined && object.date !== null
         ? DateMessage.fromPartial(object.date)
-        : undefined;
-    message.team = object.team ?? 0;
-    message.wins = object.wins ?? 0;
-    return message;
+        : undefined
+    message.team = object.team ?? 0
+    message.wins = object.wins ?? 0
+    return message
   },
-};
+}
 
 function createBaseTeamStats(): TeamStats {
-  return { teamStats: [] };
+  return { teamStats: [] }
 }
 
 export const TeamStats = {
@@ -1283,27 +1279,27 @@ export const TeamStats = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.teamStats) {
-      TeamStat.encode(v!, writer.uint32(10).fork()).ldelim();
+      TeamStat.encode(v!, writer.uint32(10).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): TeamStats {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTeamStats();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseTeamStats()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.teamStats.push(TeamStat.decode(reader, reader.uint32()));
-          break;
+          message.teamStats.push(TeamStat.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): TeamStats {
@@ -1311,33 +1307,33 @@ export const TeamStats = {
       teamStats: Array.isArray(object?.teamStats)
         ? object.teamStats.map((e: any) => TeamStat.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: TeamStats): unknown {
-    const obj: any = {};
+    const obj: any = {}
     if (message.teamStats) {
       obj.teamStats = message.teamStats.map((e) =>
         e ? TeamStat.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.teamStats = [];
+      obj.teamStats = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<TeamStats>, I>>(
     object: I
   ): TeamStats {
-    const message = createBaseTeamStats();
+    const message = createBaseTeamStats()
     message.teamStats =
-      object.teamStats?.map((e) => TeamStat.fromPartial(e)) || [];
-    return message;
+      object.teamStats?.map((e) => TeamStat.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseMapStat(): MapStat {
-  return { map: "", team: 0, wins: 0 };
+  return { map: "", team: 0, wins: 0 }
 }
 
 export const MapStat = {
@@ -1346,39 +1342,39 @@ export const MapStat = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.map !== "") {
-      writer.uint32(10).string(message.map);
+      writer.uint32(10).string(message.map)
     }
     if (message.team !== 0) {
-      writer.uint32(16).int32(message.team);
+      writer.uint32(16).int32(message.team)
     }
     if (message.wins !== 0) {
-      writer.uint32(24).int32(message.wins);
+      writer.uint32(24).int32(message.wins)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MapStat {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMapStat();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMapStat()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.map = reader.string();
-          break;
+          message.map = reader.string()
+          break
         case 2:
-          message.team = reader.int32() as any;
-          break;
+          message.team = reader.int32() as any
+          break
         case 3:
-          message.wins = reader.int32();
-          break;
+          message.wins = reader.int32()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): MapStat {
@@ -1386,28 +1382,28 @@ export const MapStat = {
       map: isSet(object.map) ? String(object.map) : "",
       team: isSet(object.team) ? teamFromJSON(object.team) : 0,
       wins: isSet(object.wins) ? Number(object.wins) : 0,
-    };
+    }
   },
 
   toJSON(message: MapStat): unknown {
-    const obj: any = {};
-    message.map !== undefined && (obj.map = message.map);
-    message.team !== undefined && (obj.team = teamToJSON(message.team));
-    message.wins !== undefined && (obj.wins = Math.round(message.wins));
-    return obj;
+    const obj: any = {}
+    message.map !== undefined && (obj.map = message.map)
+    message.team !== undefined && (obj.team = teamToJSON(message.team))
+    message.wins !== undefined && (obj.wins = Math.round(message.wins))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<MapStat>, I>>(object: I): MapStat {
-    const message = createBaseMapStat();
-    message.map = object.map ?? "";
-    message.team = object.team ?? 0;
-    message.wins = object.wins ?? 0;
-    return message;
+    const message = createBaseMapStat()
+    message.map = object.map ?? ""
+    message.team = object.team ?? 0
+    message.wins = object.wins ?? 0
+    return message
   },
-};
+}
 
 function createBaseMapStats(): MapStats {
-  return { mapStats: [] };
+  return { mapStats: [] }
 }
 
 export const MapStats = {
@@ -1416,27 +1412,27 @@ export const MapStats = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     for (const v of message.mapStats) {
-      MapStat.encode(v!, writer.uint32(10).fork()).ldelim();
+      MapStat.encode(v!, writer.uint32(10).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MapStats {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMapStats();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMapStats()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.mapStats.push(MapStat.decode(reader, reader.uint32()));
-          break;
+          message.mapStats.push(MapStat.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): MapStats {
@@ -1444,31 +1440,30 @@ export const MapStats = {
       mapStats: Array.isArray(object?.mapStats)
         ? object.mapStats.map((e: any) => MapStat.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: MapStats): unknown {
-    const obj: any = {};
+    const obj: any = {}
     if (message.mapStats) {
       obj.mapStats = message.mapStats.map((e) =>
         e ? MapStat.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.mapStats = [];
+      obj.mapStats = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<MapStats>, I>>(object: I): MapStats {
-    const message = createBaseMapStats();
-    message.mapStats =
-      object.mapStats?.map((e) => MapStat.fromPartial(e)) || [];
-    return message;
+    const message = createBaseMapStats()
+    message.mapStats = object.mapStats?.map((e) => MapStat.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseSaveResponse(): SaveResponse {
-  return { success: false };
+  return { success: false }
 }
 
 export const SaveResponse = {
@@ -1477,92 +1472,92 @@ export const SaveResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.success === true) {
-      writer.uint32(8).bool(message.success);
+      writer.uint32(8).bool(message.success)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): SaveResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSaveResponse();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseSaveResponse()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.success = reader.bool();
-          break;
+          message.success = reader.bool()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): SaveResponse {
     return {
       success: isSet(object.success) ? Boolean(object.success) : false,
-    };
+    }
   },
 
   toJSON(message: SaveResponse): unknown {
-    const obj: any = {};
-    message.success !== undefined && (obj.success = message.success);
-    return obj;
+    const obj: any = {}
+    message.success !== undefined && (obj.success = message.success)
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<SaveResponse>, I>>(
     object: I
   ): SaveResponse {
-    const message = createBaseSaveResponse();
-    message.success = object.success ?? false;
-    return message;
+    const message = createBaseSaveResponse()
+    message.success = object.success ?? false
+    return message
   },
-};
+}
 
 function createBaseCosts(): Costs {
-  return { player: undefined, buildings: [], units: [] };
+  return { player: undefined, buildings: [], units: [] }
 }
 
 export const Costs = {
   encode(message: Costs, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.player !== undefined) {
-      Player.encode(message.player, writer.uint32(18).fork()).ldelim();
+      Player.encode(message.player, writer.uint32(18).fork()).ldelim()
     }
     for (const v of message.buildings) {
-      Costs_BuiltObject.encode(v!, writer.uint32(26).fork()).ldelim();
+      Costs_BuiltObject.encode(v!, writer.uint32(26).fork()).ldelim()
     }
     for (const v of message.units) {
-      Costs_BuiltObject.encode(v!, writer.uint32(34).fork()).ldelim();
+      Costs_BuiltObject.encode(v!, writer.uint32(34).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Costs {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCosts();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseCosts()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 2:
-          message.player = Player.decode(reader, reader.uint32());
-          break;
+          message.player = Player.decode(reader, reader.uint32())
+          break
         case 3:
           message.buildings.push(
             Costs_BuiltObject.decode(reader, reader.uint32())
-          );
-          break;
+          )
+          break
         case 4:
-          message.units.push(Costs_BuiltObject.decode(reader, reader.uint32()));
-          break;
+          message.units.push(Costs_BuiltObject.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): Costs {
@@ -1574,46 +1569,46 @@ export const Costs = {
       units: Array.isArray(object?.units)
         ? object.units.map((e: any) => Costs_BuiltObject.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: Costs): unknown {
-    const obj: any = {};
+    const obj: any = {}
     message.player !== undefined &&
-      (obj.player = message.player ? Player.toJSON(message.player) : undefined);
+      (obj.player = message.player ? Player.toJSON(message.player) : undefined)
     if (message.buildings) {
       obj.buildings = message.buildings.map((e) =>
         e ? Costs_BuiltObject.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.buildings = [];
+      obj.buildings = []
     }
     if (message.units) {
       obj.units = message.units.map((e) =>
         e ? Costs_BuiltObject.toJSON(e) : undefined
-      );
+      )
     } else {
-      obj.units = [];
+      obj.units = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<Costs>, I>>(object: I): Costs {
-    const message = createBaseCosts();
+    const message = createBaseCosts()
     message.player =
       object.player !== undefined && object.player !== null
         ? Player.fromPartial(object.player)
-        : undefined;
+        : undefined
     message.buildings =
-      object.buildings?.map((e) => Costs_BuiltObject.fromPartial(e)) || [];
+      object.buildings?.map((e) => Costs_BuiltObject.fromPartial(e)) || []
     message.units =
-      object.units?.map((e) => Costs_BuiltObject.fromPartial(e)) || [];
-    return message;
+      object.units?.map((e) => Costs_BuiltObject.fromPartial(e)) || []
+    return message
   },
-};
+}
 
 function createBaseCosts_BuiltObject(): Costs_BuiltObject {
-  return { name: "", count: 0, totalSpent: 0 };
+  return { name: "", count: 0, totalSpent: 0 }
 }
 
 export const Costs_BuiltObject = {
@@ -1622,39 +1617,39 @@ export const Costs_BuiltObject = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+      writer.uint32(10).string(message.name)
     }
     if (message.count !== 0) {
-      writer.uint32(16).int32(message.count);
+      writer.uint32(16).int32(message.count)
     }
     if (message.totalSpent !== 0) {
-      writer.uint32(24).int32(message.totalSpent);
+      writer.uint32(24).int32(message.totalSpent)
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Costs_BuiltObject {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCosts_BuiltObject();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseCosts_BuiltObject()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.name = reader.string();
-          break;
+          message.name = reader.string()
+          break
         case 2:
-          message.count = reader.int32();
-          break;
+          message.count = reader.int32()
+          break
         case 3:
-          message.totalSpent = reader.int32();
-          break;
+          message.totalSpent = reader.int32()
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): Costs_BuiltObject {
@@ -1662,31 +1657,31 @@ export const Costs_BuiltObject = {
       name: isSet(object.name) ? String(object.name) : "",
       count: isSet(object.count) ? Number(object.count) : 0,
       totalSpent: isSet(object.totalSpent) ? Number(object.totalSpent) : 0,
-    };
+    }
   },
 
   toJSON(message: Costs_BuiltObject): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.count !== undefined && (obj.count = Math.round(message.count));
+    const obj: any = {}
+    message.name !== undefined && (obj.name = message.name)
+    message.count !== undefined && (obj.count = Math.round(message.count))
     message.totalSpent !== undefined &&
-      (obj.totalSpent = Math.round(message.totalSpent));
-    return obj;
+      (obj.totalSpent = Math.round(message.totalSpent))
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<Costs_BuiltObject>, I>>(
     object: I
   ): Costs_BuiltObject {
-    const message = createBaseCosts_BuiltObject();
-    message.name = object.name ?? "";
-    message.count = object.count ?? 0;
-    message.totalSpent = object.totalSpent ?? 0;
-    return message;
+    const message = createBaseCosts_BuiltObject()
+    message.name = object.name ?? ""
+    message.count = object.count ?? 0
+    message.totalSpent = object.totalSpent ?? 0
+    return message
   },
-};
+}
 
 function createBaseAllCosts(): AllCosts {
-  return { matchId: 0, costs: [] };
+  return { matchId: 0, costs: [] }
 }
 
 export const AllCosts = {
@@ -1695,33 +1690,33 @@ export const AllCosts = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.matchId !== 0) {
-      writer.uint32(8).int64(message.matchId);
+      writer.uint32(8).int64(message.matchId)
     }
     for (const v of message.costs) {
-      Costs.encode(v!, writer.uint32(18).fork()).ldelim();
+      Costs.encode(v!, writer.uint32(18).fork()).ldelim()
     }
-    return writer;
+    return writer
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): AllCosts {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAllCosts();
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseAllCosts()
     while (reader.pos < end) {
-      const tag = reader.uint32();
+      const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.matchId = longToNumber(reader.int64() as Long);
-          break;
+          message.matchId = longToNumber(reader.int64() as Long)
+          break
         case 2:
-          message.costs.push(Costs.decode(reader, reader.uint32()));
-          break;
+          message.costs.push(Costs.decode(reader, reader.uint32()))
+          break
         default:
-          reader.skipType(tag & 7);
-          break;
+          reader.skipType(tag & 7)
+          break
       }
     }
-    return message;
+    return message
   },
 
   fromJSON(object: any): AllCosts {
@@ -1730,39 +1725,38 @@ export const AllCosts = {
       costs: Array.isArray(object?.costs)
         ? object.costs.map((e: any) => Costs.fromJSON(e))
         : [],
-    };
+    }
   },
 
   toJSON(message: AllCosts): unknown {
-    const obj: any = {};
-    message.matchId !== undefined &&
-      (obj.matchId = Math.round(message.matchId));
+    const obj: any = {}
+    message.matchId !== undefined && (obj.matchId = Math.round(message.matchId))
     if (message.costs) {
-      obj.costs = message.costs.map((e) => (e ? Costs.toJSON(e) : undefined));
+      obj.costs = message.costs.map((e) => (e ? Costs.toJSON(e) : undefined))
     } else {
-      obj.costs = [];
+      obj.costs = []
     }
-    return obj;
+    return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<AllCosts>, I>>(object: I): AllCosts {
-    const message = createBaseAllCosts();
-    message.matchId = object.matchId ?? 0;
-    message.costs = object.costs?.map((e) => Costs.fromPartial(e)) || [];
-    return message;
+    const message = createBaseAllCosts()
+    message.matchId = object.matchId ?? 0
+    message.costs = object.costs?.map((e) => Costs.fromPartial(e)) || []
+    return message
   },
-};
+}
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
+declare var self: any | undefined
+declare var window: any | undefined
+declare var global: any | undefined
 var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw "Unable to locate global object";
-})();
+  if (typeof globalThis !== "undefined") return globalThis
+  if (typeof self !== "undefined") return self
+  if (typeof window !== "undefined") return window
+  if (typeof global !== "undefined") return global
+  throw "Unable to locate global object"
+})()
 
 type Builtin =
   | Date
@@ -1771,7 +1765,7 @@ type Builtin =
   | string
   | number
   | boolean
-  | undefined;
+  | undefined
 
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -1781,50 +1775,50 @@ export type DeepPartial<T> = T extends Builtin
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+  : Partial<T>
 
-type KeysOfUnion<T> = T extends T ? keyof T : never;
+type KeysOfUnion<T> = T extends T ? keyof T : never
 export type Exact<P, I extends P> = P extends Builtin
   ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<
         Exclude<keyof I, KeysOfUnion<P>>,
         never
-      >;
+      >
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = date.getTime() / 1_000;
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
+  const seconds = date.getTime() / 1_000
+  const nanos = (date.getTime() % 1_000) * 1_000_000
+  return { seconds, nanos }
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = t.seconds * 1_000;
-  millis += t.nanos / 1_000_000;
-  return new Date(millis);
+  let millis = t.seconds * 1_000
+  millis += t.nanos / 1_000_000
+  return new Date(millis)
 }
 
 function fromJsonTimestamp(o: any): Date {
   if (o instanceof Date) {
-    return o;
+    return o
   } else if (typeof o === "string") {
-    return new Date(o);
+    return new Date(o)
   } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
+    return fromTimestamp(Timestamp.fromJSON(o))
   }
 }
 
 function longToNumber(long: Long): number {
   if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER")
   }
-  return long.toNumber();
+  return long.toNumber()
 }
 
 if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
+  _m0.util.Long = Long as any
+  _m0.configure()
 }
 
 function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
+  return value !== null && value !== undefined
 }

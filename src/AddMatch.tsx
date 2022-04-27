@@ -1,87 +1,87 @@
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import enLocale from "date-fns/locale/en-US";
-import * as React from "react";
+import AdapterDateFns from "@mui/lab/AdapterDateFns"
+import DesktopDatePicker from "@mui/lab/DesktopDatePicker"
+import LocalizationProvider from "@mui/lab/LocalizationProvider"
+import Button from "@mui/material/Button"
+import Divider from "@mui/material/Divider"
+import FormControl from "@mui/material/FormControl"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import FormLabel from "@mui/material/FormLabel"
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
+import Paper from "@mui/material/Paper"
+import Radio from "@mui/material/Radio"
+import RadioGroup from "@mui/material/RadioGroup"
+import Select from "@mui/material/Select"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
+import enLocale from "date-fns/locale/en-US"
+import * as React from "react"
 import {
   General,
   generalFromJSON,
   MatchInfo,
   Player,
   Team,
-} from "./proto/match";
+} from "./proto/match"
 
 function saveMatch(match: MatchInfo) {
-  const mybytes = MatchInfo.encode(match).finish();
-  console.log("mybytes? " + mybytes);
+  const mybytes = MatchInfo.encode(match).finish()
+  console.log("mybytes? " + mybytes)
   fetch("http://localhost:5000/api/saveMatch", {
     method: "POST",
     headers: { "Content-Type": "application/x-protobuf" },
     body: mybytes,
-  }).then((r) => alert(r.text()));
+  }).then((r) => alert(r.text()))
 }
 
-const allowed_players = ["Brendan", "Jared", "Sean", "Bill"];
+const allowed_players = ["Brendan", "Jared", "Sean", "Bill"]
 
 export default function AddMatch() {
-  const [id, setId] = React.useState<number>(1);
+  const [id, setId] = React.useState<number>(1)
   const [players, setPlayers] = React.useState<string[]>([
     "Brendan",
     "Jared",
     "Sean",
     "Bill",
-  ]);
-  const [teams, setTeams] = React.useState<Team[]>([1, 1, 3, 3]);
+  ])
+  const [teams, setTeams] = React.useState<Team[]>([1, 1, 3, 3])
   const [generals, setGenerals] = React.useState<(General | undefined)[]>([
     undefined,
     undefined,
     undefined,
     undefined,
-  ]);
-  const [date, setDate] = React.useState<Date | null>(new Date());
-  const [winner, setWinner] = React.useState<1 | 2 | 3 | 4>(1);
-  const [map, setMap] = React.useState<string>("");
-  const [passcode, setPasscode] = React.useState<string>("");
-  const idx4 = [0, 1, 2, 3];
+  ])
+  const [date, setDate] = React.useState<Date | null>(new Date())
+  const [winner, setWinner] = React.useState<1 | 2 | 3 | 4>(1)
+  const [map, setMap] = React.useState<string>("")
+  const [passcode, setPasscode] = React.useState<string>("")
+  const idx4 = [0, 1, 2, 3]
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     if (passcode !== "qwer1234") {
-      alert("must have the pass code to save");
-      return;
+      alert("must have the pass code to save")
+      return
     }
     if (!date) {
-      alert("date unset");
-      return;
+      alert("date unset")
+      return
     }
     const myplayers: Player[] = idx4.map((i) => ({
       name: players[i],
       general: generals[i] ?? General.UNRECOGNIZED,
       team: teams[i],
-    }));
+    }))
     const match: MatchInfo = {
       id: id,
       timestamp: date,
       map: map,
       winningTeam: winner,
       players: myplayers,
-    };
-    saveMatch(match);
-    alert("saved");
-  };
+    }
+    saveMatch(match)
+    alert("saved")
+  }
 
   return (
     <Paper>
@@ -96,9 +96,9 @@ export default function AddMatch() {
                 label={`Player${i}`}
                 name={`player${i}`}
                 onChange={(event) => {
-                  const newPlayers = [...players];
-                  newPlayers[i] = event.target.value;
-                  setPlayers(newPlayers);
+                  const newPlayers = [...players]
+                  newPlayers[i] = event.target.value
+                  setPlayers(newPlayers)
                 }}
               >
                 {allowed_players.map((p) => (
@@ -118,9 +118,9 @@ export default function AddMatch() {
                 label={`team${i}`}
                 name={`team${i}`}
                 onChange={(event) => {
-                  const newTeams = [...teams];
-                  newTeams[i] = +event.target.value;
-                  setTeams(newTeams);
+                  const newTeams = [...teams]
+                  newTeams[i] = +event.target.value
+                  setTeams(newTeams)
                 }}
               >
                 {[1, 2, 3, 4].map((p) => (
@@ -140,10 +140,10 @@ export default function AddMatch() {
                 name={`general${i}`}
                 value={generals[i]}
                 onChange={(event) => {
-                  const newGenerals = [...generals];
-                  const parsed = generalFromJSON(event.target.value);
-                  newGenerals[i] = parsed;
-                  setGenerals(newGenerals);
+                  const newGenerals = [...generals]
+                  const parsed = generalFromJSON(event.target.value)
+                  newGenerals[i] = parsed
+                  setGenerals(newGenerals)
                 }}
               >
                 {Object.keys(General)
@@ -224,5 +224,5 @@ export default function AddMatch() {
         </form>
       </LocalizationProvider>
     </Paper>
-  );
+  )
 }

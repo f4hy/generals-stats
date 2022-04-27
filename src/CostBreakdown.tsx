@@ -1,9 +1,16 @@
-import { blue, lightGreen, purple, red } from '@mui/material/colors';
-import Container from "@mui/material/Container";
-import _ from "lodash";
-import * as React from "react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { AllCosts, Costs_BuiltObject } from "./proto/match";
+import { blue, lightGreen, purple, red } from "@mui/material/colors"
+import Container from "@mui/material/Container"
+import _ from "lodash"
+import * as React from "react"
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
+import { AllCosts, Costs_BuiltObject } from "./proto/match"
 
 function getCosts(id: number, callback: (m: AllCosts) => void) {
   fetch("/api/costs/" + id).then((r) =>
@@ -11,70 +18,113 @@ function getCosts(id: number, callback: (m: AllCosts) => void) {
       .blob()
       .then((b) => b.arrayBuffer())
       .then((j) => {
-        const a = new Uint8Array(j);
-        const costs = AllCosts.decode(a);
-        callback(costs);
+        const a = new Uint8Array(j)
+        const costs = AllCosts.decode(a)
+        callback(costs)
       })
-  );
+  )
 }
 
-const empty: AllCosts = { matchId: 0, costs: [] };
+const empty: AllCosts = { matchId: 0, costs: [] }
 
 function formatCosts(data: Costs_BuiltObject[], name: string) {
-  const sorted = _.sortBy(data, d => -d.totalSpent)
+  const sorted = _.sortBy(data, (d) => -d.totalSpent)
   function reducer(acc: any, d: Costs_BuiltObject) {
     return { ...acc, [d.name]: d.totalSpent }
   }
-  const bc = sorted.reduce(reducer, ({ name: name }))
+  const bc = sorted.reduce(reducer, { name: name })
   return bc
 }
 
 export default function CostBreakdown(props: { id: number }) {
-  const [allCosts, setAllCosts] = React.useState<AllCosts>(empty);
+  const [allCosts, setAllCosts] = React.useState<AllCosts>(empty)
   React.useEffect(() => {
-    getCosts(props.id, setAllCosts);
-  }, [props.id]);
-  const building_data = allCosts.costs.map(x => formatCosts(x.buildings, x?.player?.name ?? "unk"))
-  const building_names: string[] = _.without(_.uniq(building_data.reduce((names, n) => [...names, ...Object.keys(n)], [])), "name")
-  const unit_data = allCosts.costs.map(x => formatCosts(x.units, x?.player?.name ?? "unk"))
-  const unit_names: string[] = _.without(_.uniq(unit_data.reduce((names, n) => [...names, ...Object.keys(n)], [])), "name")
+    getCosts(props.id, setAllCosts)
+  }, [props.id])
+  const building_data = allCosts.costs.map((x) =>
+    formatCosts(x.buildings, x?.player?.name ?? "unk")
+  )
+  const building_names: string[] = _.without(
+    _.uniq(
+      building_data.reduce((names, n) => [...names, ...Object.keys(n)], [])
+    ),
+    "name"
+  )
+  const unit_data = allCosts.costs.map((x) =>
+    formatCosts(x.units, x?.player?.name ?? "unk")
+  )
+  const unit_names: string[] = _.without(
+    _.uniq(unit_data.reduce((names, n) => [...names, ...Object.keys(n)], [])),
+    "name"
+  )
 
-  const colors = [red["200"], purple["200"], lightGreen["200"], blue["200"],
-  red["400"], purple["400"], lightGreen["400"], blue["400"],
-  red["600"], purple["600"], lightGreen["600"], blue["600"],
-  red["800"], purple["800"], lightGreen["800"], blue["800"],]
+  const colors = [
+    red["200"],
+    purple["200"],
+    lightGreen["200"],
+    blue["200"],
+    red["400"],
+    purple["400"],
+    lightGreen["400"],
+    blue["400"],
+    red["600"],
+    purple["600"],
+    lightGreen["600"],
+    blue["600"],
+    red["800"],
+    purple["800"],
+    lightGreen["800"],
+    blue["800"],
+  ]
   return (
     <Container>
-      <ResponsiveContainer width="100%" height={300} >
-          <BarChart data={building_data} layout="horizontal"  margin={{top: 5,
-              right: 10,
-              left: 15,
-              bottom: 5,
-            }}   >
-          {building_names.map((n, i) =>
-            (<Bar dataKey={n} fill={colors[i % colors.length]} stackId="a" />)
-          )}
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart
+          data={building_data}
+          layout="horizontal"
+          margin={{ top: 5, right: 10, left: 15, bottom: 5 }}
+        >
+          {building_names.map((n, i) => (
+            <Bar dataKey={n} fill={colors[i % colors.length]} stackId="a" />
+          ))}
           <XAxis dataKey="name" />
-          <YAxis label={{ value: 'Building Spending', position: 'insideLeft', offset: -5, angle: -90 }} />
+          <YAxis
+            label={{
+              value: "Building Spending",
+              position: "insideLeft",
+              offset: -5,
+              angle: -90,
+            }}
+          />
           <Tooltip cursor={false} />
         </BarChart>
       </ResponsiveContainer>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={unit_data} layout="horizontal" margin={{
-          top: 5,
-          right: 10,
-          left: 15,
-          bottom: 5,
-        }}  >
-          {unit_names.map((n, i) =>
-            (<Bar dataKey={n} fill={colors[i % colors.length]} stackId="a" />)
-          )}
+        <BarChart
+          data={unit_data}
+          layout="horizontal"
+          margin={{
+            top: 5,
+            right: 10,
+            left: 15,
+            bottom: 5,
+          }}
+        >
+          {unit_names.map((n, i) => (
+            <Bar dataKey={n} fill={colors[i % colors.length]} stackId="a" />
+          ))}
           <XAxis dataKey="name" />
-          <YAxis label={{ value: 'Unit Spending', position: 'insideLeft', offset: -5, angle: -90 }} />
+          <YAxis
+            label={{
+              value: "Unit Spending",
+              position: "insideLeft",
+              offset: -5,
+              angle: -90,
+            }}
+          />
           <Tooltip cursor={false} />
         </BarChart>
       </ResponsiveContainer>
-      
-    </Container >
+    </Container>
   )
 }

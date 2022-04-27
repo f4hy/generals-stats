@@ -1,17 +1,17 @@
-import Avatar from "@mui/material/Avatar";
-import Badge from "@mui/material/Badge";
-import china from "./img/Gen_China_Logo.webp";
-import usa from "./img/Gen_USA_Logo.webp";
-import gla from "./img/Gla.webp";
-import { General } from "./proto/match";
+import Avatar from "@mui/material/Avatar"
+import Badge from "@mui/material/Badge"
+import china from "./img/Gen_China_Logo.webp"
+import usa from "./img/Gen_USA_Logo.webp"
+import gla from "./img/Gla.webp"
+import { General } from "./proto/match"
 
-type Side = "GLA" | "CHINA" | "USA";
+type Side = "GLA" | "CHINA" | "USA"
 
 const sideImg: Record<Side, string> = {
   GLA: gla,
   CHINA: china,
   USA: usa,
-};
+}
 
 function generalToSide(general: General): Side {
   switch (general) {
@@ -19,19 +19,19 @@ function generalToSide(general: General): Side {
     case General.AIR:
     case General.LASER:
     case General.SUPER:
-      return "USA";
+      return "USA"
     case General.CHINA:
     case General.NUKE:
     case General.TANK:
     case General.INFANTRY:
-      return "CHINA";
+      return "CHINA"
     case General.GLA:
     case General.TOXIN:
     case General.STEALTH:
     case General.DEMO:
-      return "GLA";
+      return "GLA"
     default:
-      return "USA";
+      return "USA"
   }
 }
 
@@ -46,5 +46,5 @@ export default function DisplayGeneral(props: { general: General }) {
       </Badge>
       {/* <Typography>{generalToJSON(props.general)}</Typography> */}
     </>
-  );
+  )
 }

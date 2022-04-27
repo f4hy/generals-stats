@@ -1,6 +1,6 @@
-import React from "react";
-import "./App.css";
-import Menu from "./Menu";
+import React from "react"
+import "./App.css"
+import Menu from "./Menu"
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
         <Menu />
       </body>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

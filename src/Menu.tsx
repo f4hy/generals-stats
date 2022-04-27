@@ -1,35 +1,33 @@
 /* Copied from https://mui.com/components/drawers/ and modified */
-import * as React from "react";
-import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MapIcon from '@mui/icons-material/Map';
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import ListIcon from "@mui/icons-material/List";
-import PersonIcon from "@mui/icons-material/Person";
-import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-import DisplayMatches from "./Matches";
-import DisplayPlayerStats from "./PlayerStats";
-import DisplayGeneralStats from "./GeneralStats";
-import DisplayTeamStats from "./TeamStats";
-import DisplayMapStats from "./MapStats";
-import PeopleIcon from "@mui/icons-material/People";
-import AddMatch from "./AddMatch";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import ListIcon from "@mui/icons-material/List"
+import MapIcon from "@mui/icons-material/Map"
+import MenuIcon from "@mui/icons-material/Menu"
+import MilitaryTechIcon from "@mui/icons-material/MilitaryTech"
+import PeopleIcon from "@mui/icons-material/People"
+import PersonIcon from "@mui/icons-material/Person"
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
+import Box from "@mui/material/Box"
+import CssBaseline from "@mui/material/CssBaseline"
+import Divider from "@mui/material/Divider"
+import MuiDrawer from "@mui/material/Drawer"
+import IconButton from "@mui/material/IconButton"
+import List from "@mui/material/List"
+import ListItemButton from "@mui/material/ListItemButton"
+import ListItemIcon from "@mui/material/ListItemIcon"
+import ListItemText from "@mui/material/ListItemText"
+import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles"
+import Toolbar from "@mui/material/Toolbar"
+import Typography from "@mui/material/Typography"
+import * as React from "react"
+import DisplayGeneralStats from "./GeneralStats"
+import DisplayMapStats from "./MapStats"
+import DisplayMatches from "./Matches"
+import DisplayPlayerStats from "./PlayerStats"
+import DisplayTeamStats from "./TeamStats"
 
-const drawerWidth = 240;
+const drawerWidth = 240
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -38,7 +36,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
-});
+})
 
 const closedMixin = (theme: Theme): CSSObject => ({
   transition: theme.transitions.create("width", {
@@ -50,7 +48,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
   [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
-});
+})
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -59,10 +57,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-}));
+}))
 
 interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
+  open?: boolean
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -81,7 +79,7 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-}));
+}))
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -98,7 +96,7 @@ const Drawer = styled(MuiDrawer, {
     ...closedMixin(theme),
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
-}));
+}))
 
 type Selection =
   | "Matches"
@@ -109,11 +107,11 @@ type Selection =
 /* | "AddMatch" */
 
 interface MenuItemProps {
-  open: boolean;
-  value: Selection;
-  text: string;
-  icon: React.ReactNode;
-  callback: (s: Selection) => void;
+  open: boolean
+  value: Selection
+  text: string
+  icon: React.ReactNode
+  callback: (s: Selection) => void
 }
 
 function Main(props: { selection: Selection }) {
@@ -121,24 +119,24 @@ function Main(props: { selection: Selection }) {
     /* case "AddMatch":
      *   return (<AddMatch />) */
     case "Matches":
-      return <DisplayMatches />;
+      return <DisplayMatches />
     case "PlayerStats":
-      return <DisplayPlayerStats />;
+      return <DisplayPlayerStats />
     case "GeneralStats":
-      return <DisplayGeneralStats />;
+      return <DisplayGeneralStats />
     case "TeamStats":
-      return <DisplayTeamStats />;
+      return <DisplayTeamStats />
     case "MapStats":
-      return <DisplayMapStats />;
+      return <DisplayMapStats />
     /* case "AddMatch":
-*   return <AddMatch />; */
+     *   return <AddMatch />; */
     default:
-      return <div>{props.selection}</div>;
+      return <div>{props.selection}</div>
   }
 }
 
 function MenuItem(props: MenuItemProps) {
-  const open = props.open;
+  const open = props.open
   return (
     <ListItemButton
       key={props.value}
@@ -160,21 +158,21 @@ function MenuItem(props: MenuItemProps) {
       </ListItemIcon>
       <ListItemText primary={props.text} sx={{ opacity: open ? 1 : 0 }} />
     </ListItemButton>
-  );
+  )
 }
 
 export default function Menu() {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
-  const [selection, setSelection] = React.useState<Selection>("Matches");
+  const theme = useTheme()
+  const [open, setOpen] = React.useState(true)
+  const [selection, setSelection] = React.useState<Selection>("Matches")
 
   const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   const handleDrawerClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -262,5 +260,5 @@ export default function Menu() {
         <Main selection={selection} />
       </Box>
     </Box>
-  );
+  )
 }
