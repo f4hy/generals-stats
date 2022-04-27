@@ -7,26 +7,25 @@ import (
 	"github.com/samber/lo"
 )
 
-func getFaction(general pb.General) pb.Faction{
-	if(general == pb.General_AIR || general == pb.General_LASER || general == pb.General_SUPER || general == pb.General_USA){
+func getFaction(general pb.General) pb.Faction {
+	if general == pb.General_AIR || general == pb.General_LASER || general == pb.General_SUPER || general == pb.General_USA {
 		return pb.Faction_ANYUSA
 	}
-	if(general == pb.General_INFANTRY || general == pb.General_NUKE || general == pb.General_TANK || general == pb.General_CHINA){
+	if general == pb.General_INFANTRY || general == pb.General_NUKE || general == pb.General_TANK || general == pb.General_CHINA {
 		return pb.Faction_ANYCHINA
 	}
 	return pb.Faction_ANYGLA
 }
 
-func PlayerStats() *pb.PlayerStats {
+func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 	var playerstats pb.PlayerStats
 
-	matches, _ := GetMatches()
 	player_stat_map := make(map[string]map[pb.General]*pb.WinLoss)
 	player_faction_stat_map := make(map[string]map[pb.Faction]*pb.WinLoss)
 
 	for _, m := range matches.Matches {
 		for _, p := range m.Players {
-			faction:= getFaction(p.General)
+			faction := getFaction(p.General)
 			_, prs := player_stat_map[p.Name]
 			if !prs {
 				player_stat_map[p.Name] = make(map[pb.General]*pb.WinLoss)
@@ -36,20 +35,20 @@ func PlayerStats() *pb.PlayerStats {
 				player_stat_map[p.Name][p.General] = &pb.WinLoss{}
 			}
 			_, fprs := player_faction_stat_map[p.Name]
-			if !fprs{
+			if !fprs {
 				player_faction_stat_map[p.Name] = make(map[pb.Faction]*pb.WinLoss)
 			}
 			_, fexists := player_faction_stat_map[p.Name][faction]
 			if !fexists {
 				player_faction_stat_map[p.Name][faction] = &pb.WinLoss{}
 			}
-			
+
 			if m.WinningTeam == p.Team {
 				player_stat_map[p.Name][p.General].Wins += 1
-				player_faction_stat_map[p.Name][faction].Wins +=1
+				player_faction_stat_map[p.Name][faction].Wins += 1
 			} else {
 				player_stat_map[p.Name][p.General].Losses += 1
-				player_faction_stat_map[p.Name][faction].Losses +=1
+				player_faction_stat_map[p.Name][faction].Losses += 1
 			}
 		}
 	}
@@ -62,16 +61,16 @@ func PlayerStats() *pb.PlayerStats {
 				General: general,
 				WinLoss: winloss,
 			})
-			faction:= getFaction(general)
-			f_wl := player_faction_stat_map[player][faction]		
+			faction := getFaction(general)
+			f_wl := player_faction_stat_map[player][faction]
 			factionWL = append(factionWL, &pb.PlayerStat_FactionWL{
 				Faction: faction,
 				WinLoss: f_wl,
 			})
 		}
 		playerstat := pb.PlayerStat{
-			PlayerName: player,
-			Stats:      generalWL,
+			PlayerName:   player,
+			Stats:        generalWL,
 			FactionStats: factionWL,
 		}
 		playerstats.PlayerStats = append(playerstats.PlayerStats, &playerstat)
@@ -82,10 +81,9 @@ func PlayerStats() *pb.PlayerStats {
 	return &playerstats
 }
 
-func GeneralStats() *pb.GeneralStats {
+func GeneralStats(matches *pb.Matches) *pb.GeneralStats {
 	var generalstats pb.GeneralStats
 
-	matches, _ := GetMatches()
 	general_stat_map := make(map[pb.General]map[string]*pb.WinLoss)
 	overall := make(map[pb.General]*pb.WinLoss)
 	for _, m := range matches.Matches {
@@ -138,10 +136,9 @@ func getTeams(match *pb.MatchInfo) []pb.Team {
 	return lo.Uniq(teams)
 }
 
-func TeamStats() *pb.TeamStats {
+func TeamStats(matches *pb.Matches) *pb.TeamStats {
 	var teamstats pb.TeamStats
 
-	matches, _ := GetMatches()
 	for _, m := range matches.Matches {
 		winner := m.GetWinningTeam()
 		date := m.Timestamp.AsTime()
@@ -169,28 +166,27 @@ func TeamStats() *pb.TeamStats {
 	sort.Slice(teamstats.TeamStats, func(i, j int) bool {
 		di := teamstats.TeamStats[i].Date
 		dj := teamstats.TeamStats[j].Date
-		return (di.Year*1000 + di.Month*100 + di.Day) <(dj.Year*1000 + dj.Month*100 + dj.Day)
+		return (di.Year*1000 + di.Month*100 + di.Day) < (dj.Year*1000 + dj.Month*100 + dj.Day)
 	})
 	return &teamstats
 }
 
-type team_and_map struct{
-	team pb.Team;
-	played_map string;
+type team_and_map struct {
+	team       pb.Team
+	played_map string
 }
 
-func MapStats() *pb.MapStats {
+func MapStats(matches *pb.Matches) *pb.MapStats {
 	var teamstats pb.MapStats
 	team_map_map := make(map[team_and_map]int)
 
-	matches, _ := GetMatches()
 	for _, m := range matches.Matches {
 		tam := team_and_map{team: m.WinningTeam, played_map: m.Map}
 		team_map_map[tam] += 1
 	}
 	for t_and_m, wins := range team_map_map {
 		mapstats := &pb.MapStat{
-			Map: t_and_m.played_map,
+			Map:  t_and_m.played_map,
 			Team: t_and_m.team,
 			Wins: int32(wins),
 		}

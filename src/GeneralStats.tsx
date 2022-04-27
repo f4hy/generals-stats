@@ -23,7 +23,6 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
       .blob()
       .then((b) => b.arrayBuffer())
       .then((j) => {
-        console.log(j)
         const a = new Uint8Array(j)
         const generalStats = GeneralStats.decode(a)
         generalStats.generalStats.sort((s1, s2) => s1.general - s2.general)
@@ -93,7 +92,6 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
   )
 }
 function roundUpNearest5(num: number) {
-  console.log("ceil is for " + num + ":" + Math.ceil(num / 5))
   return Math.ceil(num / 5) * 5
 }
 

@@ -20,7 +20,6 @@ func SaveCosts(costs *pb.AllCosts) error {
 	return err
 }
 
-
 func SaveMatch(match *pb.MatchInfo) error {
 	path := fmt.Sprintf("parsed-matches/%d.json", match.GetId())
 	dataToSave, err := proto.Marshal(match)
@@ -62,12 +61,12 @@ func GetMatches() (*pb.Matches, error) {
 	}, nil
 }
 
-func GetCosts(match_id int64) (*pb.AllCosts, error){
+func GetCosts(match_id int64) (*pb.AllCosts, error) {
 	path := fmt.Sprintf("match-costs/%d.json", match_id)
 	log.Infof("fetching match %s", path)
 	costs := &pb.AllCosts{}
 	costdata, err := s3.GetS3Data(path)
-	if(err != nil){
+	if err != nil {
 		return costs, err
 	}
 	proto.Unmarshal(costdata, costs)

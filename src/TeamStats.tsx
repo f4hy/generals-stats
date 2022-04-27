@@ -32,7 +32,6 @@ function getTeamStats(callback: (m: TeamStats) => void) {
 }
 
 function roundUpNearest5(num: number) {
-  console.log("ceil is for " + num + ":" + Math.ceil(num / 5))
   return Math.ceil(num / 5) * 5
 }
 
