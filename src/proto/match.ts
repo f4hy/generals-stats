@@ -285,9 +285,17 @@ export interface Costs_BuiltObject {
   totalSpent: number
 }
 
-export interface AllCosts {
+export interface APM {
+  playerName: string
+  actionCount: number
+  minutes: number
+  apm: number
+}
+
+export interface MatchDetails {
   matchId: number
   costs: Costs[]
+  apms: APM[]
 }
 
 function createBasePlayer(): Player {
@@ -1680,36 +1688,45 @@ export const Costs_BuiltObject = {
   },
 }
 
-function createBaseAllCosts(): AllCosts {
-  return { matchId: 0, costs: [] }
+function createBaseAPM(): APM {
+  return { playerName: "", actionCount: 0, minutes: 0, apm: 0 }
 }
 
-export const AllCosts = {
-  encode(
-    message: AllCosts,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.matchId !== 0) {
-      writer.uint32(8).int64(message.matchId)
+export const APM = {
+  encode(message: APM, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName)
     }
-    for (const v of message.costs) {
-      Costs.encode(v!, writer.uint32(18).fork()).ldelim()
+    if (message.actionCount !== 0) {
+      writer.uint32(16).int64(message.actionCount)
+    }
+    if (message.minutes !== 0) {
+      writer.uint32(25).double(message.minutes)
+    }
+    if (message.apm !== 0) {
+      writer.uint32(33).double(message.apm)
     }
     return writer
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): AllCosts {
+  decode(input: _m0.Reader | Uint8Array, length?: number): APM {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
     let end = length === undefined ? reader.len : reader.pos + length
-    const message = createBaseAllCosts()
+    const message = createBaseAPM()
     while (reader.pos < end) {
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.matchId = longToNumber(reader.int64() as Long)
+          message.playerName = reader.string()
           break
         case 2:
-          message.costs.push(Costs.decode(reader, reader.uint32()))
+          message.actionCount = longToNumber(reader.int64() as Long)
+          break
+        case 3:
+          message.minutes = reader.double()
+          break
+        case 4:
+          message.apm = reader.double()
           break
         default:
           reader.skipType(tag & 7)
@@ -1719,16 +1736,93 @@ export const AllCosts = {
     return message
   },
 
-  fromJSON(object: any): AllCosts {
+  fromJSON(object: any): APM {
+    return {
+      playerName: isSet(object.playerName) ? String(object.playerName) : "",
+      actionCount: isSet(object.actionCount) ? Number(object.actionCount) : 0,
+      minutes: isSet(object.minutes) ? Number(object.minutes) : 0,
+      apm: isSet(object.apm) ? Number(object.apm) : 0,
+    }
+  },
+
+  toJSON(message: APM): unknown {
+    const obj: any = {}
+    message.playerName !== undefined && (obj.playerName = message.playerName)
+    message.actionCount !== undefined &&
+      (obj.actionCount = Math.round(message.actionCount))
+    message.minutes !== undefined && (obj.minutes = message.minutes)
+    message.apm !== undefined && (obj.apm = message.apm)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<APM>, I>>(object: I): APM {
+    const message = createBaseAPM()
+    message.playerName = object.playerName ?? ""
+    message.actionCount = object.actionCount ?? 0
+    message.minutes = object.minutes ?? 0
+    message.apm = object.apm ?? 0
+    return message
+  },
+}
+
+function createBaseMatchDetails(): MatchDetails {
+  return { matchId: 0, costs: [], apms: [] }
+}
+
+export const MatchDetails = {
+  encode(
+    message: MatchDetails,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.matchId !== 0) {
+      writer.uint32(8).int64(message.matchId)
+    }
+    for (const v of message.costs) {
+      Costs.encode(v!, writer.uint32(18).fork()).ldelim()
+    }
+    for (const v of message.apms) {
+      APM.encode(v!, writer.uint32(26).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MatchDetails {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMatchDetails()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.matchId = longToNumber(reader.int64() as Long)
+          break
+        case 2:
+          message.costs.push(Costs.decode(reader, reader.uint32()))
+          break
+        case 3:
+          message.apms.push(APM.decode(reader, reader.uint32()))
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MatchDetails {
     return {
       matchId: isSet(object.matchId) ? Number(object.matchId) : 0,
       costs: Array.isArray(object?.costs)
         ? object.costs.map((e: any) => Costs.fromJSON(e))
         : [],
+      apms: Array.isArray(object?.apms)
+        ? object.apms.map((e: any) => APM.fromJSON(e))
+        : [],
     }
   },
 
-  toJSON(message: AllCosts): unknown {
+  toJSON(message: MatchDetails): unknown {
     const obj: any = {}
     message.matchId !== undefined && (obj.matchId = Math.round(message.matchId))
     if (message.costs) {
@@ -1736,13 +1830,21 @@ export const AllCosts = {
     } else {
       obj.costs = []
     }
+    if (message.apms) {
+      obj.apms = message.apms.map((e) => (e ? APM.toJSON(e) : undefined))
+    } else {
+      obj.apms = []
+    }
     return obj
   },
 
-  fromPartial<I extends Exact<DeepPartial<AllCosts>, I>>(object: I): AllCosts {
-    const message = createBaseAllCosts()
+  fromPartial<I extends Exact<DeepPartial<MatchDetails>, I>>(
+    object: I
+  ): MatchDetails {
+    const message = createBaseMatchDetails()
     message.matchId = object.matchId ?? 0
     message.costs = object.costs?.map((e) => Costs.fromPartial(e)) || []
+    message.apms = object.apms?.map((e) => APM.fromPartial(e)) || []
     return message
   },
 }

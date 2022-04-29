@@ -88,7 +88,7 @@ func main() {
 			ts := data.MapStats(matches)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
-		api.GET("/costs/:matchid", func(c *gin.Context) {
+		api.GET("/details/:matchid", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
 			matchidstr := c.Param("matchid")
 			matchid, err := strconv.ParseInt(matchidstr, 10, 0)
@@ -97,7 +97,7 @@ func main() {
 				c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
-			ts, err := data.GetCosts(matchid)
+			ts, err := data.GetDetails(matchid)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
 		api.POST("/saveMatch", func(c *gin.Context) {

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/bill-rich/cncstats/pkg/zhreplay"
+	"github.com/bill-rich/cncstats/pkg/zhreplay/body"
 	"github.com/bill-rich/cncstats/pkg/zhreplay/object"
 	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
@@ -57,7 +58,51 @@ func player_parse(playername string) string {
 	return ""
 }
 
-func parse_file(filename string) (*pb.MatchInfo, *pb.AllCosts, error) {
+func getPlayer(psummary *object.PlayerSummary) (*pb.Player){
+	return &pb.Player{
+			Name:    player_parse(psummary.Name),
+			General: general_parse(psummary.Side),
+			Team:    pb.Team(psummary.Team),
+		}
+}
+
+func getBuildings(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
+	ret := []*pb.Costs_BuiltObject{}
+	for bname, building := range psummary.BuildingsBuilt {
+			built := pb.Costs_BuiltObject{
+				Name:       bname,
+				Count:      int32(building.Count),
+				TotalSpent: int32(building.TotalSpent),
+			}
+			ret = append(ret, &built)
+
+	}
+	return ret	
+}
+
+func getUnits(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
+	ret := []*pb.Costs_BuiltObject{}
+		for uname, unit := range psummary.UnitsCreated {
+			created_unit := pb.Costs_BuiltObject{
+				Name:       uname,
+				Count:      int32(unit.Count),
+				TotalSpent: int32(unit.TotalSpent),
+			}
+			ret = append(ret, &created_unit)
+		}
+	return ret	
+}
+
+
+func getActionCounts(body []*body.BodyChunk)(map[string]int64 ){
+	counts := make(map[string]int64)
+	for _, b := range body{
+		counts[player_parse(b.PlayerName)] += 1
+	}
+	return counts	
+}
+
+func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	data, err := ioutil.ReadFile(filename)
 	replay := zhreplay.Replay{}
 	err = json.Unmarshal(data, &replay)
@@ -68,7 +113,7 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.AllCosts, error) {
 	date := time.Date(h.Year, time.Month(h.Month), h.Day, h.Hour, h.Minute, h.Second, h.Millisecond, time.UTC)
 	timestamp := timestamppb.New(date)
 	match_id := int64(timestamp.Seconds)
-	costs := pb.AllCosts{
+	details := pb.MatchDetails{
 		MatchId: match_id,
 	}
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
@@ -77,7 +122,7 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.AllCosts, error) {
 	})
 	if !found {
 		log.Println("no winnner??")
-		return &pb.MatchInfo{}, &costs, errors.New("Could not determine winner")
+		return &pb.MatchInfo{}, &details, errors.New("Could not determine winner")
 	}
 	match := pb.MatchInfo{
 		Id:          match_id,
@@ -87,35 +132,29 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.AllCosts, error) {
 	}
 	for _, i := range replay.Summary {
 		// fmt.Printf("Name: %s : %s: %t %d\n", i.Name, i.Side, i.Win, i.Team)
-		player := &pb.Player{
-			Name:    player_parse(i.Name),
-			General: general_parse(i.Side),
-			Team:    pb.Team(i.Team),
-		}
+		player := getPlayer(i)
 		match.Players = append(match.Players, player)
 		cost := &pb.Costs{
 			Player: player,
+			Buildings: getBuildings(i),
+			Units: getUnits(i),
 		}
-		for bname, building := range i.BuildingsBuilt {
-			built := pb.Costs_BuiltObject{
-				Name:       bname,
-				Count:      int32(building.Count),
-				TotalSpent: int32(building.TotalSpent),
-			}
-			cost.Buildings = append(cost.Buildings, &built)
-
-		}
-		for uname, unit := range i.UnitsCreated {
-			created_unit := pb.Costs_BuiltObject{
-				Name:       uname,
-				Count:      int32(unit.Count),
-				TotalSpent: int32(unit.TotalSpent),
-			}
-			cost.Units = append(cost.Units, &created_unit)
-		}
-		costs.Costs = append(costs.Costs, cost)
+		details.Costs = append(details.Costs, cost)
 	}
-	return &match, &costs, nil
+	counts := getActionCounts(replay.Body)
+	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
+	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
+	minutes := end.Sub(start).Minutes()
+	for player_name, count := range counts {
+		apm := &pb.APM{
+			PlayerName: player_name,
+			ActionCount: count,
+			Minutes: minutes,
+			Apm: float64(count) / minutes,
+		}
+		details.Apms = append(details.Apms, apm)
+	}
+	return &match, &details, nil
 }
 
 func main() {
@@ -129,16 +168,15 @@ func main() {
 		fmt.Println(file.Name(), file.IsDir())
 		if strings.Contains(file.Name(), ".json") && strings.Contains(file.Name(), "2v2") && strings.Contains(file.Name(), "jbb") {
 			// fmt.Println("parsing!! ", file.Name())
-			result, costs, err := parse_file("./jsons/" + file.Name())
+			result, details, err := parse_file("./jsons/" + file.Name())
 			if err != nil {
 				fmt.Println("could not parse file", file.Name())
 			} else {
 				// fmt.Println("Match result:", result.Timestamp.AsTime())
-				_ = result
-				_ = costs
-				fmt.Println("costs :", costs)
+				fmt.Println("details :", details)
 				data.SaveMatch(result)
-				data.SaveCosts(costs)
+				data.SaveDetails(details)
+				// data.SaveCosts(costs)
 			}
 
 		}
