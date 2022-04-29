@@ -97,7 +97,9 @@ func getUnits(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
 func getActionCounts(body []*body.BodyChunk)(map[string]int64 ){
 	counts := make(map[string]int64)
 	for _, b := range body{
-		counts[player_parse(b.PlayerName)] += 1
+		if(!strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum")){
+			counts[player_parse(b.PlayerName)] += 1
+		}
 	}
 	return counts	
 }

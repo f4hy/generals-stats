@@ -8,24 +8,11 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
+  YAxis
 } from "recharts"
-import { AllCosts, Costs_BuiltObject } from "./proto/match"
+import { Costs, Costs_BuiltObject } from "./proto/match"
 
-function getCosts(id: number, callback: (m: AllCosts) => void) {
-  fetch("/api/costs/" + id).then((r) =>
-    r
-      .blob()
-      .then((b) => b.arrayBuffer())
-      .then((j) => {
-        const a = new Uint8Array(j)
-        const costs = AllCosts.decode(a)
-        callback(costs)
-      })
-  )
-}
 
-const empty: AllCosts = { matchId: 0, costs: [] }
 
 function formatCosts(data: Costs_BuiltObject[], name: string) {
   const sorted = _.sortBy(data, (d) => -d.totalSpent)
@@ -36,12 +23,8 @@ function formatCosts(data: Costs_BuiltObject[], name: string) {
   return bc
 }
 
-export default function CostBreakdown(props: { id: number }) {
-  const [allCosts, setAllCosts] = React.useState<AllCosts>(empty)
-  React.useEffect(() => {
-    getCosts(props.id, setAllCosts)
-  }, [props.id])
-  const building_data = allCosts.costs.map((x) =>
+export default function CostBreakdown(props: { costs: Costs[] }) {
+  const building_data = props.costs.map((x) =>
     formatCosts(x.buildings, x?.player?.name ?? "unk")
   )
   const building_names: string[] = _.without(
@@ -50,7 +33,7 @@ export default function CostBreakdown(props: { id: number }) {
     ),
     "name"
   )
-  const unit_data = allCosts.costs.map((x) =>
+  const unit_data = props.costs.map((x) =>
     formatCosts(x.units, x?.player?.name ?? "unk")
   )
   const unit_names: string[] = _.without(

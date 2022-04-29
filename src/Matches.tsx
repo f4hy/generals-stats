@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography"
 import * as React from "react"
 import DisplayGeneral from "./Generals"
 import { Matches, MatchInfo } from "./proto/match"
-import CostBreakdown from "./CostBreakdown"
+import ShowMatchDetails from "./ShowMatchDetails"
 
 function getMatches(callback: (m: Matches) => void) {
   fetch("/api/matches").then((r) =>
@@ -128,7 +128,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
       <Button variant="contained" onClick={() => setDetails(!details)}>
         Match Details
       </Button>
-      {details ? <CostBreakdown id={props.match.id} /> : <Divider />}
+      {details ? <ShowMatchDetails id={props.match.id} /> : <Divider />}
     </Paper>
   )
 }
