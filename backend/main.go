@@ -39,7 +39,7 @@ func updateMatches(existing *pb.Matches, last_time time.Time) (*pb.Matches, time
 	}
 	matches, err := data.GetMatches()
 	if err != nil {
-		log.Error("Failed to get matches, keeping cache")
+		log.Error("Failed to get matches, keeping cache: ", err.Error())
 		return existing, last_time
 	}
 	log.Info("Updating match data")
