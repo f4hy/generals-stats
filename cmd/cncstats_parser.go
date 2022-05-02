@@ -94,7 +94,32 @@ func getUnits(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
 }
 
 
-func getActionCounts(body []*body.BodyChunk)(map[string]int64 ){
+func processBody(body []*body.BodyChunk, minutes float64)([]*pb.APM, map[string][]*pb.UpgradeEvent ){
+	counts := make(map[string]int64)
+	upgrades := make(map[string][]*pb.UpgradeEvent)
+	for _, b := range body{
+		if(!strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum")){
+			counts[player_parse(b.PlayerName)] += 1
+		}
+		if(strings.Contains(b.OrderName, "Upgrade")){
+			x := upgrades[b.PlayerName]
+			x = append(x, )
+		}
+	}
+	apms := []*pb.APM{}
+	for player_name, count := range counts {
+		apm := &pb.APM{
+			PlayerName: player_name,
+			ActionCount: count,
+			Minutes: minutes,
+			Apm: float64(count) / minutes,
+		}
+		apms = append(apms, apm)
+	}
+	return apms, upgrades
+}
+
+func getUpgradeEvents(body []*body.BodyChunk)(map[string]int64 ){
 	counts := make(map[string]int64)
 	for _, b := range body{
 		if(!strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum")){
@@ -103,6 +128,7 @@ func getActionCounts(body []*body.BodyChunk)(map[string]int64 ){
 	}
 	return counts	
 }
+
 
 func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	data, err := ioutil.ReadFile(filename)
@@ -147,15 +173,6 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
 	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
 	minutes := end.Sub(start).Minutes()
-	for player_name, count := range counts {
-		apm := &pb.APM{
-			PlayerName: player_name,
-			ActionCount: count,
-			Minutes: minutes,
-			Apm: float64(count) / minutes,
-		}
-		details.Apms = append(details.Apms, apm)
-	}
 	return &match, &details, nil
 }
 

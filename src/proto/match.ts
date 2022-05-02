@@ -292,10 +292,22 @@ export interface APM {
   apm: number
 }
 
+export interface UpgradeEvent {
+  playerName: string
+  timecode: number
+  upgradeName: string
+}
+
 export interface MatchDetails {
   matchId: number
   costs: Costs[]
   apms: APM[]
+  upgradeEvents: { [key: string]: UpgradeEvent }
+}
+
+export interface MatchDetails_UpgradeEventsEntry {
+  key: string
+  value: UpgradeEvent | undefined
 }
 
 function createBasePlayer(): Player {
@@ -1765,8 +1777,81 @@ export const APM = {
   },
 }
 
+function createBaseUpgradeEvent(): UpgradeEvent {
+  return { playerName: "", timecode: 0, upgradeName: "" }
+}
+
+export const UpgradeEvent = {
+  encode(
+    message: UpgradeEvent,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName)
+    }
+    if (message.timecode !== 0) {
+      writer.uint32(16).int64(message.timecode)
+    }
+    if (message.upgradeName !== "") {
+      writer.uint32(26).string(message.upgradeName)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpgradeEvent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseUpgradeEvent()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.playerName = reader.string()
+          break
+        case 2:
+          message.timecode = longToNumber(reader.int64() as Long)
+          break
+        case 3:
+          message.upgradeName = reader.string()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): UpgradeEvent {
+    return {
+      playerName: isSet(object.playerName) ? String(object.playerName) : "",
+      timecode: isSet(object.timecode) ? Number(object.timecode) : 0,
+      upgradeName: isSet(object.upgradeName) ? String(object.upgradeName) : "",
+    }
+  },
+
+  toJSON(message: UpgradeEvent): unknown {
+    const obj: any = {}
+    message.playerName !== undefined && (obj.playerName = message.playerName)
+    message.timecode !== undefined &&
+      (obj.timecode = Math.round(message.timecode))
+    message.upgradeName !== undefined && (obj.upgradeName = message.upgradeName)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<UpgradeEvent>, I>>(
+    object: I
+  ): UpgradeEvent {
+    const message = createBaseUpgradeEvent()
+    message.playerName = object.playerName ?? ""
+    message.timecode = object.timecode ?? 0
+    message.upgradeName = object.upgradeName ?? ""
+    return message
+  },
+}
+
 function createBaseMatchDetails(): MatchDetails {
-  return { matchId: 0, costs: [], apms: [] }
+  return { matchId: 0, costs: [], apms: [], upgradeEvents: {} }
 }
 
 export const MatchDetails = {
@@ -1783,6 +1868,12 @@ export const MatchDetails = {
     for (const v of message.apms) {
       APM.encode(v!, writer.uint32(26).fork()).ldelim()
     }
+    Object.entries(message.upgradeEvents).forEach(([key, value]) => {
+      MatchDetails_UpgradeEventsEntry.encode(
+        { key: key as any, value },
+        writer.uint32(34).fork()
+      ).ldelim()
+    })
     return writer
   },
 
@@ -1802,6 +1893,15 @@ export const MatchDetails = {
         case 3:
           message.apms.push(APM.decode(reader, reader.uint32()))
           break
+        case 4:
+          const entry4 = MatchDetails_UpgradeEventsEntry.decode(
+            reader,
+            reader.uint32()
+          )
+          if (entry4.value !== undefined) {
+            message.upgradeEvents[entry4.key] = entry4.value
+          }
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -1819,6 +1919,14 @@ export const MatchDetails = {
       apms: Array.isArray(object?.apms)
         ? object.apms.map((e: any) => APM.fromJSON(e))
         : [],
+      upgradeEvents: isObject(object.upgradeEvents)
+        ? Object.entries(object.upgradeEvents).reduce<{
+            [key: string]: UpgradeEvent
+          }>((acc, [key, value]) => {
+            acc[key] = UpgradeEvent.fromJSON(value)
+            return acc
+          }, {})
+        : {},
     }
   },
 
@@ -1835,6 +1943,12 @@ export const MatchDetails = {
     } else {
       obj.apms = []
     }
+    obj.upgradeEvents = {}
+    if (message.upgradeEvents) {
+      Object.entries(message.upgradeEvents).forEach(([k, v]) => {
+        obj.upgradeEvents[k] = UpgradeEvent.toJSON(v)
+      })
+    }
     return obj
   },
 
@@ -1845,6 +1959,88 @@ export const MatchDetails = {
     message.matchId = object.matchId ?? 0
     message.costs = object.costs?.map((e) => Costs.fromPartial(e)) || []
     message.apms = object.apms?.map((e) => APM.fromPartial(e)) || []
+    message.upgradeEvents = Object.entries(object.upgradeEvents ?? {}).reduce<{
+      [key: string]: UpgradeEvent
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = UpgradeEvent.fromPartial(value)
+      }
+      return acc
+    }, {})
+    return message
+  },
+}
+
+function createBaseMatchDetails_UpgradeEventsEntry(): MatchDetails_UpgradeEventsEntry {
+  return { key: "", value: undefined }
+}
+
+export const MatchDetails_UpgradeEventsEntry = {
+  encode(
+    message: MatchDetails_UpgradeEventsEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key)
+    }
+    if (message.value !== undefined) {
+      UpgradeEvent.encode(message.value, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MatchDetails_UpgradeEventsEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMatchDetails_UpgradeEventsEntry()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string()
+          break
+        case 2:
+          message.value = UpgradeEvent.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MatchDetails_UpgradeEventsEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value)
+        ? UpgradeEvent.fromJSON(object.value)
+        : undefined,
+    }
+  },
+
+  toJSON(message: MatchDetails_UpgradeEventsEntry): unknown {
+    const obj: any = {}
+    message.key !== undefined && (obj.key = message.key)
+    message.value !== undefined &&
+      (obj.value = message.value
+        ? UpgradeEvent.toJSON(message.value)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MatchDetails_UpgradeEventsEntry>, I>>(
+    object: I
+  ): MatchDetails_UpgradeEventsEntry {
+    const message = createBaseMatchDetails_UpgradeEventsEntry()
+    message.key = object.key ?? ""
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? UpgradeEvent.fromPartial(object.value)
+        : undefined
     return message
   },
 }
@@ -1919,6 +2115,10 @@ function longToNumber(long: Long): number {
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any
   _m0.configure()
+}
+
+function isObject(value: any): boolean {
+  return typeof value === "object" && value !== null
 }
 
 function isSet(value: any): boolean {

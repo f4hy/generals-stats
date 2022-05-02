@@ -137,8 +137,16 @@ message APM {
   double apm=4;
 }
 
+message UpgradeEvent {
+  string player_name = 1;
+  int64 timecode = 2;
+  string upgrade_name = 3  ;
+}
+
+
 message MatchDetails{
   int64 match_id = 1;
   repeated Costs costs = 2;
   repeated APM apms = 3;
+  map<string, UpgradeEvent> upgrade_events = 4;
 }
