@@ -78,6 +78,25 @@ func main() {
 			general := data.GeneralStats(matches)
 			c.ProtoBuf(http.StatusOK, general)
 		})
+		api.GET("/listmaps", func(c *gin.Context) {
+			// c.Header("Cache-Control", maxAge)
+			maps, err := data.ListMaps()
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.JSON(http.StatusOK, maps)
+		})
+		api.GET("/map/:mapname", func(c *gin.Context) {
+			mapurl, err := data.GetMap(c.Param("mapname"))
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, mapurl)
+		})
 		api.GET("/teamstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
 			ts := data.TeamStats(matches)

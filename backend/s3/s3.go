@@ -74,7 +74,7 @@ func GetS3Data(filePath string) ([]byte, error) {
 
 // Gets an s3 presigned url from the bucket so that it can be accessed
 // by the front end
-func GetPresignedUrl(path string) string {
+func GetPresignedUrl(path string) (string, error) {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
 	log.Infof("Getting presigned url for ", path)
 	req, _ := s3.New(s).GetObjectRequest(&s3.GetObjectInput{
@@ -85,9 +85,10 @@ func GetPresignedUrl(path string) string {
 
 	if err != nil {
 		log.Infof("Failed to sign request", err)
+		return urlStr, err
 	}
 	log.Infof("The URL is", urlStr)
-	return urlStr
+	return urlStr, nil
 }
 
 func List(path string) ([]string, error) {
@@ -120,3 +121,4 @@ func List(path string) ([]string, error) {
 	}
 	return asStrings, nil
 }
+

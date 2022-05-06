@@ -31,6 +31,19 @@ function getMatches(callback: (m: Matches) => void) {
   )
 }
 
+function getMapList(callback: (m: string[]) => void) {
+  fetch("/api/listmaps").then((r) =>
+      r.json()
+  ).then(callback)
+}
+
+
+function getMapUrl(mapname: string, callback: (m: string) => void) {
+  fetch("/api/map/" + encodeURIComponent(mapname)).then((r) => r.text())
+    .then((s) => callback(s))
+}
+
+
 function MatchCard(props: { avatar: React.ReactNode, title: React.ReactNode, color: string }) {
   return (
     <Card sx={{ backgroundColor: props.color }}>
@@ -43,8 +56,23 @@ function MatchCard(props: { avatar: React.ReactNode, title: React.ReactNode, col
   )
 }
 
-function DisplayMatchInfo(props: { match: MatchInfo }) {
+function DisplayMatchInfo(props: { match: MatchInfo, maplist: string[] }) {
   const [details, setDetails] = React.useState<boolean>(false)
+  const [mapUrl, setMapUrl] = React.useState<string>("")
+    const [mapMatch, setMapMatch] = React.useState<string>("")
+  const mapname = props.match.map.split("/").slice(-1).pop() ?? ""
+  React.useEffect(() => {
+    const mapmatch = props.maplist.find(m => m.includes(mapname))
+      if(mapmatch){
+        setMapMatch(mapmatch)
+        const maproot = mapmatch.split("/").slice(-1).pop()
+        if (maproot) {
+            setMapMatch(mapmatch + " ??? " + maproot)
+          getMapUrl(maproot, setMapUrl)
+        }
+	}
+  }, [])
+
   const date: string = props.match.timestamp
     ? props.match.timestamp.toDateString()
     : "unknown"
@@ -70,7 +98,8 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
         <ListItemText key="match-text" primary={header} />
       </ListItem>
       <Grid container spacing={1}>
-        <Grid item xs={4}>
+        <Grid item xs={2}>{mapUrl.length ? <img src={mapUrl} /> : <div>no image</div>} </Grid>
+        <Grid item xs={2}>
           <MatchCard title={
             <Typography variant="h5">
               {"Team " + props.match.winningTeam}
@@ -137,14 +166,16 @@ const empty = { matches: [] }
 
 export default function DisplayMatches() {
   const [matchList, setMatchList] = React.useState<Matches>(empty)
+  const [mapList, setMapList] = React.useState<string[]>([])
   React.useEffect(() => {
-    getMatches(setMatchList)
+      getMatches(setMatchList)
+      getMapList(setMapList)
   }, [])
   return (
     <Paper>
       {matchList.matches.map((m, i) => (
-        <>
-          <DisplayMatchInfo match={m} key={m.id} />
+          <>
+          <DisplayMatchInfo match={m} maplist={mapList} key={m.id} />
           <Divider />
         </>
       ))}
