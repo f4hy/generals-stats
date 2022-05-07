@@ -1,5 +1,6 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import ThumbDownIcon from "@mui/icons-material/ThumbDown"
+import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
 import Divider from "@mui/material/Divider"
@@ -7,10 +8,10 @@ import Grid from "@mui/material/Grid"
 import ListItem from "@mui/material/ListItem"
 import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
-import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
 import DisplayGeneral from "./Generals"
+import Map from "./Map"
 import { Matches, MatchInfo } from "./proto/match"
 import ShowMatchDetails from "./ShowMatchDetails"
 
@@ -31,6 +32,10 @@ function getMatches(callback: (m: Matches) => void) {
   )
 }
 
+
+
+
+
 function MatchCard(props: { avatar: React.ReactNode, title: React.ReactNode, color: string }) {
   return (
     <Card sx={{ backgroundColor: props.color }}>
@@ -43,8 +48,9 @@ function MatchCard(props: { avatar: React.ReactNode, title: React.ReactNode, col
   )
 }
 
-function DisplayMatchInfo(props: { match: MatchInfo }) {
+function DisplayMatchInfo(props: { match: MatchInfo}) {
   const [details, setDetails] = React.useState<boolean>(false)
+
   const date: string = props.match.timestamp
     ? props.match.timestamp.toDateString()
     : "unknown"
@@ -70,66 +76,73 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
         <ListItemText key="match-text" primary={header} />
       </ListItem>
       <Grid container spacing={1}>
-        <Grid item xs={4}>
-          <MatchCard title={
-            <Typography variant="h5">
-              {"Team " + props.match.winningTeam}
-            </Typography>
-          }
-            avatar={<EmojiEventsIcon />}
-            color="#c5e1a5"
-          />
-        </Grid>
-        {winners.map((p) => (
-          <Grid item xs={4}>
-            <MatchCard title={
-              <Typography variant="h5">{`${p.name.padEnd(
-                50,
-                " "
-              )}`}</Typography>
-            }
-              avatar={<DisplayGeneral
-                general={p.general}
-                key={p.name + "-" + p.general + "-general"}
-              />
+        <Grid item xs={10}>
+          <Grid container spacing={1}>
+            <Grid item xs={4}>
+              <MatchCard title={
+                <Typography variant="h5">
+                  {"Team " + props.match.winningTeam}
+                </Typography>
               }
-              color="#c5e1a5"
-            />
-          </Grid>
-        ))}
-        <Grid item xs={4}>
-          <MatchCard title={
-            <Typography variant="h5">
-              {"Team " + losingTeam}
-            </Typography>
-          }
-            avatar={<ThumbDownIcon />}
-            color="#e57373"
-          />
-        </Grid>
-        {losers.map((p) => (
-          <Grid item xs={4}>
-            <MatchCard title={
-              <Typography variant="h5">{`${p.name.padEnd(
-                50,
-                " "
-              )}`}</Typography>
-            }
-              avatar={<DisplayGeneral
-                general={p.general}
-                key={p.name + "-" + p.general + "-general"}
+                avatar={<EmojiEventsIcon />}
+                color="#c5e1a5"
               />
+            </Grid>
+            {winners.map((p) => (
+              <Grid item xs={4}>
+                <MatchCard title={
+                  <Typography variant="h5">{`${p.name.padEnd(
+                    50,
+                    " "
+                  )}`}</Typography>
+                }
+                  avatar={<DisplayGeneral
+                    general={p.general}
+                    key={p.name + "-" + p.general + "-general"}
+                  />
+                  }
+                  color="#c5e1a5"
+                />
+              </Grid>
+            ))}
+            <Grid item xs={4}>
+              <MatchCard title={
+                <Typography variant="h5">
+                  {"Team " + losingTeam}
+                </Typography>
               }
-              color="#e57373"
-            />
+                avatar={<ThumbDownIcon />}
+                color="#e57373"
+              />
+            </Grid>
+            {losers.map((p) => (
+              <Grid item xs={4}>
+                <MatchCard title={
+                  <Typography variant="h5">{`${p.name.padEnd(
+                    50,
+                    " "
+                  )}`}</Typography>
+                }
+                  avatar={<DisplayGeneral
+                    general={p.general}
+                    key={p.name + "-" + p.general + "-general"}
+                  />
+                  }
+                  color="#e57373"
+                />
+              </Grid>
+            ))}
           </Grid>
-        ))}
+        </Grid>
+        <Grid item xs={2} >
+	    <Map mapname={props.match.map} />
+        </Grid>
       </Grid>
       <Button variant="contained" onClick={() => setDetails(!details)}>
         Match Details
       </Button>
       {details ? <ShowMatchDetails id={props.match.id} /> : <Divider />}
-    </Paper>
+    </Paper >
   )
 }
 
@@ -138,12 +151,12 @@ const empty = { matches: [] }
 export default function DisplayMatches() {
   const [matchList, setMatchList] = React.useState<Matches>(empty)
   React.useEffect(() => {
-    getMatches(setMatchList)
+      getMatches(setMatchList)
   }, [])
   return (
     <Paper>
-      {matchList.matches.map((m, i) => (
-        <>
+      {matchList.matches.map((m) => (
+          <>
           <DisplayMatchInfo match={m} key={m.id} />
           <Divider />
         </>
