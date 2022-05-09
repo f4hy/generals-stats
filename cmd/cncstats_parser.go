@@ -58,84 +58,100 @@ func player_parse(playername string) string {
 	return ""
 }
 
-func getPlayer(psummary *object.PlayerSummary) (*pb.Player){
+func getPlayer(psummary *object.PlayerSummary) *pb.Player {
 	return &pb.Player{
-			Name:    player_parse(psummary.Name),
-			General: general_parse(psummary.Side),
-			Team:    pb.Team(psummary.Team),
-		}
+		Name:    player_parse(psummary.Name),
+		General: general_parse(psummary.Side),
+		Team:    pb.Team(psummary.Team),
+	}
 }
 
-func getBuildings(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
+func getBuildings(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	ret := []*pb.Costs_BuiltObject{}
 	for bname, building := range psummary.BuildingsBuilt {
-			built := pb.Costs_BuiltObject{
-				Name:       bname,
-				Count:      int32(building.Count),
-				TotalSpent: int32(building.TotalSpent),
-			}
-			ret = append(ret, &built)
+		built := pb.Costs_BuiltObject{
+			Name:       bname,
+			Count:      int32(building.Count),
+			TotalSpent: int32(building.TotalSpent),
+		}
+		ret = append(ret, &built)
 
 	}
-	return ret	
+	return ret
 }
 
-func getUnits(psummary *object.PlayerSummary) ([]*pb.Costs_BuiltObject){
+func getUnits(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	ret := []*pb.Costs_BuiltObject{}
-		for uname, unit := range psummary.UnitsCreated {
-			created_unit := pb.Costs_BuiltObject{
-				Name:       uname,
-				Count:      int32(unit.Count),
-				TotalSpent: int32(unit.TotalSpent),
-			}
-			ret = append(ret, &created_unit)
+	for uname, unit := range psummary.UnitsCreated {
+		created_unit := pb.Costs_BuiltObject{
+			Name:       uname,
+			Count:      int32(unit.Count),
+			TotalSpent: int32(unit.TotalSpent),
 		}
-	return ret	
+		ret = append(ret, &created_unit)
+	}
+	return ret
 }
 
-
-func processBody(body []*body.BodyChunk, minutes float64)([]*pb.APM, map[string][]*pb.UpgradeEvent ){
+func processBody(body []*body.BodyChunk, minutes float64) ([]*pb.APM, map[string]*pb.Upgrades) {
 	counts := make(map[string]int64)
-	upgrades := make(map[string][]*pb.UpgradeEvent)
-	for _, b := range body{
-		if(!strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum")){
+	upgrades := getUpgradeEvents(body)
+	for _, b := range body {
+		if !strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum") {
 			counts[player_parse(b.PlayerName)] += 1
-		}
-		if(strings.Contains(b.OrderName, "Upgrade")){
-			x := upgrades[b.PlayerName]
-			x = append(x, )
 		}
 	}
 	apms := []*pb.APM{}
 	for player_name, count := range counts {
 		apm := &pb.APM{
-			PlayerName: player_name,
+			PlayerName:  player_name,
 			ActionCount: count,
-			Minutes: minutes,
-			Apm: float64(count) / minutes,
+			Minutes:     minutes,
+			Apm:         float64(count) / minutes,
 		}
 		apms = append(apms, apm)
 	}
+
 	return apms, upgrades
 }
 
-func getUpgradeEvents(body []*body.BodyChunk)(map[string]int64 ){
-	counts := make(map[string]int64)
-	for _, b := range body{
-		if(!strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum")){
-			counts[player_parse(b.PlayerName)] += 1
+func getUpgradeEvents(body []*body.BodyChunk) map[string]*pb.Upgrades {
+	log.Println("Parsing the body")
+	upgrades := make(map[string]*pb.Upgrades)
+	for _, b := range body {
+		if strings.Contains(b.OrderName, "Upgrade") {
+			log.Println("parsing %s", b)
+			log.Println("player %s", b.PlayerName)
+			log.Println("DETAILS %s", b.Details)
+			log.Println("DETAILS %s", b.Details.GetName())
+			_, prs := upgrades[b.PlayerName]
+			if !prs {
+				upgrades[b.PlayerName] = &pb.Upgrades{}
+			}
+			details := b.Details
+			upgrade := pb.UpgradeEvent{
+				PlayerName: b.PlayerName,
+				Timecode:   int64(b.TimeCode),
+			}
+			if details != nil {
+				upgrade.UpgradeName = details.GetName()
+			} else {
+				upgrade.UpgradeName = "wtf unknown"
+			}
+			upgrades[b.PlayerName].Upgrades = append(upgrades[b.PlayerName].Upgrades, &upgrade)
 		}
 	}
-	return counts	
+	log.Println("done parsing upgrades")
+	return upgrades
 }
-
 
 func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	data, err := ioutil.ReadFile(filename)
 	replay := zhreplay.Replay{}
 	err = json.Unmarshal(data, &replay)
 	if err != nil {
-		// fmt.Println("error:", err)
+		fmt.Println("error:", err)
+		log.Fatal("Failed to unmarshal")
 	}
 	h := replay.Header
 	date := time.Date(h.Year, time.Month(h.Month), h.Day, h.Hour, h.Minute, h.Second, h.Millisecond, time.UTC)
@@ -163,16 +179,21 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 		player := getPlayer(i)
 		match.Players = append(match.Players, player)
 		cost := &pb.Costs{
-			Player: player,
+			Player:    player,
 			Buildings: getBuildings(i),
-			Units: getUnits(i),
+			Units:     getUnits(i),
 		}
 		details.Costs = append(details.Costs, cost)
 	}
-	counts := getActionCounts(replay.Body)
 	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
 	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
 	minutes := end.Sub(start).Minutes()
+	apm, upgrades := processBody(replay.Body, minutes)
+	log.Printf("Parsed apm %s", apm)
+	log.Printf("Parsed upgrades %s", apm)
+
+	details.Apms = apm
+	details.UpgradeEvents = upgrades
 	return &match, &details, nil
 }
 
@@ -193,11 +214,15 @@ func main() {
 			} else {
 				// fmt.Println("Match result:", result.Timestamp.AsTime())
 				fmt.Println("details :", details)
-				data.SaveMatch(result)
-				data.SaveDetails(details)
+				// data.SaveMatch(result)
+				// data.SaveDetails(details)
+				_ = result
+				_ = data.SaveMatch
 				// data.SaveCosts(costs)
 			}
 
+		}else{
+			log.Print("Not a 2v2 of our squad")
 		}
 	}
 }

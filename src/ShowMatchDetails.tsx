@@ -5,13 +5,15 @@ import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
-  BarChart,
+    BarChart,
+    LineChart,
+    Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts"
-import { Costs_BuiltObject, MatchDetails, APM } from "./proto/match"
+import { Costs_BuiltObject, MatchDetails, APM, UpgradeEvent } from "./proto/match"
 import CostBreakdown from "./CostBreakdown"
 
 function getDetails(id: number, callback: (m: MatchDetails) => void) {
@@ -27,7 +29,39 @@ function getDetails(id: number, callback: (m: MatchDetails) => void) {
   )
 }
 
-const empty: MatchDetails = { matchId: 0, costs: [], apms: [] }
+const empty: MatchDetails = { matchId: 0, costs: [], apms: [], upgradeEvents: {} }
+
+function EventChart(props: {upgrades: UpgradeEvent[]}){
+    if(props.upgrades){
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={props.upgrades}
+            layout="horizontal"
+            margin={{ top: 5, right: 10, left: 15, bottom: 5 }}
+          >
+            <Line dataKey="upgradeName" />
+            <XAxis dataKey="timecode" />
+            <YAxis
+              label={{
+                value: "Actions Per Minute",
+                position: "insideLeft",
+                offset: -5,
+                angle: -90,
+              }}
+            />
+            <Tooltip cursor={false} />
+          </LineChart>
+        </ResponsiveContainer>
+
+      )
+    }
+    else{
+	return (
+    <div>{JSON.stringify(props.upgrades)}</div>
+	)
+    }
+}
 
 function ApmChart(props: {apms: APM[]}){
     const data = _.sortBy(props.apms, a => -a.apm)
@@ -60,9 +94,12 @@ export default function ShowMatchDetails(props: { id: number }) {
   React.useEffect(() => {
     getDetails(props.id, setDetails)
   }, [props.id])
-    return (
+    const upgrades = details.upgradeEvents?.Modus?.upgrades
+  return (
     <>
-      <ApmChart apms={details.apms} />
+	<ApmChart apms={details.apms} />
+	<div>{JSON.stringify(details.upgradeEvents)}</div>
+      {/* <EventChart upgrades={upgrades} /> */}
       <Divider />
       <CostBreakdown costs={details.costs} />
     </>
