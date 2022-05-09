@@ -45,6 +45,7 @@ message MatchInfo {
   string map = 3;
   Team winning_team = 4;
   repeated Player players = 5;
+  double duration_minutes = 6;
 }
 
 message Matches {

@@ -197,6 +197,7 @@ export interface MatchInfo {
   map: string
   winningTeam: Team
   players: Player[]
+  durationMinutes: number
 }
 
 export interface Matches {
@@ -370,7 +371,14 @@ export const Player = {
 }
 
 function createBaseMatchInfo(): MatchInfo {
-  return { id: 0, timestamp: undefined, map: "", winningTeam: 0, players: [] }
+  return {
+    id: 0,
+    timestamp: undefined,
+    map: "",
+    winningTeam: 0,
+    players: [],
+    durationMinutes: 0,
+  }
 }
 
 export const MatchInfo = {
@@ -395,6 +403,9 @@ export const MatchInfo = {
     }
     for (const v of message.players) {
       Player.encode(v!, writer.uint32(42).fork()).ldelim()
+    }
+    if (message.durationMinutes !== 0) {
+      writer.uint32(49).double(message.durationMinutes)
     }
     return writer
   },
@@ -423,6 +434,9 @@ export const MatchInfo = {
         case 5:
           message.players.push(Player.decode(reader, reader.uint32()))
           break
+        case 6:
+          message.durationMinutes = reader.double()
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -444,6 +458,9 @@ export const MatchInfo = {
       players: Array.isArray(object?.players)
         ? object.players.map((e: any) => Player.fromJSON(e))
         : [],
+      durationMinutes: isSet(object.durationMinutes)
+        ? Number(object.durationMinutes)
+        : 0,
     }
   },
 
@@ -462,6 +479,8 @@ export const MatchInfo = {
     } else {
       obj.players = []
     }
+    message.durationMinutes !== undefined &&
+      (obj.durationMinutes = message.durationMinutes)
     return obj
   },
 
@@ -474,6 +493,7 @@ export const MatchInfo = {
     message.map = object.map ?? ""
     message.winningTeam = object.winningTeam ?? 0
     message.players = object.players?.map((e) => Player.fromPartial(e)) || []
+    message.durationMinutes = object.durationMinutes ?? 0
     return message
   },
 }

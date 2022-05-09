@@ -1,10 +1,9 @@
 package data
 
 import (
-	"sort"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
-
+	"sort"
 )
 
 func ListMaps() ([]string, error) {
