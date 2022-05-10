@@ -129,6 +129,7 @@ message Costs {
   }
   repeated BuiltObject buildings = 3;
   repeated BuiltObject units = 4;
+  repeated BuiltObject upgrades = 5;
 }
 
 message APM {

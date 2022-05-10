@@ -99,6 +99,19 @@ func getUnits(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
+func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
+	ret := []*pb.Costs_BuiltObject{}
+	for uname, unit := range psummary.UpgradesBuilt {
+		created_unit := pb.Costs_BuiltObject{
+			Name:       uname,
+			Count:      int32(unit.Count),
+			TotalSpent: int32(unit.TotalSpent),
+		}
+		ret = append(ret, &created_unit)
+	}
+	return ret
+}
+
 func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64) ([]*pb.APM, map[string]*pb.Upgrades) {
 	counts := make(map[string]int64)
 	upgrades := getUpgradeEvents(body)
@@ -187,6 +200,7 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 			Player:    player,
 			Buildings: getBuildings(i),
 			Units:     getUnits(i),
+			Upgrades:  getUpgradesummary(i),
 		}
 		details.Costs = append(details.Costs, cost)
 	}
@@ -237,8 +251,8 @@ func main() {
 				}
 				detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
 				err = os.WriteFile(detailpath, details_bytes, 0644)
-				go data.SaveMatch(result)
-				go data.SaveDetails(details)
+				data.SaveMatch(result)
+				data.SaveDetails(details)
 				// _ = data.SaveDetails
 				// _ = result
 				// _ = data.SaveMatch

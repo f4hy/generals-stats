@@ -1,34 +1,19 @@
-import { blue, lightGreen, purple, red } from "@mui/material/colors"
-import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
-  BarChart,
-  LineChart,
-  Line,
-  LabelList,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
+  BarChart, CartesianGrid, Legend,
+  ResponsiveContainer, Scatter, ScatterChart, Tooltip,
   XAxis,
   YAxis,
-  ZAxis,
-  ScatterChart,
-  Scatter,
-  CartesianGrid,
+  ZAxis
 } from "recharts"
-import {
-  Costs_BuiltObject,
-  MatchDetails,
-  APM,
-  UpgradeEvent,
-  Upgrades,
-} from "./proto/match"
-import CostBreakdown from "./CostBreakdown"
 import { TeamColor } from "./Colors"
-import { isShorthandPropertyAssignment } from "typescript"
+import CostBreakdown from "./CostBreakdown"
+import {
+  APM, MatchDetails, Upgrades
+} from "./proto/match"
 
 function getDetails(id: number, callback: (m: MatchDetails) => void) {
   fetch("/api/details/" + id).then((r) =>

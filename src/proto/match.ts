@@ -278,6 +278,7 @@ export interface Costs {
   player: Player | undefined
   buildings: Costs_BuiltObject[]
   units: Costs_BuiltObject[]
+  upgrades: Costs_BuiltObject[]
 }
 
 export interface Costs_BuiltObject {
@@ -1562,7 +1563,7 @@ export const SaveResponse = {
 }
 
 function createBaseCosts(): Costs {
-  return { player: undefined, buildings: [], units: [] }
+  return { player: undefined, buildings: [], units: [], upgrades: [] }
 }
 
 export const Costs = {
@@ -1575,6 +1576,9 @@ export const Costs = {
     }
     for (const v of message.units) {
       Costs_BuiltObject.encode(v!, writer.uint32(34).fork()).ldelim()
+    }
+    for (const v of message.upgrades) {
+      Costs_BuiltObject.encode(v!, writer.uint32(42).fork()).ldelim()
     }
     return writer
   },
@@ -1597,6 +1601,11 @@ export const Costs = {
         case 4:
           message.units.push(Costs_BuiltObject.decode(reader, reader.uint32()))
           break
+        case 5:
+          message.upgrades.push(
+            Costs_BuiltObject.decode(reader, reader.uint32())
+          )
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -1613,6 +1622,9 @@ export const Costs = {
         : [],
       units: Array.isArray(object?.units)
         ? object.units.map((e: any) => Costs_BuiltObject.fromJSON(e))
+        : [],
+      upgrades: Array.isArray(object?.upgrades)
+        ? object.upgrades.map((e: any) => Costs_BuiltObject.fromJSON(e))
         : [],
     }
   },
@@ -1635,6 +1647,13 @@ export const Costs = {
     } else {
       obj.units = []
     }
+    if (message.upgrades) {
+      obj.upgrades = message.upgrades.map((e) =>
+        e ? Costs_BuiltObject.toJSON(e) : undefined
+      )
+    } else {
+      obj.upgrades = []
+    }
     return obj
   },
 
@@ -1648,6 +1667,8 @@ export const Costs = {
       object.buildings?.map((e) => Costs_BuiltObject.fromPartial(e)) || []
     message.units =
       object.units?.map((e) => Costs_BuiltObject.fromPartial(e)) || []
+    message.upgrades =
+      object.upgrades?.map((e) => Costs_BuiltObject.fromPartial(e)) || []
     return message
   },
 }

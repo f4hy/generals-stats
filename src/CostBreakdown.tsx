@@ -39,6 +39,16 @@ export default function CostBreakdown(props: { costs: Costs[] }) {
     "name"
   )
 
+  const upgrade_data = props.costs.map((x) =>
+    formatCosts(x.upgrades, x?.player?.name ?? "unk")
+  )
+  const upgrade_names: string[] = _.without(
+    _.uniq(
+      upgrade_data.reduce((names, n) => [...names, ...Object.keys(n)], [])
+    ),
+    "name"
+  )
+
   const colors = [
     red["200"],
     purple["200"],
@@ -98,6 +108,32 @@ export default function CostBreakdown(props: { costs: Costs[] }) {
           <YAxis
             label={{
               value: "Unit Spending",
+              position: "insideLeft",
+              offset: -5,
+              angle: -90,
+            }}
+          />
+          <Tooltip cursor={false} />
+        </BarChart>
+      </ResponsiveContainer>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart
+          data={upgrade_data}
+          layout="horizontal"
+          margin={{
+            top: 5,
+            right: 10,
+            left: 15,
+            bottom: 5,
+          }}
+        >
+          {upgrade_names.map((n, i) => (
+            <Bar dataKey={n} fill={colors[i % colors.length]} stackId="a" />
+          ))}
+          <XAxis dataKey="name" />
+          <YAxis
+            label={{
+              value: "Upgrade Spending",
               position: "insideLeft",
               offset: -5,
               angle: -90,
