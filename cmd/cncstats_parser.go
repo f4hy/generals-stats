@@ -223,12 +223,18 @@ func main() {
 				// fmt.Println("Match result:", result.Timestamp.AsTime())
 				// fmt.Println("details :", details)
 				result_bytes, err := proto.Marshal(result)
-				if(err != nil){panic(err)}
+				if err != nil {
+					panic(err)
+				}
 				resultpath := fmt.Sprintf("parsed-matches/%d.proto", result.Id)
 				err = os.WriteFile(resultpath, result_bytes, 0644)
-				if(err != nil){panic(err)}
+				if err != nil {
+					panic(err)
+				}
 				details_bytes, err := proto.Marshal(details)
-				if(err != nil){panic(err)}
+				if err != nil {
+					panic(err)
+				}
 				detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
 				err = os.WriteFile(detailpath, details_bytes, 0644)
 				go data.SaveMatch(result)
@@ -239,9 +245,8 @@ func main() {
 				// data.SaveCosts(costs)
 			}
 
-		}else{
+		} else {
 			log.Print("Not a 2v2 of our squad")
 		}
 	}
 }
-

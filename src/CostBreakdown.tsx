@@ -8,11 +8,9 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts"
 import { Costs, Costs_BuiltObject } from "./proto/match"
-
-
 
 function formatCosts(data: Costs_BuiltObject[], name: string) {
   const sorted = _.sortBy(data, (d) => -d.totalSpent)

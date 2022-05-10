@@ -77,8 +77,8 @@ export default function AddMatch() {
       timestamp: date,
       map: map,
       winningTeam: winner,
-	players: myplayers,
-	durationMinutes: 0.0, /* Not updated */
+      players: myplayers,
+      durationMinutes: 0.0 /* Not updated */,
     }
     saveMatch(match)
     alert("saved")

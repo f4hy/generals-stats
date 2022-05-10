@@ -19,7 +19,13 @@ import {
   Scatter,
   CartesianGrid,
 } from "recharts"
-import { Costs_BuiltObject, MatchDetails, APM, UpgradeEvent, Upgrades } from "./proto/match"
+import {
+  Costs_BuiltObject,
+  MatchDetails,
+  APM,
+  UpgradeEvent,
+  Upgrades,
+} from "./proto/match"
 import CostBreakdown from "./CostBreakdown"
 import { TeamColor } from "./Colors"
 import { isShorthandPropertyAssignment } from "typescript"
@@ -37,28 +43,44 @@ function getDetails(id: number, callback: (m: MatchDetails) => void) {
   )
 }
 
-const empty: MatchDetails = { matchId: 0, costs: [], apms: [], upgradeEvents: {} }
+const empty: MatchDetails = {
+  matchId: 0,
+  costs: [],
+  apms: [],
+  upgradeEvents: {},
+}
 
+const shapes: (
+  | "circle"
+  | "cross"
+  | "diamond"
+  | "square"
+  | "star"
+  | "triangle"
+)[] = ["circle", "star", "square", "triangle"]
 
-const shapes: ('circle' | 'cross' | 'diamond' | 'square' | 'star' | 'triangle')[] = ['circle','star', 'square' , 'triangle']
-
-function EventChart(props: { upgrades: ({ [name: string]: Upgrades }) }) {
-  const names = Object.keys(props.upgrades).sort((x1, x2) => x1.localeCompare(x2))
+function EventChart(props: { upgrades: { [name: string]: Upgrades } }) {
+  const names = Object.keys(props.upgrades).sort((x1, x2) =>
+    x1.localeCompare(x2)
+  )
   if (props.upgrades) {
     return (
       <ResponsiveContainer width="100%" height={300}>
-        <ScatterChart
-          margin={{ top: 5, right: 10, left: 15, bottom: 5 }}
-        >
-          {names.map((name, idx) =>
-          (<Scatter name={name} fill={TeamColor(name)} data={props.upgrades[name].upgrades} shape={shapes[idx]} legendType={shapes[idx]}
-          >
-            {/* <LabelList dataKey="upgradeName" position="left" formatter={labelformater} offset={100} /> */}
-          </Scatter>
-          )
-          )}
+        <ScatterChart margin={{ top: 5, right: 10, left: 15, bottom: 5 }}>
+          {names.map((name, idx) => (
+            <Scatter
+              name={name}
+              fill={TeamColor(name)}
+              data={props.upgrades[name].upgrades}
+              shape={shapes[idx]}
+              legendType={shapes[idx]}
+            >
+              {/* <LabelList dataKey="upgradeName" position="left" formatter={labelformater} offset={100} /> */}
+            </Scatter>
+          ))}
           <XAxis type="number" dataKey="timecode" />
-          <YAxis type="number"
+          <YAxis
+            type="number"
             dataKey="cost"
             label={{
               value: "Cost",
@@ -68,23 +90,19 @@ function EventChart(props: { upgrades: ({ [name: string]: Upgrades }) }) {
             }}
           />
           <ZAxis dataKey="upgradeName" name="upgrade" />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
           <CartesianGrid />
           <Legend />
         </ScatterChart>
-      </ResponsiveContainer >
-
+      </ResponsiveContainer>
     )
-  }
-  else {
-    return (
-      <div>{JSON.stringify(props.upgrades)}</div>
-    )
+  } else {
+    return <div>{JSON.stringify(props.upgrades)}</div>
   }
 }
 
 function ApmChart(props: { apms: APM[] }) {
-  const data = _.sortBy(props.apms, a => -a.apm)
+  const data = _.sortBy(props.apms, (a) => -a.apm)
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
@@ -105,7 +123,6 @@ function ApmChart(props: { apms: APM[] }) {
         <Tooltip cursor={false} />
       </BarChart>
     </ResponsiveContainer>
-
   )
 }
 

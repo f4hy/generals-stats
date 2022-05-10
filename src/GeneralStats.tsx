@@ -33,20 +33,23 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
   )
 }
 
-function DisplayOverallGeneralStat(props: {stats: GeneralStats}){
-  const data = props.stats.generalStats.map(x => ({ wins: x?.total?.wins ?? 0, losses: x?.total?.losses ?? 0, name: General[x.general]}))
+function DisplayOverallGeneralStat(props: { stats: GeneralStats }) {
+  const data = props.stats.generalStats.map((x) => ({
+    wins: x?.total?.wins ?? 0,
+    losses: x?.total?.losses ?? 0,
+    name: General[x.general],
+  }))
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data} layout="horizontal">
         <CartesianGrid strokeDasharray="5 5" vertical={false} />
         <Bar dataKey="wins" fill="#42A5F5" />
         <Bar dataKey="losses" fill="#FF7043" />
-        <XAxis dataKey="name"  />
+        <XAxis dataKey="name" />
         <YAxis />
         <Tooltip cursor={false} />
       </BarChart>
     </ResponsiveContainer>
-
   )
 }
 

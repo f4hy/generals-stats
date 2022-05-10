@@ -17,7 +17,7 @@ import {
   YAxis,
 } from "recharts"
 import { DateMessage, TeamStat, TeamStats } from "./proto/match"
-import { TeamColor} from "./Colors"
+import { TeamColor } from "./Colors"
 
 function getTeamStats(callback: (m: TeamStats) => void) {
   fetch("/api/teamstats").then((r) =>
