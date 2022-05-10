@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/samber/lo"
+	"google.golang.org/protobuf/proto"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -97,7 +99,7 @@ func getUnits(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
-func processBody(body []*body.BodyChunk, minutes float64) ([]*pb.APM, map[string]*pb.Upgrades) {
+func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64) ([]*pb.APM, map[string]*pb.Upgrades) {
 	counts := make(map[string]int64)
 	upgrades := getUpgradeEvents(body)
 	for _, b := range body {
@@ -119,15 +121,11 @@ func processBody(body []*body.BodyChunk, minutes float64) ([]*pb.APM, map[string
 	return apms, upgrades
 }
 
-func getUpgradeEvents(body []*body.BodyChunk) map[string]*pb.Upgrades {
+func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall) map[string]*pb.Upgrades {
 	log.Println("Parsing the body")
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
 		if strings.Contains(b.OrderName, "Upgrade") {
-			log.Println("parsing %s", b)
-			log.Println("player %s", b.PlayerName)
-			log.Println("DETAILS %s", b.Details)
-			log.Println("DETAILS %s", b.Details.GetName())
 			_, prs := upgrades[b.PlayerName]
 			if !prs {
 				upgrades[b.PlayerName] = &pb.Upgrades{}
@@ -137,11 +135,8 @@ func getUpgradeEvents(body []*body.BodyChunk) map[string]*pb.Upgrades {
 				PlayerName: b.PlayerName,
 				Timecode:   int64(b.TimeCode),
 			}
-			if details != nil {
-				upgrade.UpgradeName = details.GetName()
-			} else {
-				upgrade.UpgradeName = "wtf unknown"
-			}
+			upgrade.UpgradeName = details.Name
+			upgrade.Cost = int64(details.Cost)
 			upgrades[b.PlayerName].Upgrades = append(upgrades[b.PlayerName].Upgrades, &upgrade)
 		}
 	}
@@ -151,7 +146,7 @@ func getUpgradeEvents(body []*body.BodyChunk) map[string]*pb.Upgrades {
 
 func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	data, err := ioutil.ReadFile(filename)
-	replay := zhreplay.Replay{}
+	replay := zhreplay.ReplayEasyUnmarshall{}
 	err = json.Unmarshal(data, &replay)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -164,12 +159,15 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	details := pb.MatchDetails{
 		MatchId: match_id,
 	}
+	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
+	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
+	minutes := end.Sub(start).Minutes()
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	winner, found := lo.Find(replay.Summary, func(p *object.PlayerSummary) bool {
 		return p.Win
 	})
 	if !found {
-		log.Println("no winnner??")
+		log.Println("no winnner?? time", minutes)
 		return &pb.MatchInfo{}, &details, errors.New("Could not determine winner")
 	}
 	match := pb.MatchInfo{
@@ -192,12 +190,9 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 		}
 		details.Costs = append(details.Costs, cost)
 	}
-	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
-	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
-	minutes := end.Sub(start).Minutes()
 	apm, upgrades := processBody(replay.Body, minutes)
-	log.Printf("Parsed apm %s", apm)
-	log.Printf("Parsed upgrades %s", apm)
+	// log.Printf("Parsed apm %s", apm)
+	// log.Printf("Parsed upgrades %s", upgrades)
 
 	details.Apms = apm
 	details.UpgradeEvents = upgrades
@@ -227,10 +222,20 @@ func main() {
 			} else {
 				// fmt.Println("Match result:", result.Timestamp.AsTime())
 				// fmt.Println("details :", details)
-				// data.SaveMatch(result)
-				// data.SaveDetails(details)
-				_ = result
-				_ = data.SaveMatch
+				result_bytes, err := proto.Marshal(result)
+				if(err != nil){panic(err)}
+				resultpath := fmt.Sprintf("parsed-matches/%d.proto", result.Id)
+				err = os.WriteFile(resultpath, result_bytes, 0644)
+				if(err != nil){panic(err)}
+				details_bytes, err := proto.Marshal(details)
+				if(err != nil){panic(err)}
+				detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
+				err = os.WriteFile(detailpath, details_bytes, 0644)
+				go data.SaveMatch(result)
+				go data.SaveDetails(details)
+				// _ = data.SaveDetails
+				// _ = result
+				// _ = data.SaveMatch
 				// data.SaveCosts(costs)
 			}
 
@@ -239,3 +244,4 @@ func main() {
 		}
 	}
 }
+

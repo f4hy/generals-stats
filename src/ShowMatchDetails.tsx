@@ -5,16 +5,24 @@ import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
-    BarChart,
-    LineChart,
-    Line,
+  BarChart,
+  LineChart,
+  Line,
+  LabelList,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
+  ZAxis,
+  ScatterChart,
+  Scatter,
+  CartesianGrid,
 } from "recharts"
-import { Costs_BuiltObject, MatchDetails, APM, UpgradeEvent } from "./proto/match"
+import { Costs_BuiltObject, MatchDetails, APM, UpgradeEvent, Upgrades } from "./proto/match"
 import CostBreakdown from "./CostBreakdown"
+import { TeamColor } from "./Colors"
+import { isShorthandPropertyAssignment } from "typescript"
 
 function getDetails(id: number, callback: (m: MatchDetails) => void) {
   fetch("/api/details/" + id).then((r) =>
@@ -31,41 +39,53 @@ function getDetails(id: number, callback: (m: MatchDetails) => void) {
 
 const empty: MatchDetails = { matchId: 0, costs: [], apms: [], upgradeEvents: {} }
 
-function EventChart(props: {upgrades: UpgradeEvent[]}){
-    if(props.upgrades){
-    return (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={props.upgrades}
-            layout="horizontal"
-            margin={{ top: 5, right: 10, left: 15, bottom: 5 }}
-          >
-            <Line dataKey="upgradeName" />
-            <XAxis dataKey="timecode" />
-            <YAxis
-              label={{
-                value: "Actions Per Minute",
-                position: "insideLeft",
-                offset: -5,
-                angle: -90,
-              }}
-            />
-            <Tooltip cursor={false} />
-          </LineChart>
-        </ResponsiveContainer>
 
-      )
-    }
-    else{
-	return (
-    <div>{JSON.stringify(props.upgrades)}</div>
-	)
-    }
+const shapes: ('circle' | 'cross' | 'diamond' | 'square' | 'star' | 'triangle')[] = ['circle','star', 'square' , 'triangle']
+
+function EventChart(props: { upgrades: ({ [name: string]: Upgrades }) }) {
+  const names = Object.keys(props.upgrades).sort((x1, x2) => x1.localeCompare(x2))
+  if (props.upgrades) {
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <ScatterChart
+          margin={{ top: 5, right: 10, left: 15, bottom: 5 }}
+        >
+          {names.map((name, idx) =>
+          (<Scatter name={name} fill={TeamColor(name)} data={props.upgrades[name].upgrades} shape={shapes[idx]} legendType={shapes[idx]}
+          >
+            {/* <LabelList dataKey="upgradeName" position="left" formatter={labelformater} offset={100} /> */}
+          </Scatter>
+          )
+          )}
+          <XAxis type="number" dataKey="timecode" />
+          <YAxis type="number"
+            dataKey="cost"
+            label={{
+              value: "Cost",
+              position: "insideLeft",
+              offset: -5,
+              angle: -90,
+            }}
+          />
+          <ZAxis dataKey="upgradeName" name="upgrade" />
+          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+          <CartesianGrid />
+          <Legend />
+        </ScatterChart>
+      </ResponsiveContainer >
+
+    )
+  }
+  else {
+    return (
+      <div>{JSON.stringify(props.upgrades)}</div>
+    )
+  }
 }
 
-function ApmChart(props: {apms: APM[]}){
-    const data = _.sortBy(props.apms, a => -a.apm)
-    return (
+function ApmChart(props: { apms: APM[] }) {
+  const data = _.sortBy(props.apms, a => -a.apm)
+  return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
         data={data}
@@ -94,12 +114,10 @@ export default function ShowMatchDetails(props: { id: number }) {
   React.useEffect(() => {
     getDetails(props.id, setDetails)
   }, [props.id])
-    const upgrades = details.upgradeEvents?.Modus?.upgrades
   return (
     <>
-	<ApmChart apms={details.apms} />
-	<div>{JSON.stringify(details.upgradeEvents)}</div>
-      {/* <EventChart upgrades={upgrades} /> */}
+      <EventChart upgrades={details.upgradeEvents} />
+      <ApmChart apms={details.apms} />
       <Divider />
       <CostBreakdown costs={details.costs} />
     </>

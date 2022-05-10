@@ -297,6 +297,7 @@ export interface UpgradeEvent {
   playerName: string
   timecode: number
   upgradeName: string
+  cost: number
 }
 
 export interface Upgrades {
@@ -1802,7 +1803,7 @@ export const APM = {
 }
 
 function createBaseUpgradeEvent(): UpgradeEvent {
-  return { playerName: "", timecode: 0, upgradeName: "" }
+  return { playerName: "", timecode: 0, upgradeName: "", cost: 0 }
 }
 
 export const UpgradeEvent = {
@@ -1818,6 +1819,9 @@ export const UpgradeEvent = {
     }
     if (message.upgradeName !== "") {
       writer.uint32(26).string(message.upgradeName)
+    }
+    if (message.cost !== 0) {
+      writer.uint32(32).int64(message.cost)
     }
     return writer
   },
@@ -1838,6 +1842,9 @@ export const UpgradeEvent = {
         case 3:
           message.upgradeName = reader.string()
           break
+        case 4:
+          message.cost = longToNumber(reader.int64() as Long)
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -1851,6 +1858,7 @@ export const UpgradeEvent = {
       playerName: isSet(object.playerName) ? String(object.playerName) : "",
       timecode: isSet(object.timecode) ? Number(object.timecode) : 0,
       upgradeName: isSet(object.upgradeName) ? String(object.upgradeName) : "",
+      cost: isSet(object.cost) ? Number(object.cost) : 0,
     }
   },
 
@@ -1860,6 +1868,7 @@ export const UpgradeEvent = {
     message.timecode !== undefined &&
       (obj.timecode = Math.round(message.timecode))
     message.upgradeName !== undefined && (obj.upgradeName = message.upgradeName)
+    message.cost !== undefined && (obj.cost = Math.round(message.cost))
     return obj
   },
 
@@ -1870,6 +1879,7 @@ export const UpgradeEvent = {
     message.playerName = object.playerName ?? ""
     message.timecode = object.timecode ?? 0
     message.upgradeName = object.upgradeName ?? ""
+    message.cost = object.cost ?? 0
     return message
   },
 }

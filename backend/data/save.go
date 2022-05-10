@@ -15,7 +15,6 @@ func SaveDetails(costs *pb.MatchDetails) error {
 	if err != nil {
 		return err
 	}
-	log.Infof("Saving costs to %s", path)
 	err = s3.AddDataToS3(path, dataToSave)
 	return err
 }
@@ -26,7 +25,6 @@ func SaveMatch(match *pb.MatchInfo) error {
 	if err != nil {
 		return err
 	}
-	log.Infof("Saving match to %s", path)
 	err = s3.AddDataToS3(path, dataToSave)
 	return err
 }

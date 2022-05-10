@@ -17,6 +17,7 @@ import {
   YAxis,
 } from "recharts"
 import { DateMessage, TeamStat, TeamStats } from "./proto/match"
+import { TeamColor} from "./Colors"
 
 function getTeamStats(callback: (m: TeamStats) => void) {
   fetch("/api/teamstats").then((r) =>
@@ -92,8 +93,8 @@ function RecordOverTime(props: { stats: TeamStats }) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line dataKey="team1" stroke="#82ca9d" strokeWidth={3} />
-          <Line dataKey="team3" stroke="#8884d8" strokeWidth={3} />
+          <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
+          <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
         </LineChart>
       </ResponsiveContainer>
     </Box>
