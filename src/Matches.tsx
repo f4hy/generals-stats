@@ -62,7 +62,9 @@ function DisplayMatchInfo(props: { match: MatchInfo}) {
     " on Map: " +
     props.match.map +
     "  winner:" +
-    props.match.winningTeam
+    props.match.winningTeam +
+    " Duration " +
+    props.match.durationMinutes.toFixed(2) + " minutes"
   const winners = props.match.players.filter(
     (p) => p.team === props.match.winningTeam
   )
