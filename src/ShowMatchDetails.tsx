@@ -63,7 +63,7 @@ function EventChart(props: { upgrades: { [name: string]: Upgrades } }) {
               {/* <LabelList dataKey="upgradeName" position="left" formatter={labelformater} offset={100} /> */}
             </Scatter>
           ))}
-          <XAxis type="number" dataKey="timecode" />
+          <XAxis type="number" dataKey="atMinute" />
           <YAxis
             type="number"
             dataKey="cost"

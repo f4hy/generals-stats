@@ -112,9 +112,10 @@ func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
-func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64) ([]*pb.APM, map[string]*pb.Upgrades) {
+func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades) {
 	counts := make(map[string]int64)
-	upgrades := getUpgradeEvents(body)
+	minutePerTimestemp := minutes / float64(timesteps)
+	upgrades := getUpgradeEvents(body, minutePerTimestemp)
 	for _, b := range body {
 		if !strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum") {
 			counts[player_parse(b.PlayerName)] += 1
@@ -134,7 +135,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64) ([]*pb.A
 	return apms, upgrades
 }
 
-func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall) map[string]*pb.Upgrades {
+func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float64) map[string]*pb.Upgrades {
 	log.Println("Parsing the body")
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
@@ -147,9 +148,10 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall) map[string]*pb.Upgra
 			upgrade := pb.UpgradeEvent{
 				PlayerName: b.PlayerName,
 				Timecode:   int64(b.TimeCode),
+				UpgradeName: details.Name,
+				Cost: int64(details.Cost),
+				AtMinute: float64(b.TimeCode) * minPerTimestep,
 			}
-			upgrade.UpgradeName = details.Name
-			upgrade.Cost = int64(details.Cost)
 			upgrades[b.PlayerName].Upgrades = append(upgrades[b.PlayerName].Upgrades, &upgrade)
 		}
 	}
@@ -174,6 +176,7 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 	}
 	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
 	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
+	
 	minutes := end.Sub(start).Minutes()
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	winner, found := lo.Find(replay.Summary, func(p *object.PlayerSummary) bool {
@@ -204,7 +207,8 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 		}
 		details.Costs = append(details.Costs, cost)
 	}
-	apm, upgrades := processBody(replay.Body, minutes)
+	numTimeStamps := int64(replay.Header.NumTimeStamps)
+	apm, upgrades := processBody(replay.Body, minutes, numTimeStamps)
 	// log.Printf("Parsed apm %s", apm)
 	// log.Printf("Parsed upgrades %s", upgrades)
 

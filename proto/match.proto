@@ -144,6 +144,7 @@ message UpgradeEvent {
   int64 timecode = 2;
   string upgrade_name = 3  ;
   int64 cost = 4;
+  double atMinute = 5;
 }
 
 message Upgrades {

@@ -299,6 +299,7 @@ export interface UpgradeEvent {
   timecode: number
   upgradeName: string
   cost: number
+  atMinute: number
 }
 
 export interface Upgrades {
@@ -1824,7 +1825,7 @@ export const APM = {
 }
 
 function createBaseUpgradeEvent(): UpgradeEvent {
-  return { playerName: "", timecode: 0, upgradeName: "", cost: 0 }
+  return { playerName: "", timecode: 0, upgradeName: "", cost: 0, atMinute: 0 }
 }
 
 export const UpgradeEvent = {
@@ -1843,6 +1844,9 @@ export const UpgradeEvent = {
     }
     if (message.cost !== 0) {
       writer.uint32(32).int64(message.cost)
+    }
+    if (message.atMinute !== 0) {
+      writer.uint32(41).double(message.atMinute)
     }
     return writer
   },
@@ -1866,6 +1870,9 @@ export const UpgradeEvent = {
         case 4:
           message.cost = longToNumber(reader.int64() as Long)
           break
+        case 5:
+          message.atMinute = reader.double()
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -1880,6 +1887,7 @@ export const UpgradeEvent = {
       timecode: isSet(object.timecode) ? Number(object.timecode) : 0,
       upgradeName: isSet(object.upgradeName) ? String(object.upgradeName) : "",
       cost: isSet(object.cost) ? Number(object.cost) : 0,
+      atMinute: isSet(object.atMinute) ? Number(object.atMinute) : 0,
     }
   },
 
@@ -1890,6 +1898,7 @@ export const UpgradeEvent = {
       (obj.timecode = Math.round(message.timecode))
     message.upgradeName !== undefined && (obj.upgradeName = message.upgradeName)
     message.cost !== undefined && (obj.cost = Math.round(message.cost))
+    message.atMinute !== undefined && (obj.atMinute = message.atMinute)
     return obj
   },
 
@@ -1901,6 +1910,7 @@ export const UpgradeEvent = {
     message.timecode = object.timecode ?? 0
     message.upgradeName = object.upgradeName ?? ""
     message.cost = object.cost ?? 0
+    message.atMinute = object.atMinute ?? 0
     return message
   },
 }
