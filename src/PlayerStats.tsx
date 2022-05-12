@@ -22,7 +22,7 @@ import {
   General,
   PlayerStat,
   PlayerStats,
-  PlayerStat_GeneralWL,
+  GeneralWL,
 } from "./proto/match"
 
 function getPlayerStats(callback: (m: PlayerStats) => void) {
@@ -42,7 +42,7 @@ function roundUpNearestN(num: number, N: number) {
   return Math.ceil(num / N) * N
 }
 
-function PlayerListItem(props: { playerStatWL: PlayerStat_GeneralWL }) {
+function PlayerListItem(props: { playerStatWL: GeneralWL }) {
   const p = props.playerStatWL
   return (
     <ListItem>

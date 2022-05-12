@@ -209,15 +209,15 @@ export interface WinLoss {
   losses: number
 }
 
-export interface PlayerStat {
-  playerName: string
-  stats: PlayerStat_GeneralWL[]
-  factionStats: PlayerStat_FactionWL[]
-}
-
-export interface PlayerStat_GeneralWL {
+export interface GeneralWL {
   general: General
   winLoss: WinLoss | undefined
+}
+
+export interface PlayerStat {
+  playerName: string
+  stats: GeneralWL[]
+  factionStats: PlayerStat_FactionWL[]
 }
 
 export interface PlayerStat_FactionWL {
@@ -316,6 +316,20 @@ export interface MatchDetails {
 export interface MatchDetails_UpgradeEventsEntry {
   key: string
   value: Upgrades | undefined
+}
+
+export interface PairWinLoss {
+  general1wl: GeneralWL | undefined
+  general2wl: GeneralWL | undefined
+}
+
+export interface PairsWinLosses {
+  pairsWinLosses: { [key: string]: PairWinLoss }
+}
+
+export interface PairsWinLosses_PairsWinLossesEntry {
+  key: string
+  value: PairWinLoss | undefined
 }
 
 function createBasePlayer(): Player {
@@ -638,6 +652,78 @@ export const WinLoss = {
   },
 }
 
+function createBaseGeneralWL(): GeneralWL {
+  return { general: 0, winLoss: undefined }
+}
+
+export const GeneralWL = {
+  encode(
+    message: GeneralWL,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.general !== 0) {
+      writer.uint32(8).int32(message.general)
+    }
+    if (message.winLoss !== undefined) {
+      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GeneralWL {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseGeneralWL()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.general = reader.int32() as any
+          break
+        case 2:
+          message.winLoss = WinLoss.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): GeneralWL {
+    return {
+      general: isSet(object.general) ? generalFromJSON(object.general) : 0,
+      winLoss: isSet(object.winLoss)
+        ? WinLoss.fromJSON(object.winLoss)
+        : undefined,
+    }
+  },
+
+  toJSON(message: GeneralWL): unknown {
+    const obj: any = {}
+    message.general !== undefined &&
+      (obj.general = generalToJSON(message.general))
+    message.winLoss !== undefined &&
+      (obj.winLoss = message.winLoss
+        ? WinLoss.toJSON(message.winLoss)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<GeneralWL>, I>>(
+    object: I
+  ): GeneralWL {
+    const message = createBaseGeneralWL()
+    message.general = object.general ?? 0
+    message.winLoss =
+      object.winLoss !== undefined && object.winLoss !== null
+        ? WinLoss.fromPartial(object.winLoss)
+        : undefined
+    return message
+  },
+}
+
 function createBasePlayerStat(): PlayerStat {
   return { playerName: "", stats: [], factionStats: [] }
 }
@@ -651,7 +737,7 @@ export const PlayerStat = {
       writer.uint32(10).string(message.playerName)
     }
     for (const v of message.stats) {
-      PlayerStat_GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim()
+      GeneralWL.encode(v!, writer.uint32(18).fork()).ldelim()
     }
     for (const v of message.factionStats) {
       PlayerStat_FactionWL.encode(v!, writer.uint32(26).fork()).ldelim()
@@ -670,9 +756,7 @@ export const PlayerStat = {
           message.playerName = reader.string()
           break
         case 2:
-          message.stats.push(
-            PlayerStat_GeneralWL.decode(reader, reader.uint32())
-          )
+          message.stats.push(GeneralWL.decode(reader, reader.uint32()))
           break
         case 3:
           message.factionStats.push(
@@ -691,7 +775,7 @@ export const PlayerStat = {
     return {
       playerName: isSet(object.playerName) ? String(object.playerName) : "",
       stats: Array.isArray(object?.stats)
-        ? object.stats.map((e: any) => PlayerStat_GeneralWL.fromJSON(e))
+        ? object.stats.map((e: any) => GeneralWL.fromJSON(e))
         : [],
       factionStats: Array.isArray(object?.factionStats)
         ? object.factionStats.map((e: any) => PlayerStat_FactionWL.fromJSON(e))
@@ -704,7 +788,7 @@ export const PlayerStat = {
     message.playerName !== undefined && (obj.playerName = message.playerName)
     if (message.stats) {
       obj.stats = message.stats.map((e) =>
-        e ? PlayerStat_GeneralWL.toJSON(e) : undefined
+        e ? GeneralWL.toJSON(e) : undefined
       )
     } else {
       obj.stats = []
@@ -724,85 +808,9 @@ export const PlayerStat = {
   ): PlayerStat {
     const message = createBasePlayerStat()
     message.playerName = object.playerName ?? ""
-    message.stats =
-      object.stats?.map((e) => PlayerStat_GeneralWL.fromPartial(e)) || []
+    message.stats = object.stats?.map((e) => GeneralWL.fromPartial(e)) || []
     message.factionStats =
       object.factionStats?.map((e) => PlayerStat_FactionWL.fromPartial(e)) || []
-    return message
-  },
-}
-
-function createBasePlayerStat_GeneralWL(): PlayerStat_GeneralWL {
-  return { general: 0, winLoss: undefined }
-}
-
-export const PlayerStat_GeneralWL = {
-  encode(
-    message: PlayerStat_GeneralWL,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.general !== 0) {
-      writer.uint32(8).int32(message.general)
-    }
-    if (message.winLoss !== undefined) {
-      WinLoss.encode(message.winLoss, writer.uint32(18).fork()).ldelim()
-    }
-    return writer
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PlayerStat_GeneralWL {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
-    let end = length === undefined ? reader.len : reader.pos + length
-    const message = createBasePlayerStat_GeneralWL()
-    while (reader.pos < end) {
-      const tag = reader.uint32()
-      switch (tag >>> 3) {
-        case 1:
-          message.general = reader.int32() as any
-          break
-        case 2:
-          message.winLoss = WinLoss.decode(reader, reader.uint32())
-          break
-        default:
-          reader.skipType(tag & 7)
-          break
-      }
-    }
-    return message
-  },
-
-  fromJSON(object: any): PlayerStat_GeneralWL {
-    return {
-      general: isSet(object.general) ? generalFromJSON(object.general) : 0,
-      winLoss: isSet(object.winLoss)
-        ? WinLoss.fromJSON(object.winLoss)
-        : undefined,
-    }
-  },
-
-  toJSON(message: PlayerStat_GeneralWL): unknown {
-    const obj: any = {}
-    message.general !== undefined &&
-      (obj.general = generalToJSON(message.general))
-    message.winLoss !== undefined &&
-      (obj.winLoss = message.winLoss
-        ? WinLoss.toJSON(message.winLoss)
-        : undefined)
-    return obj
-  },
-
-  fromPartial<I extends Exact<DeepPartial<PlayerStat_GeneralWL>, I>>(
-    object: I
-  ): PlayerStat_GeneralWL {
-    const message = createBasePlayerStat_GeneralWL()
-    message.general = object.general ?? 0
-    message.winLoss =
-      object.winLoss !== undefined && object.winLoss !== null
-        ? WinLoss.fromPartial(object.winLoss)
-        : undefined
     return message
   },
 }
@@ -2162,6 +2170,241 @@ export const MatchDetails_UpgradeEventsEntry = {
     message.value =
       object.value !== undefined && object.value !== null
         ? Upgrades.fromPartial(object.value)
+        : undefined
+    return message
+  },
+}
+
+function createBasePairWinLoss(): PairWinLoss {
+  return { general1wl: undefined, general2wl: undefined }
+}
+
+export const PairWinLoss = {
+  encode(
+    message: PairWinLoss,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.general1wl !== undefined) {
+      GeneralWL.encode(message.general1wl, writer.uint32(10).fork()).ldelim()
+    }
+    if (message.general2wl !== undefined) {
+      GeneralWL.encode(message.general2wl, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PairWinLoss {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePairWinLoss()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.general1wl = GeneralWL.decode(reader, reader.uint32())
+          break
+        case 2:
+          message.general2wl = GeneralWL.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PairWinLoss {
+    return {
+      general1wl: isSet(object.general1wl)
+        ? GeneralWL.fromJSON(object.general1wl)
+        : undefined,
+      general2wl: isSet(object.general2wl)
+        ? GeneralWL.fromJSON(object.general2wl)
+        : undefined,
+    }
+  },
+
+  toJSON(message: PairWinLoss): unknown {
+    const obj: any = {}
+    message.general1wl !== undefined &&
+      (obj.general1wl = message.general1wl
+        ? GeneralWL.toJSON(message.general1wl)
+        : undefined)
+    message.general2wl !== undefined &&
+      (obj.general2wl = message.general2wl
+        ? GeneralWL.toJSON(message.general2wl)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PairWinLoss>, I>>(
+    object: I
+  ): PairWinLoss {
+    const message = createBasePairWinLoss()
+    message.general1wl =
+      object.general1wl !== undefined && object.general1wl !== null
+        ? GeneralWL.fromPartial(object.general1wl)
+        : undefined
+    message.general2wl =
+      object.general2wl !== undefined && object.general2wl !== null
+        ? GeneralWL.fromPartial(object.general2wl)
+        : undefined
+    return message
+  },
+}
+
+function createBasePairsWinLosses(): PairsWinLosses {
+  return { pairsWinLosses: {} }
+}
+
+export const PairsWinLosses = {
+  encode(
+    message: PairsWinLosses,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    Object.entries(message.pairsWinLosses).forEach(([key, value]) => {
+      PairsWinLosses_PairsWinLossesEntry.encode(
+        { key: key as any, value },
+        writer.uint32(10).fork()
+      ).ldelim()
+    })
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PairsWinLosses {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePairsWinLosses()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          const entry1 = PairsWinLosses_PairsWinLossesEntry.decode(
+            reader,
+            reader.uint32()
+          )
+          if (entry1.value !== undefined) {
+            message.pairsWinLosses[entry1.key] = entry1.value
+          }
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PairsWinLosses {
+    return {
+      pairsWinLosses: isObject(object.pairsWinLosses)
+        ? Object.entries(object.pairsWinLosses).reduce<{
+            [key: string]: PairWinLoss
+          }>((acc, [key, value]) => {
+            acc[key] = PairWinLoss.fromJSON(value)
+            return acc
+          }, {})
+        : {},
+    }
+  },
+
+  toJSON(message: PairsWinLosses): unknown {
+    const obj: any = {}
+    obj.pairsWinLosses = {}
+    if (message.pairsWinLosses) {
+      Object.entries(message.pairsWinLosses).forEach(([k, v]) => {
+        obj.pairsWinLosses[k] = PairWinLoss.toJSON(v)
+      })
+    }
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PairsWinLosses>, I>>(
+    object: I
+  ): PairsWinLosses {
+    const message = createBasePairsWinLosses()
+    message.pairsWinLosses = Object.entries(
+      object.pairsWinLosses ?? {}
+    ).reduce<{ [key: string]: PairWinLoss }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = PairWinLoss.fromPartial(value)
+      }
+      return acc
+    }, {})
+    return message
+  },
+}
+
+function createBasePairsWinLosses_PairsWinLossesEntry(): PairsWinLosses_PairsWinLossesEntry {
+  return { key: "", value: undefined }
+}
+
+export const PairsWinLosses_PairsWinLossesEntry = {
+  encode(
+    message: PairsWinLosses_PairsWinLossesEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key)
+    }
+    if (message.value !== undefined) {
+      PairWinLoss.encode(message.value, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): PairsWinLosses_PairsWinLossesEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePairsWinLosses_PairsWinLossesEntry()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string()
+          break
+        case 2:
+          message.value = PairWinLoss.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PairsWinLosses_PairsWinLossesEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value)
+        ? PairWinLoss.fromJSON(object.value)
+        : undefined,
+    }
+  },
+
+  toJSON(message: PairsWinLosses_PairsWinLossesEntry): unknown {
+    const obj: any = {}
+    message.key !== undefined && (obj.key = message.key)
+    message.value !== undefined &&
+      (obj.value = message.value
+        ? PairWinLoss.toJSON(message.value)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<
+    I extends Exact<DeepPartial<PairsWinLosses_PairsWinLossesEntry>, I>
+  >(object: I): PairsWinLosses_PairsWinLossesEntry {
+    const message = createBasePairsWinLosses_PairsWinLossesEntry()
+    message.key = object.key ?? ""
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? PairWinLoss.fromPartial(object.value)
         : undefined
     return message
   },

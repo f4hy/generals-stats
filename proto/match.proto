@@ -57,12 +57,13 @@ message WinLoss {
   int32 losses = 2;
 }
 
+message GeneralWL {
+  General general = 1;
+  WinLoss win_loss = 2;
+}
+
 message PlayerStat {
   string player_name = 1;
-  message GeneralWL {
-    General general = 1;
-    WinLoss win_loss = 2;
-  }
   repeated GeneralWL stats =2;
   message FactionWL {
     Faction faction = 1;
@@ -156,4 +157,15 @@ message MatchDetails{
   repeated Costs costs = 2;
   repeated APM apms = 3;
   map<string, Upgrades> upgrade_events = 4;
+}
+
+
+message PairWinLoss{
+  General general1 = 1;
+  General general2 = 2;
+  WinLoss winloss = 3
+}
+
+message PairsWinLosses{
+  map<string, repeated PairWinLoss> pairs_win_losses = 1;
 }
