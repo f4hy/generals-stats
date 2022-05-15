@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"reflect"
 
 	"github.com/bill-rich/cncstats/pkg/zhreplay"
 	"github.com/bill-rich/cncstats/pkg/zhreplay/body"
@@ -112,11 +113,23 @@ func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
-func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades) {
+func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades, int64) {
 	counts := make(map[string]int64)
 	minutePerTimestemp := minutes / float64(timesteps)
 	upgrades := getUpgradeEvents(body, minutePerTimestemp)
+	var id int64
 	for _, b := range body {
+		if(id == 0 && strings.Contains(b.OrderName, "Checksum")){
+			checksum, ok := b.Arguments[0].(int64);
+			if(ok){
+				id = checksum
+			}else{
+				
+				log.Fatal("checksum was not an int %s", b.Arguments[0],  reflect.TypeOf(b.Arguments[0]), reflect.ValueOf(b.Arguments[0]))
+			}
+			
+		}
+		
 		if !strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum") {
 			counts[player_parse(b.PlayerName)] += 1
 		}
@@ -132,7 +145,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 		apms = append(apms, apm)
 	}
 
-	return apms, upgrades
+	return apms, upgrades, id
 }
 
 func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float64) map[string]*pb.Upgrades {
@@ -208,7 +221,8 @@ func parse_file(filename string) (*pb.MatchInfo, *pb.MatchDetails, error) {
 		details.Costs = append(details.Costs, cost)
 	}
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
-	apm, upgrades := processBody(replay.Body, minutes, numTimeStamps)
+	apm, upgrades, id := processBody(replay.Body, minutes, numTimeStamps)
+	details.MatchId = id
 	// log.Printf("Parsed apm %s", apm)
 	// log.Printf("Parsed upgrades %s", upgrades)
 
@@ -255,9 +269,9 @@ func main() {
 				}
 				detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
 				err = os.WriteFile(detailpath, details_bytes, 0644)
-				data.SaveMatch(result)
-				data.SaveDetails(details)
-				// _ = data.SaveDetails
+				// data.SaveMatch(result)
+				// data.SaveDetails(details)
+				_ = data.SaveDetails
 				// _ = result
 				// _ = data.SaveMatch
 				// data.SaveCosts(costs)
