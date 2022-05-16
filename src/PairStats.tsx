@@ -99,7 +99,7 @@ export default function DisplayPairstats() {
   return (
     <>
       <Typography variant="h2">Pair stats.</Typography>
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flexGrow: 1, maxWidth: 1600 }}>
         {teams.map((team) => (
           <PairBarChart pairdata={pairstats.teamPairs[team]} team={team} />
         ))}

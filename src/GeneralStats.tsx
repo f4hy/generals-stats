@@ -131,15 +131,15 @@ export default function DisplayGeneralStats() {
   )
   const maxWinLoss = roundUpNearest5(maxwl + 1)
   return (
-    <Paper>
-      {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
-      <DisplayOverallGeneralStat stats={generalStats} />
-      {generalStats.generalStats.map((m) => (
-        <>
-          <DisplayGeneralStat stat={m} max={maxWinLoss} />
-          <Divider />
-        </>
-      ))}
+    <Paper sx={{ flexGrow: 1, maxWidth: 1600 }}>
+        {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
+        <DisplayOverallGeneralStat stats={generalStats} />
+        {generalStats.generalStats.map((m) => (
+          <>
+            <DisplayGeneralStat stat={m} max={maxWinLoss} />
+            <Divider />
+          </>
+        ))}
     </Paper>
   )
 }

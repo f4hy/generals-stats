@@ -72,8 +72,8 @@ export default function DisplayMapstats() {
   return (
     <Paper>
       <Typography variant="h2">Map stats.</Typography>
-      <Box sx={{ flexGrow: 1 }}>
-        <ResponsiveContainer width="90%" height={800}>
+      <Box sx={{ flexGrow: 1, maxWidth: 1600, textAlign: "center" }}>
+        <ResponsiveContainer width="100%" height={800}>
           <BarChart
             data={data}
             layout="horizontal"

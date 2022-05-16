@@ -5,6 +5,7 @@ import ListIcon from "@mui/icons-material/List"
 import MapIcon from "@mui/icons-material/Map"
 import MenuIcon from "@mui/icons-material/Menu"
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech"
+import LooksTwoIcon from '@mui/icons-material/LooksTwo';
 import PeopleIcon from "@mui/icons-material/People"
 import PersonIcon from "@mui/icons-material/Person"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
@@ -167,7 +168,7 @@ function MenuItem(props: MenuItemProps) {
 
 export default function Menu() {
   const theme = useTheme()
-  const [open, setOpen] = React.useState(true)
+  const [open, setOpen] = React.useState(false)
   const [selection, setSelection] = React.useState<Selection>("PairStats")
 
   const handleDrawerOpen = () => {
@@ -200,7 +201,7 @@ export default function Menu() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
+      <Drawer variant="permanent" open={open} sx={{width: 10 }}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
@@ -251,7 +252,7 @@ export default function Menu() {
             value="PairStats"
             text="Pair Stats"
             open={open}
-            icon={<MapIcon />}
+            icon={<LooksTwoIcon />}
             callback={setSelection}
           />
         </List>
@@ -266,7 +267,7 @@ export default function Menu() {
           />
         </List> */}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 0.1 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
         <DrawerHeader />
         <Main selection={selection} />
       </Box>
