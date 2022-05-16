@@ -171,6 +171,6 @@ message PairsWinLosses{
   repeated PairWinLoss pairwl = 1;
 }
 
-message PlayerPairs{
-  map<string, PairsWinLosses> player_pairs = 1;
+message TeamPairs{
+  map<string, PairsWinLosses> team_pairs = 1;
 }

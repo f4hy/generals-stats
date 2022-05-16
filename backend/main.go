@@ -107,6 +107,11 @@ func main() {
 			ts := data.MapStats(matches)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
+		api.GET("/pairstats", func(c *gin.Context) {
+			// c.Header("Cache-Control", maxAge)
+			ts := data.PairStats(matches)
+			c.ProtoBuf(http.StatusOK, ts)
+		})
 		api.GET("/details/:matchid", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
 			matchidstr := c.Param("matchid")

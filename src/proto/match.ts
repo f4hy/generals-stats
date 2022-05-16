@@ -329,11 +329,11 @@ export interface PairsWinLosses {
   pairwl: PairWinLoss[]
 }
 
-export interface PlayerPairs {
-  playerPairs: { [key: string]: PairsWinLosses }
+export interface TeamPairs {
+  teamPairs: { [key: string]: PairsWinLosses }
 }
 
-export interface PlayerPairs_PlayerPairsEntry {
+export interface TeamPairs_TeamPairsEntry {
   key: string
   value: PairsWinLosses | undefined
 }
@@ -2335,17 +2335,17 @@ export const PairsWinLosses = {
   },
 }
 
-function createBasePlayerPairs(): PlayerPairs {
-  return { playerPairs: {} }
+function createBaseTeamPairs(): TeamPairs {
+  return { teamPairs: {} }
 }
 
-export const PlayerPairs = {
+export const TeamPairs = {
   encode(
-    message: PlayerPairs,
+    message: TeamPairs,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    Object.entries(message.playerPairs).forEach(([key, value]) => {
-      PlayerPairs_PlayerPairsEntry.encode(
+    Object.entries(message.teamPairs).forEach(([key, value]) => {
+      TeamPairs_TeamPairsEntry.encode(
         { key: key as any, value },
         writer.uint32(10).fork()
       ).ldelim()
@@ -2353,20 +2353,20 @@ export const PlayerPairs = {
     return writer
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): PlayerPairs {
+  decode(input: _m0.Reader | Uint8Array, length?: number): TeamPairs {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
     let end = length === undefined ? reader.len : reader.pos + length
-    const message = createBasePlayerPairs()
+    const message = createBaseTeamPairs()
     while (reader.pos < end) {
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          const entry1 = PlayerPairs_PlayerPairsEntry.decode(
+          const entry1 = TeamPairs_TeamPairsEntry.decode(
             reader,
             reader.uint32()
           )
           if (entry1.value !== undefined) {
-            message.playerPairs[entry1.key] = entry1.value
+            message.teamPairs[entry1.key] = entry1.value
           }
           break
         default:
@@ -2377,10 +2377,10 @@ export const PlayerPairs = {
     return message
   },
 
-  fromJSON(object: any): PlayerPairs {
+  fromJSON(object: any): TeamPairs {
     return {
-      playerPairs: isObject(object.playerPairs)
-        ? Object.entries(object.playerPairs).reduce<{
+      teamPairs: isObject(object.teamPairs)
+        ? Object.entries(object.teamPairs).reduce<{
             [key: string]: PairsWinLosses
           }>((acc, [key, value]) => {
             acc[key] = PairsWinLosses.fromJSON(value)
@@ -2390,22 +2390,22 @@ export const PlayerPairs = {
     }
   },
 
-  toJSON(message: PlayerPairs): unknown {
+  toJSON(message: TeamPairs): unknown {
     const obj: any = {}
-    obj.playerPairs = {}
-    if (message.playerPairs) {
-      Object.entries(message.playerPairs).forEach(([k, v]) => {
-        obj.playerPairs[k] = PairsWinLosses.toJSON(v)
+    obj.teamPairs = {}
+    if (message.teamPairs) {
+      Object.entries(message.teamPairs).forEach(([k, v]) => {
+        obj.teamPairs[k] = PairsWinLosses.toJSON(v)
       })
     }
     return obj
   },
 
-  fromPartial<I extends Exact<DeepPartial<PlayerPairs>, I>>(
+  fromPartial<I extends Exact<DeepPartial<TeamPairs>, I>>(
     object: I
-  ): PlayerPairs {
-    const message = createBasePlayerPairs()
-    message.playerPairs = Object.entries(object.playerPairs ?? {}).reduce<{
+  ): TeamPairs {
+    const message = createBaseTeamPairs()
+    message.teamPairs = Object.entries(object.teamPairs ?? {}).reduce<{
       [key: string]: PairsWinLosses
     }>((acc, [key, value]) => {
       if (value !== undefined) {
@@ -2417,13 +2417,13 @@ export const PlayerPairs = {
   },
 }
 
-function createBasePlayerPairs_PlayerPairsEntry(): PlayerPairs_PlayerPairsEntry {
+function createBaseTeamPairs_TeamPairsEntry(): TeamPairs_TeamPairsEntry {
   return { key: "", value: undefined }
 }
 
-export const PlayerPairs_PlayerPairsEntry = {
+export const TeamPairs_TeamPairsEntry = {
   encode(
-    message: PlayerPairs_PlayerPairsEntry,
+    message: TeamPairs_TeamPairsEntry,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== "") {
@@ -2438,10 +2438,10 @@ export const PlayerPairs_PlayerPairsEntry = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): PlayerPairs_PlayerPairsEntry {
+  ): TeamPairs_TeamPairsEntry {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
     let end = length === undefined ? reader.len : reader.pos + length
-    const message = createBasePlayerPairs_PlayerPairsEntry()
+    const message = createBaseTeamPairs_TeamPairsEntry()
     while (reader.pos < end) {
       const tag = reader.uint32()
       switch (tag >>> 3) {
@@ -2459,7 +2459,7 @@ export const PlayerPairs_PlayerPairsEntry = {
     return message
   },
 
-  fromJSON(object: any): PlayerPairs_PlayerPairsEntry {
+  fromJSON(object: any): TeamPairs_TeamPairsEntry {
     return {
       key: isSet(object.key) ? String(object.key) : "",
       value: isSet(object.value)
@@ -2468,7 +2468,7 @@ export const PlayerPairs_PlayerPairsEntry = {
     }
   },
 
-  toJSON(message: PlayerPairs_PlayerPairsEntry): unknown {
+  toJSON(message: TeamPairs_TeamPairsEntry): unknown {
     const obj: any = {}
     message.key !== undefined && (obj.key = message.key)
     message.value !== undefined &&
@@ -2478,10 +2478,10 @@ export const PlayerPairs_PlayerPairsEntry = {
     return obj
   },
 
-  fromPartial<I extends Exact<DeepPartial<PlayerPairs_PlayerPairsEntry>, I>>(
+  fromPartial<I extends Exact<DeepPartial<TeamPairs_TeamPairsEntry>, I>>(
     object: I
-  ): PlayerPairs_PlayerPairsEntry {
-    const message = createBasePlayerPairs_PlayerPairsEntry()
+  ): TeamPairs_TeamPairsEntry {
+    const message = createBaseTeamPairs_TeamPairsEntry()
     message.key = object.key ?? ""
     message.value =
       object.value !== undefined && object.value !== null

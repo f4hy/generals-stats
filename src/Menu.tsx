@@ -23,6 +23,7 @@ import Typography from "@mui/material/Typography"
 import * as React from "react"
 import DisplayGeneralStats from "./GeneralStats"
 import DisplayMapStats from "./MapStats"
+import DisplayPairStats from "./PairStats"
 import DisplayMatches from "./Matches"
 import DisplayPlayerStats from "./PlayerStats"
 import DisplayTeamStats from "./TeamStats"
@@ -104,6 +105,7 @@ type Selection =
   | "PlayerStats"
   | "TeamStats"
   | "MapStats"
+  | "PairStats"
 /* | "AddMatch" */
 
 interface MenuItemProps {
@@ -128,6 +130,8 @@ function Main(props: { selection: Selection }) {
       return <DisplayTeamStats />
     case "MapStats":
       return <DisplayMapStats />
+    case "PairStats":
+      return <DisplayPairStats />
     /* case "AddMatch":
      *   return <AddMatch />; */
     default:
@@ -164,7 +168,7 @@ function MenuItem(props: MenuItemProps) {
 export default function Menu() {
   const theme = useTheme()
   const [open, setOpen] = React.useState(true)
-  const [selection, setSelection] = React.useState<Selection>("Matches")
+  const [selection, setSelection] = React.useState<Selection>("PairStats")
 
   const handleDrawerOpen = () => {
     setOpen(true)
@@ -243,6 +247,13 @@ export default function Menu() {
             icon={<MapIcon />}
             callback={setSelection}
           />
+          <MenuItem
+            value="PairStats"
+            text="Pair Stats"
+            open={open}
+            icon={<MapIcon />}
+            callback={setSelection}
+          />
         </List>
         {/* <Divider />
         <List>
@@ -255,7 +266,7 @@ export default function Menu() {
           />
         </List> */}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 0.1 }}>
         <DrawerHeader />
         <Main selection={selection} />
       </Box>
