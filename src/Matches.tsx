@@ -70,7 +70,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
   )
   const losingTeam = losers[0].team
   return (
-    <Paper sx={{ width: "90%" }}>
+    <Paper sx={{ width: "100%", maxWidth: 1600 }}>
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
       </ListItem>
@@ -157,13 +157,13 @@ export default function DisplayMatches() {
     getMatches(setMatchList)
   }, [])
   return (
-    <Paper>
+    <>
       {matchList.matches.map((m) => (
         <>
           <DisplayMatchInfo match={m} key={m.id} />
           <Divider />
         </>
       ))}
-    </Paper>
+    </>
   )
 }
