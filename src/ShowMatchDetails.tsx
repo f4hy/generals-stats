@@ -3,17 +3,20 @@ import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
-  BarChart, CartesianGrid, Legend,
-  ResponsiveContainer, Scatter, ScatterChart, Tooltip,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Scatter,
+  ScatterChart,
+  Tooltip,
   XAxis,
   YAxis,
-  ZAxis
+  ZAxis,
 } from "recharts"
 import { TeamColor } from "./Colors"
 import CostBreakdown from "./CostBreakdown"
-import {
-  APM, MatchDetails, Upgrades
-} from "./proto/match"
+import { APM, MatchDetails, Upgrades } from "./proto/match"
 
 function getDetails(id: number, callback: (m: MatchDetails) => void) {
   fetch("/api/details/" + id).then((r) =>

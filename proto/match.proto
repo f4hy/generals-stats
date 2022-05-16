@@ -46,6 +46,7 @@ message MatchInfo {
   Team winning_team = 4;
   repeated Player players = 5;
   double duration_minutes = 6;
+  string filename = 7;
 }
 
 message Matches {
@@ -163,9 +164,13 @@ message MatchDetails{
 message PairWinLoss{
   General general1 = 1;
   General general2 = 2;
-  WinLoss winloss = 3
+  WinLoss winloss = 3;
 }
 
 message PairsWinLosses{
-  map<string, repeated PairWinLoss> pairs_win_losses = 1;
+  repeated PairWinLoss pairwl = 1;
+}
+
+message PlayerPairs{
+  map<string, PairsWinLosses> player_pairs = 1;
 }
