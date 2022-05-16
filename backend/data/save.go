@@ -2,16 +2,37 @@ package data
 
 import (
 	"fmt"
-
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
+	"os"
 )
 
-func SaveDetails(costs *pb.MatchDetails) error {
-	path := fmt.Sprintf("match-details/%d.json", costs.MatchId)
-	dataToSave, err := proto.Marshal(costs)
+var (
+	matchDetails string = "match-details"
+	matchInfo    string = "parsed-matches"
+)
+
+func init() {
+	isdev := os.Getenv("DEV")
+	if isdev != "" {
+		matchDetails = "dev/match-details"
+		matchInfo = "dev/parsed-matches"
+	}
+}
+
+func detailsPath(id int64) string {
+	return fmt.Sprintf("%s/%d.proto", matchDetails, id)
+}
+
+func matchPath(id int64) string {
+	return fmt.Sprintf("%s/%d.proto", matchInfo, id)
+}
+
+func SaveDetails(details *pb.MatchDetails) error {
+	path := detailsPath(details.MatchId)
+	dataToSave, err := proto.Marshal(details)
 	if err != nil {
 		return err
 	}
@@ -20,7 +41,7 @@ func SaveDetails(costs *pb.MatchDetails) error {
 }
 
 func SaveMatch(match *pb.MatchInfo) error {
-	path := fmt.Sprintf("parsed-matches/%d.json", match.GetId())
+	path := matchPath(match.Id)
 	dataToSave, err := proto.Marshal(match)
 	if err != nil {
 		return err
@@ -38,7 +59,7 @@ func getMatch(c chan *pb.MatchInfo, matchpath string) {
 }
 
 func GetMatches() (*pb.Matches, error) {
-	listing, err := s3.List("parsed-matches/")
+	listing, err := s3.List(matchInfo)
 	log.Infof("Found %d matchs", len(listing))
 	if err != nil {
 		return nil, err
@@ -60,7 +81,7 @@ func GetMatches() (*pb.Matches, error) {
 }
 
 func GetDetails(match_id int64) (*pb.MatchDetails, error) {
-	path := fmt.Sprintf("match-details/%d.json", match_id)
+	path := detailsPath(match_id)
 	log.Infof("fetching match %s", path)
 	details := &pb.MatchDetails{}
 	costdata, err := s3.GetS3Data(path)

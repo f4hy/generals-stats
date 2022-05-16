@@ -198,6 +198,7 @@ export interface MatchInfo {
   winningTeam: Team
   players: Player[]
   durationMinutes: number
+  filename: string
 }
 
 export interface Matches {
@@ -397,6 +398,7 @@ function createBaseMatchInfo(): MatchInfo {
     winningTeam: 0,
     players: [],
     durationMinutes: 0,
+    filename: "",
   }
 }
 
@@ -425,6 +427,9 @@ export const MatchInfo = {
     }
     if (message.durationMinutes !== 0) {
       writer.uint32(49).double(message.durationMinutes)
+    }
+    if (message.filename !== "") {
+      writer.uint32(58).string(message.filename)
     }
     return writer
   },
@@ -456,6 +461,9 @@ export const MatchInfo = {
         case 6:
           message.durationMinutes = reader.double()
           break
+        case 7:
+          message.filename = reader.string()
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -480,6 +488,7 @@ export const MatchInfo = {
       durationMinutes: isSet(object.durationMinutes)
         ? Number(object.durationMinutes)
         : 0,
+      filename: isSet(object.filename) ? String(object.filename) : "",
     }
   },
 
@@ -500,6 +509,7 @@ export const MatchInfo = {
     }
     message.durationMinutes !== undefined &&
       (obj.durationMinutes = message.durationMinutes)
+    message.filename !== undefined && (obj.filename = message.filename)
     return obj
   },
 
@@ -513,6 +523,7 @@ export const MatchInfo = {
     message.winningTeam = object.winningTeam ?? 0
     message.players = object.players?.map((e) => Player.fromPartial(e)) || []
     message.durationMinutes = object.durationMinutes ?? 0
+    message.filename = object.filename ?? ""
     return message
   },
 }

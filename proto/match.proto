@@ -46,6 +46,7 @@ message MatchInfo {
   Team winning_team = 4;
   repeated Player players = 5;
   double duration_minutes = 6;
+  string filename = 7;
 }
 
 message Matches {

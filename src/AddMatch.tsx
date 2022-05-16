@@ -79,6 +79,7 @@ export default function AddMatch() {
       winningTeam: winner,
       players: myplayers,
       durationMinutes: 0.0 /* Not updated */,
+      filename: "" /* not updated */,
     }
     saveMatch(match)
     alert("saved")
