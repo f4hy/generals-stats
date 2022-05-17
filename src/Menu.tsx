@@ -169,7 +169,7 @@ function MenuItem(props: MenuItemProps) {
 export default function Menu() {
   const theme = useTheme()
   const [open, setOpen] = React.useState(false)
-  const [selection, setSelection] = React.useState<Selection>("PairStats")
+  const [selection, setSelection] = React.useState<Selection>("Matches")
 
   const handleDrawerOpen = () => {
     setOpen(true)
