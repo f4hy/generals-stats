@@ -38,13 +38,13 @@ function generalToSide(general: General): Side {
 export default function DisplayGeneral(props: { general: General }) {
   return (
     <>
-      <Badge badgeContent={General[props.general]} color="primary">
+      <Badge badgeContent={General[props.general]} color="primary" sx={{ fontSize: 1 }}>
         <Avatar
           key={props.general}
           src={sideImg[generalToSide(props.general)]}
+          sx={{ width: "2rem", height: "2.1rem" }}
         />
       </Badge>
-      {/* <Typography>{generalToJSON(props.general)}</Typography> */}
     </>
   )
 }

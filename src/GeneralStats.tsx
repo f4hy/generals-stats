@@ -40,7 +40,7 @@ function DisplayOverallGeneralStat(props: { stats: GeneralStats }) {
     name: General[x.general],
   }))
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="99%" height={350}>
       <BarChart data={data} layout="horizontal">
         <CartesianGrid strokeDasharray="5 5" vertical={false} />
         <Bar dataKey="wins" fill="#42A5F5" />
@@ -69,37 +69,8 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
   ]
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2} m={1}>
-        <Grid item xs={2}>
-          <List>
-            <ListItem>
-              <ListItemAvatar>
-                <DisplayGeneral general={props.stat.general} />
-              </ListItemAvatar>
-              <ListItemText primary={General[props.stat.general]} />
-            </ListItem>
-            <ListItem>
-              <ListItemText
-                primary={`Total: (${overall?.wins ?? 0} : ${
-                  overall?.losses ?? 0
-                }) `}
-              />
-            </ListItem>
-            <Divider />
-            {sorted.map((p) => (
-              <ListItem key={p.playerName}>
-                <ListItemText
-                  key={p.playerName + "-text"}
-                  primary={`${p.playerName}: (${p.winLoss?.wins ?? 0} : ${
-                    p.winLoss?.losses ?? 0
-                  })`}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Grid>
-        <Grid item xs={9}>
-          <ResponsiveContainer width="100%" height={350}>
+          <DisplayGeneral general={props.stat.general} />
+          <ResponsiveContainer width="99%" height={350}>
             <BarChart data={data} layout="horizontal">
               <CartesianGrid strokeDasharray="5 5" vertical={false} />
               <Bar dataKey="wins" fill="#42A5F5" />
@@ -109,8 +80,6 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
               <Tooltip cursor={false} />
             </BarChart>
           </ResponsiveContainer>
-        </Grid>
-      </Grid>
     </Box>
   )
 }

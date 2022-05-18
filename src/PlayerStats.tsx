@@ -1,3 +1,4 @@
+import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -50,9 +51,7 @@ function PlayerListItem(props: { playerStatWL: GeneralWL }) {
         <DisplayGeneral general={p.general} />
       </ListItemAvatar>
       <ListItemText
-        primary={`${General[p.general]}: (${p.winLoss?.wins ?? 0} : ${
-          p.winLoss?.losses ?? 0
-        })`}
+        primary={`${General[p.general]}:(${p.winLoss?.wins ?? 0}:${p.winLoss?.losses ?? 0})`}
       />
     </ListItem>
   )
@@ -76,18 +75,16 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        <Grid item xs={2}>
-          <List>
-            <ListItem>
-              <ListItemText primary={"Player Name: " + props.stat.playerName} />
-            </ListItem>
+        <Grid item xs={12} md={2}>
+          <Typography variant="h3">{props.stat.playerName}</Typography>
+          <List sx={{ display: { xs: 'none', md: 'block' } }}>
             {sorted.map((p) => (
               <PlayerListItem playerStatWL={p} />
             ))}
           </List>
         </Grid>
-        <Grid item xs={9}>
-          <ResponsiveContainer width="100%" height={350}>
+        <Grid item xs={12} md={10}>
+          <ResponsiveContainer width="99%" height={350}>
             <BarChart data={faction_data} layout="horizontal">
               <CartesianGrid strokeDasharray="5 5" vertical={false} />
               <Bar dataKey="wins" fill="#42A5F5" />
@@ -97,19 +94,25 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
               <Tooltip cursor={false} />
             </BarChart>
           </ResponsiveContainer>
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="99%" height={350}>
             <BarChart data={data} layout="horizontal">
               <CartesianGrid strokeDasharray="5 5" vertical={false} />
               <Bar dataKey="wins" fill="#42A5F5" />
               <Bar dataKey="losses" fill="#FF7043" />
-              <XAxis dataKey="general" />
+              <XAxis dataKey="general"
+                height={80}
+                angle={90}
+                textAnchor="begin"
+                minTickGap={0}
+                interval={0}
+              />
               <YAxis domain={[0, props.max]} />
               <Tooltip cursor={false} />
             </BarChart>
           </ResponsiveContainer>
         </Grid>
-      </Grid>
-    </Box>
+      </Grid >
+    </Box >
   )
 }
 

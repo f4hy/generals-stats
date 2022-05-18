@@ -39,7 +39,7 @@ function MatchCard(props: {
 }) {
   return (
     <Card sx={{ backgroundColor: props.color }}>
-      <CardHeader sx={{ m: 1 }} title={props.title} avatar={props.avatar} />
+      <CardHeader sx={{ m: {md: 1, xs:0}}} title={props.title} avatar={props.avatar} component="div" />
     </Card>
   )
 }
@@ -70,18 +70,18 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
   )
   const losingTeam = losers[0].team
   return (
-    <Paper sx={{ width: "100%", maxWidth: 1600 }}>
+    <Paper sx={{ width: "99%", maxWidth: 1600 }}>
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
       </ListItem>
-      <Grid container spacing={1}>
-        <Grid item xs={10}>
-          <Grid container spacing={1}>
-            <Grid item xs={4}>
+      <Grid container spacing={{sx: 0, md:1, width: "99%"}}>
+        <Grid item xs={12} md={10} >
+          <Grid container spacing={{sx: 0, md:1}} sx={{ width: "99%"}}>
+            <Grid item xs={4} sx={{ display: { xs: 'none', md: 'block' } }}>
               <MatchCard
                 title={
                   <Typography variant="h5">
-                    {"Team " + props.match.winningTeam}
+                    {"Team:" + props.match.winningTeam}
                   </Typography>
                 }
                 avatar={<EmojiEventsIcon />}
@@ -89,7 +89,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
               />
             </Grid>
             {winners.map((p) => (
-              <Grid item xs={4}>
+              <Grid item xs={6} md={4}>
                 <MatchCard
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
@@ -107,17 +107,17 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
                 />
               </Grid>
             ))}
-            <Grid item xs={4}>
+            <Grid item xs={6} md={4} sx={{ display: { xs: 'none', md: 'block' } }}>
               <MatchCard
                 title={
-                  <Typography variant="h5">{"Team " + losingTeam}</Typography>
+                  <Typography variant="h5">{"Team:" + losingTeam}</Typography>
                 }
                 avatar={<ThumbDownIcon />}
                 color="#e57373"
               />
             </Grid>
             {losers.map((p) => (
-              <Grid item xs={4}>
+              <Grid item xs={6} md={4}>
                 <MatchCard
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
@@ -137,7 +137,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={12} md={2}>
           <Map mapname={props.match.map} />
         </Grid>
       </Grid>

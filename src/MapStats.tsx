@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box"
+import _ from "lodash"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
@@ -11,6 +12,7 @@ import {
   YAxis,
 } from "recharts"
 import { MapStat, MapStats } from "./proto/match"
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 function getMapStats(callback: (m: MapStats) => void) {
   fetch("/api/mapstats").then((r) =>
@@ -24,7 +26,6 @@ function getMapStats(callback: (m: MapStats) => void) {
       })
   )
 }
-
 const empty = { mapStats: [] }
 
 interface Red {
@@ -38,6 +39,8 @@ export default function DisplayMapstats() {
   React.useEffect(() => {
     getMapStats(setMapstats)
   }, [])
+  const isBig = useMediaQuery('(min-width:1200px)');
+
   const max = mapstats.mapStats.reduce((max, s) => Math.max(max, s.wins), 0)
   const initial: Red[] = []
   function reducer(reds: Red[], next: MapStat) {
@@ -69,36 +72,39 @@ export default function DisplayMapstats() {
   const data = mapstats.mapStats
     .reduce(reducer, initial)
     .sort((m1, m2) => redScore(m2) - redScore(m1))
+  const chunks = _.chunk(data, isBig ? 64 : 16)
   return (
     <Paper>
       <Typography variant="h2">Map stats.</Typography>
       <Box sx={{ flexGrow: 1, maxWidth: 1600, textAlign: "center" }}>
-        <ResponsiveContainer width="100%" height={800}>
-          <BarChart
-            data={data}
-            layout="horizontal"
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <Bar dataKey="team1" fill="#82ca9d" stackId="a" />
-            <Bar dataKey="team3" fill="#8884d8" stackId="a" />
-            <XAxis
-              dataKey="map"
-              label="map"
-              angle={90}
-              height={500}
-              textAnchor="begin"
-              minTickGap={0}
-              interval={0}
-            />
-            <YAxis domain={[0, max]} label="wins" />
-            <Tooltip cursor={false} />
-          </BarChart>
-        </ResponsiveContainer>
+        {chunks.map(chunk => (
+          <ResponsiveContainer width="99%" height={800}>
+            <BarChart
+              data={chunk}
+              layout="horizontal"
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <Bar dataKey="team1" fill="#82ca9d" stackId="a" />
+              <Bar dataKey="team3" fill="#8884d8" stackId="a" />
+              <XAxis
+                dataKey="map"
+                label="map"
+                angle={90}
+                height={500}
+                textAnchor="begin"
+                minTickGap={0}
+                interval={0}
+              />
+              <YAxis domain={[0, max]} label="wins" />
+              <Tooltip cursor={false} />
+            </BarChart>
+          </ResponsiveContainer>
+        ))}
       </Box>
     </Paper>
   )

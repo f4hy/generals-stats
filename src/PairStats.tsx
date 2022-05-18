@@ -19,6 +19,7 @@ import {
   PairsWinLosses,
   TeamPairs,
 } from "./proto/match"
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 function getPairStats(callback: (m: TeamPairs) => void) {
   fetch("/api/pairstats").then((r) =>
@@ -54,38 +55,43 @@ function PairBarChart(props: { pairdata: PairsWinLosses; team: string }) {
     pair: generalToJSON(pwl.general1) + " : " + generalToJSON(pwl.general2),
   }))
   const sorted = _.sortBy(data, (d) => -(d.losses + d.wins * 1.001))
+  const isBig = useMediaQuery('(min-width:1200px)');
+
+  const chunks = _.chunk(sorted, isBig ? 64 : 16)
   return (
     <Paper>
       <Typography variant="h3">Team {props.team} pairs!</Typography>
-      <ResponsiveContainer width="100%" height={500}>
-        <BarChart
-          data={sorted}
-          layout="horizontal"
-          stackOffset="sign"
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <Bar dataKey="wins" fill="#42A5F5" stackId="a" />
-          <Bar dataKey="losses" fill="#FF7043" stackId="a" />
-          <ReferenceLine y={0} stroke="#000" />
-          <XAxis
-            dataKey="pair"
-            label="pair"
-            height={300}
-            angle={-90}
-            minTickGap={0}
-            interval={0}
-            textAnchor="end"
-            dx={-6}
-          />
-          <YAxis label="wins" />
-          <Tooltip cursor={false} />
-        </BarChart>
-      </ResponsiveContainer>
+      {chunks.map((chunk, idx) => (
+        <ResponsiveContainer width="99%" height={500}>
+          <BarChart
+            data={chunk}
+            layout="horizontal"
+            stackOffset="sign"
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <Bar dataKey="wins" fill="#42A5F5" stackId="a" />
+            <Bar dataKey="losses" fill="#FF7043" stackId="a" />
+            <ReferenceLine y={0} stroke="#000" />
+            <XAxis
+              dataKey="pair"
+              label={"Team " + props.team + " pairs_" + idx}
+              height={300}
+              angle={-90}
+              minTickGap={0}
+              interval={0}
+              textAnchor="end"
+              dx={-6}
+            />
+            <YAxis label="wins" />
+            <Tooltip cursor={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      ))}
     </Paper>
   )
 }
@@ -98,7 +104,6 @@ export default function DisplayPairstats() {
   const teams = _.sortBy(Object.keys(pairstats.teamPairs), (x) => x)
   return (
     <>
-      <Typography variant="h2">Pair stats.</Typography>
       <Box sx={{ flexGrow: 1, maxWidth: 1600 }}>
         {teams.map((team) => (
           <PairBarChart pairdata={pairstats.teamPairs[team]} team={team} />

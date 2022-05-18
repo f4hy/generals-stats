@@ -14,10 +14,10 @@ export default function Map(props: { mapname: string }) {
 
   return (
     <Tooltip title={mapname}>
-      <Card>
+      <Card sx={{minheight: 160}}>
         {/* <div>{mapUrl}</div>
         <div>{mapmatch}</div> */}
-        <CardMedia component="img" image={mapUrl} height="200" alt={mapname} />
+        <CardMedia component="img" image={mapUrl} height="99%" alt={mapname} />
       </Card>
     </Tooltip>
   )
