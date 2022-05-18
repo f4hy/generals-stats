@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts"
 import { MapStat, MapStats } from "./proto/match"
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from "@mui/material/useMediaQuery"
 
 function getMapStats(callback: (m: MapStats) => void) {
   fetch("/api/mapstats").then((r) =>
@@ -39,7 +39,7 @@ export default function DisplayMapstats() {
   React.useEffect(() => {
     getMapStats(setMapstats)
   }, [])
-  const isBig = useMediaQuery('(min-width:1200px)');
+  const isBig = useMediaQuery("(min-width:1200px)")
 
   const max = mapstats.mapStats.reduce((max, s) => Math.max(max, s.wins), 0)
   const initial: Red[] = []
@@ -77,7 +77,7 @@ export default function DisplayMapstats() {
     <Paper>
       <Typography variant="h2">Map stats.</Typography>
       <Box sx={{ flexGrow: 1, maxWidth: 1600, textAlign: "center" }}>
-        {chunks.map(chunk => (
+        {chunks.map((chunk) => (
           <ResponsiveContainer width="99%" height={800}>
             <BarChart
               data={chunk}

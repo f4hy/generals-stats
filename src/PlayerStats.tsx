@@ -51,7 +51,9 @@ function PlayerListItem(props: { playerStatWL: GeneralWL }) {
         <DisplayGeneral general={p.general} />
       </ListItemAvatar>
       <ListItemText
-        primary={`${General[p.general]}:(${p.winLoss?.wins ?? 0}:${p.winLoss?.losses ?? 0})`}
+        primary={`${General[p.general]}:(${p.winLoss?.wins ?? 0}:${
+          p.winLoss?.losses ?? 0
+        })`}
       />
     </ListItem>
   )
@@ -77,7 +79,7 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
       <Grid container spacing={2}>
         <Grid item xs={12} md={2}>
           <Typography variant="h3">{props.stat.playerName}</Typography>
-          <List sx={{ display: { xs: 'none', md: 'block' } }}>
+          <List sx={{ display: { xs: "none", md: "block" } }}>
             {sorted.map((p) => (
               <PlayerListItem playerStatWL={p} />
             ))}
@@ -99,7 +101,8 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
               <CartesianGrid strokeDasharray="5 5" vertical={false} />
               <Bar dataKey="wins" fill="#42A5F5" />
               <Bar dataKey="losses" fill="#FF7043" />
-              <XAxis dataKey="general"
+              <XAxis
+                dataKey="general"
                 height={80}
                 angle={90}
                 textAnchor="begin"
@@ -111,8 +114,8 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
             </BarChart>
           </ResponsiveContainer>
         </Grid>
-      </Grid >
-    </Box >
+      </Grid>
+    </Box>
   )
 }
 

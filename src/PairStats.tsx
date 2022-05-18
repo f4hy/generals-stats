@@ -19,7 +19,7 @@ import {
   PairsWinLosses,
   TeamPairs,
 } from "./proto/match"
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from "@mui/material/useMediaQuery"
 
 function getPairStats(callback: (m: TeamPairs) => void) {
   fetch("/api/pairstats").then((r) =>
@@ -55,7 +55,7 @@ function PairBarChart(props: { pairdata: PairsWinLosses; team: string }) {
     pair: generalToJSON(pwl.general1) + " : " + generalToJSON(pwl.general2),
   }))
   const sorted = _.sortBy(data, (d) => -(d.losses + d.wins * 1.001))
-  const isBig = useMediaQuery('(min-width:1200px)');
+  const isBig = useMediaQuery("(min-width:1200px)")
 
   const chunks = _.chunk(sorted, isBig ? 64 : 16)
   return (

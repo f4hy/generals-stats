@@ -39,7 +39,12 @@ function MatchCard(props: {
 }) {
   return (
     <Card sx={{ backgroundColor: props.color }}>
-      <CardHeader sx={{ m: {md: 1, xs:0}}} title={props.title} avatar={props.avatar} component="div" />
+      <CardHeader
+        sx={{ m: { md: 1, xs: 0 } }}
+        title={props.title}
+        avatar={props.avatar}
+        component="div"
+      />
     </Card>
   )
 }
@@ -74,10 +79,10 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
       </ListItem>
-      <Grid container spacing={{sx: 0, md:1, width: "99%"}}>
-        <Grid item xs={12} md={10} >
-          <Grid container spacing={{sx: 0, md:1}} sx={{ width: "99%"}}>
-            <Grid item xs={4} sx={{ display: { xs: 'none', md: 'block' } }}>
+      <Grid container spacing={{ sx: 0, md: 1, width: "99%" }}>
+        <Grid item xs={12} md={10}>
+          <Grid container spacing={{ sx: 0, md: 1 }} sx={{ width: "99%" }}>
+            <Grid item xs={4} sx={{ display: { xs: "none", md: "block" } }}>
               <MatchCard
                 title={
                   <Typography variant="h5">
@@ -107,7 +112,12 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
                 />
               </Grid>
             ))}
-            <Grid item xs={6} md={4} sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Grid
+              item
+              xs={6}
+              md={4}
+              sx={{ display: { xs: "none", md: "block" } }}
+            >
               <MatchCard
                 title={
                   <Typography variant="h5">{"Team:" + losingTeam}</Typography>

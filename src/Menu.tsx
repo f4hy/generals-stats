@@ -5,7 +5,7 @@ import ListIcon from "@mui/icons-material/List"
 import MapIcon from "@mui/icons-material/Map"
 import MenuIcon from "@mui/icons-material/Menu"
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech"
-import LooksTwoIcon from '@mui/icons-material/LooksTwo';
+import LooksTwoIcon from "@mui/icons-material/LooksTwo"
 import PeopleIcon from "@mui/icons-material/People"
 import PersonIcon from "@mui/icons-material/Person"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
@@ -201,7 +201,7 @@ export default function Menu() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={open} sx={{width: 10 }}>
+      <Drawer variant="permanent" open={open} sx={{ width: 10 }}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (

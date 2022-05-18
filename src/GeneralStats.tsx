@@ -1,10 +1,5 @@
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
-import Grid from "@mui/material/Grid"
-import List from "@mui/material/List"
-import ListItem from "@mui/material/ListItem"
-import ListItemAvatar from "@mui/material/ListItemAvatar"
-import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
 import * as React from "react"
 import {
@@ -69,17 +64,17 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
   ]
   return (
     <Box sx={{ flexGrow: 1 }}>
-          <DisplayGeneral general={props.stat.general} />
-          <ResponsiveContainer width="99%" height={350}>
-            <BarChart data={data} layout="horizontal">
-              <CartesianGrid strokeDasharray="5 5" vertical={false} />
-              <Bar dataKey="wins" fill="#42A5F5" />
-              <Bar dataKey="losses" fill="#FF7043" />
-              <XAxis dataKey="name" />
-              <YAxis domain={["auto", props.max]} />
-              <Tooltip cursor={false} />
-            </BarChart>
-          </ResponsiveContainer>
+      <DisplayGeneral general={props.stat.general} />
+      <ResponsiveContainer width="99%" height={350}>
+        <BarChart data={data} layout="horizontal">
+          <CartesianGrid strokeDasharray="5 5" vertical={false} />
+          <Bar dataKey="wins" fill="#42A5F5" />
+          <Bar dataKey="losses" fill="#FF7043" />
+          <XAxis dataKey="name" />
+          <YAxis domain={["auto", props.max]} />
+          <Tooltip cursor={false} />
+        </BarChart>
+      </ResponsiveContainer>
     </Box>
   )
 }
@@ -101,14 +96,14 @@ export default function DisplayGeneralStats() {
   const maxWinLoss = roundUpNearest5(maxwl + 1)
   return (
     <Paper sx={{ flexGrow: 1, maxWidth: 1600 }}>
-        {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
-        <DisplayOverallGeneralStat stats={generalStats} />
-        {generalStats.generalStats.map((m) => (
-          <>
-            <DisplayGeneralStat stat={m} max={maxWinLoss} />
-            <Divider />
-          </>
-        ))}
+      {/* <Button variant="contained" onClick={() => getGeneralStats(setGeneralStats)} >Get Matches</Button> */}
+      <DisplayOverallGeneralStat stats={generalStats} />
+      {generalStats.generalStats.map((m) => (
+        <>
+          <DisplayGeneralStat stat={m} max={maxWinLoss} />
+          <Divider />
+        </>
+      ))}
     </Paper>
   )
 }
