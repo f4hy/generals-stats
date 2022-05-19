@@ -28,77 +28,162 @@ import DisplayPairStats from "./PairStats"
 import DisplayMatches from "./Matches"
 import DisplayPlayerStats from "./PlayerStats"
 import DisplayTeamStats from "./TeamStats"
+import useMediaQuery from "@mui/material/useMediaQuery"
 
-const drawerWidth = 240
 
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: "hidden",
-})
 
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-})
+import AppBar from '@mui/material/AppBar';
+import Drawer from '@mui/material/Drawer';
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}))
+const drawerWidth = 240;
 
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * You won't need it on your project.
+   */
+  window?: () => Window;
 }
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}))
+export default function Menu(props: Props) {
+  const { window } = props;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [selection, setSelection] = React.useState<Selection>("Matches")
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
-  ...(open && {
-    ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    "& .MuiDrawer-paper": closedMixin(theme),
-  }),
-}))
+  const drawer = (
+    <div>
+      <Toolbar />
+      <Divider />
+      <List>
+        <MenuItem
+          value="Matches"
+          text="Matches"
+          open={true}
+          icon={<ListIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="PlayerStats"
+          text="Player Stats"
+          open={true}
+          icon={<PersonIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="TeamStats"
+          text="Team Stats"
+          open={true}
+          icon={<PeopleIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="GeneralStats"
+          text="General Stats"
+          open={true}
+          icon={<MilitaryTechIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="MapStats"
+          text="Map Stats"
+          open={true}
+          icon={<MapIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="PairStats"
+          text="Pair Stats"
+          open={true}
+          icon={<LooksTwoIcon />}
+          callback={setSelection}
+        />
+      </List>
+      {/* <Divider />
+        <List>
+          <MenuItem
+            value="AddMatch"
+            text="Add Match"
+            open={open}
+            icon={<AddBoxIcon />}
+            callback={setSelection}
+          />
+        </List> */}
+      <Divider />
+    </div >
+  );
+
+  const container = window !== undefined ? () => window().document.body : undefined;
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            {selection}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+      >
+        <Toolbar />
+        <Main selection={selection} />
+      </Box>
+    </Box>
+  );
+}
+
 
 type Selection =
   | "Matches"
@@ -163,114 +248,5 @@ function MenuItem(props: MenuItemProps) {
       </ListItemIcon>
       <ListItemText primary={props.text} sx={{ opacity: open ? 1 : 0 }} />
     </ListItemButton>
-  )
-}
-
-export default function Menu() {
-  const theme = useTheme()
-  const [open, setOpen] = React.useState(false)
-  const [selection, setSelection] = React.useState<Selection>("Matches")
-
-  const handleDrawerOpen = () => {
-    setOpen(true)
-  }
-
-  const handleDrawerClose = () => {
-    setOpen(false)
-  }
-
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: "none" }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {"Generals Stats - " + selection}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open} sx={{ width: 10 }}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          <MenuItem
-            value="Matches"
-            text="Matches"
-            open={open}
-            icon={<ListIcon />}
-            callback={setSelection}
-          />
-          <MenuItem
-            value="PlayerStats"
-            text="Player Stats"
-            open={open}
-            icon={<PersonIcon />}
-            callback={setSelection}
-          />
-          <MenuItem
-            value="TeamStats"
-            text="Team Stats"
-            open={open}
-            icon={<PeopleIcon />}
-            callback={setSelection}
-          />
-          <MenuItem
-            value="GeneralStats"
-            text="General Stats"
-            open={open}
-            icon={<MilitaryTechIcon />}
-            callback={setSelection}
-          />
-          <MenuItem
-            value="MapStats"
-            text="Map Stats"
-            open={open}
-            icon={<MapIcon />}
-            callback={setSelection}
-          />
-          <MenuItem
-            value="PairStats"
-            text="Pair Stats"
-            open={open}
-            icon={<LooksTwoIcon />}
-            callback={setSelection}
-          />
-        </List>
-        {/* <Divider />
-        <List>
-          <MenuItem
-            value="AddMatch"
-            text="Add Match"
-            open={open}
-            icon={<AddBoxIcon />}
-            callback={setSelection}
-          />
-        </List> */}
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
-        <DrawerHeader />
-        <Main selection={selection} />
-      </Box>
-    </Box>
   )
 }
