@@ -3,12 +3,12 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
-import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import ListItem from "@mui/material/ListItem"
 import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
+import _ from "lodash"
 import * as React from "react"
 import DisplayGeneral from "./Generals"
 import Map from "./Map"
@@ -70,9 +70,11 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
   const winners = props.match.players.filter(
     (p) => p.team === props.match.winningTeam
   )
-  const losers = props.match.players.filter(
-    (p) => p.team !== props.match.winningTeam
+  const losers = _.sortBy(
+    props.match.players.filter((p) => p.team !== props.match.winningTeam),
+    (p) => p.team
   )
+
   const losingTeam = losers[0].team
   const paperprops: any = { width: "99%", maxWidth: 1600, borderRadius: "20px" }
   if (props.match.incomplete) {
