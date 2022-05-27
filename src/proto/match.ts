@@ -199,6 +199,8 @@ export interface MatchInfo {
   players: Player[]
   durationMinutes: number
   filename: string
+  incomplete: string
+  notes: string
 }
 
 export interface Matches {
@@ -418,6 +420,8 @@ function createBaseMatchInfo(): MatchInfo {
     players: [],
     durationMinutes: 0,
     filename: "",
+    incomplete: "",
+    notes: "",
   }
 }
 
@@ -449,6 +453,12 @@ export const MatchInfo = {
     }
     if (message.filename !== "") {
       writer.uint32(58).string(message.filename)
+    }
+    if (message.incomplete !== "") {
+      writer.uint32(66).string(message.incomplete)
+    }
+    if (message.notes !== "") {
+      writer.uint32(74).string(message.notes)
     }
     return writer
   },
@@ -483,6 +493,12 @@ export const MatchInfo = {
         case 7:
           message.filename = reader.string()
           break
+        case 8:
+          message.incomplete = reader.string()
+          break
+        case 9:
+          message.notes = reader.string()
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -508,6 +524,8 @@ export const MatchInfo = {
         ? Number(object.durationMinutes)
         : 0,
       filename: isSet(object.filename) ? String(object.filename) : "",
+      incomplete: isSet(object.incomplete) ? String(object.incomplete) : "",
+      notes: isSet(object.notes) ? String(object.notes) : "",
     }
   },
 
@@ -529,6 +547,8 @@ export const MatchInfo = {
     message.durationMinutes !== undefined &&
       (obj.durationMinutes = message.durationMinutes)
     message.filename !== undefined && (obj.filename = message.filename)
+    message.incomplete !== undefined && (obj.incomplete = message.incomplete)
+    message.notes !== undefined && (obj.notes = message.notes)
     return obj
   },
 
@@ -543,6 +563,8 @@ export const MatchInfo = {
     message.players = object.players?.map((e) => Player.fromPartial(e)) || []
     message.durationMinutes = object.durationMinutes ?? 0
     message.filename = object.filename ?? ""
+    message.incomplete = object.incomplete ?? ""
+    message.notes = object.notes ?? ""
     return message
   },
 }

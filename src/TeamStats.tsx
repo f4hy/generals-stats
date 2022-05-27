@@ -112,10 +112,10 @@ function DisplayTeamStat(props: {
     <Box sx={{ flexGrow: 1 }}>
       <h3>{props.title}</h3>
       <ResponsiveContainer width="90%" height={300}>
-        <BarChart data={data} layout="horizontal">
+        <BarChart data={data} layout="vertical">
           <Bar dataKey="wins" fill="#8884d8" />
-          <XAxis dataKey="team" label="team" />
-          <YAxis domain={[0, props.max]} label="wins" />
+          <YAxis dataKey="team" label="team" type="category" />
+          <XAxis label="wins" type="number" domain={[0, props.max]} />
           <Tooltip cursor={false} />
         </BarChart>
       </ResponsiveContainer>
@@ -138,11 +138,12 @@ export default function DisplayTeamStats() {
         `${ts.date?.Year ?? 0}-${ts.date?.Month ?? 0}-${ts.date?.Day ?? 0}`
     )
   )
+  const ordered = _.sortBy(grouped, (s) => -s[0])
   return (
     <Paper>
       <Typography variant="h2">Team Records by session.</Typography>
       <RecordOverTime stats={teamStats} />
-      {grouped.map(([date, m]) => (
+      {ordered.map(([date, m]) => (
         <>
           <DisplayTeamStat stats={m} title={date} max={roundUpNearest5(max)} />
           <Divider />

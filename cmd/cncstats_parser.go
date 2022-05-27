@@ -208,13 +208,6 @@ func parse_file(filename string) (match_and_details, error) {
 
 	minutes := end.Sub(start).Minutes()
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
-	winner, found := lo.Find(replay.Summary, func(p *object.PlayerSummary) bool {
-		return p.Win
-	})
-	if !found {
-		log.Println("no winnner?? time", minutes)
-		return match_and_details{&pb.MatchInfo{}, &pb.MatchDetails{}}, errors.New("Could not determine winner")
-	}
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
 	apm, upgrades, id := processBody(replay.Body, minutes, numTimeStamps)
 	match_id := int64(timestamp.Seconds)
@@ -223,12 +216,21 @@ func parse_file(filename string) (match_and_details, error) {
 		MatchId: id,
 	}
 	match := pb.MatchInfo{
-		Id:          id,
-		Timestamp:   timestamp,
-		Map:         replay.Header.Metadata.MapFile,
-		WinningTeam: pb.Team(winner.Team),
-		Filename:    filename,
+		Id:        id,
+		Timestamp: timestamp,
+		Map:       replay.Header.Metadata.MapFile,
+		Filename:  filename,
 	}
+	winner, found := lo.Find(replay.Summary, func(p *object.PlayerSummary) bool {
+		return p.Win
+	})
+	if !found {
+		match.Incomplete = "No winner detected in replay"
+		log.Println("no winnner?? time", minutes)
+	} else {
+		match.WinningTeam = pb.Team(winner.Team)
+	}
+
 	for _, i := range replay.Summary {
 		// fmt.Printf("Name: %s : %s: %t %d\n", i.Name, i.Side, i.Win, i.Team)
 		player, err := getPlayer(i)
@@ -283,6 +285,29 @@ func saveMatch(m *match_and_details) error {
 	return nil
 }
 
+func knownAborted(matchId int64) string {
+	aborted := map[int64]string{
+		1650483008: "I dont remember",
+		593943529:  "Baby Early",
+		722564743:  "Baby Early",
+		1649130810: "Baby Early",
+		1897002896: "Baby Early",
+		629393234:  "Baby Midgame",
+		2541574142: "Missmatch epic quad game",
+	}
+	reason := aborted[matchId]
+	return reason
+}
+
+func winnerOverride(matchId int64) (pb.Team, bool) {
+	overrides := map[int64]pb.Team{
+		3125981705: pb.Team_THREE,
+		3952919954: pb.Team_ONE,
+	}
+	team, prs := overrides[matchId]
+	return team, prs
+}
+
 func main() {
 	files, err := ioutil.ReadDir("./jsons/")
 	if err != nil {
@@ -293,17 +318,24 @@ func main() {
 
 	for _, file := range files {
 		fmt.Println(file.Name(), file.IsDir())
-		// if(!strings.Contains(file.Name(), "05_May_15")){
-		//      continue
-		// }
 		if strings.Contains(file.Name(), ".json") && strings.Contains(file.Name(), "2v2") && strings.Contains(file.Name(), "jbb") {
 			log.Println("parsing: ", file.Name())
 
 			parsed, err := parse_file("./jsons/" + file.Name())
 			result := parsed.info
-			if result.Id == 1650483008 || result.Id == 593943529 || result.Id == 1649130810 || result.Id == 1897002896 {
-				log.Print("Aborted match.")
-				continue
+			abortReason := knownAborted(result.Id)
+			if abortReason != "" {
+				log.Print("Aborted Match.")
+				parsed.info.Incomplete = abortReason
+			}
+			team, needOverride := winnerOverride(result.Id)
+			if needOverride {
+				result.WinningTeam = team
+				result.Notes = "Overriding auto detected team with team " + team.String()
+				if result.Incomplete != "" {
+					result.Notes += " autodetect error: " + result.Incomplete
+				}
+				result.Incomplete = ""
 			}
 			if err != nil {
 				fmt.Println("could not parse file", file.Name())

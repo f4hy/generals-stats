@@ -27,7 +27,6 @@ import DisplayTeamStats from "./TeamStats"
 
 const drawerWidth = 190
 
-
 export default function Menu() {
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [selection, setSelection] = React.useState<Selection>("Matches")
@@ -87,7 +86,6 @@ export default function Menu() {
     </div>
   )
 
-
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -95,7 +93,7 @@ export default function Menu() {
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-            ml: { sm: `${drawerWidth}px` },
+          ml: { sm: `${drawerWidth}px` },
         }}
       >
         <Toolbar>

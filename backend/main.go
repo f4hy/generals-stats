@@ -32,6 +32,16 @@ func getEnv(key, fallback string) string {
 	return value
 }
 
+func completedMatches(all *pb.Matches) *pb.Matches {
+	completed := pb.Matches{}
+	for _, m := range all.Matches {
+		if m.Incomplete == "" {
+			completed.Matches = append(completed.Matches, m)
+		}
+	}
+	return &completed
+}
+
 func updateMatches(existing *pb.Matches, last_time time.Time) (*pb.Matches, time.Time) {
 	elapsed := time.Since(last_time)
 	if elapsed.Minutes() < 5 {
@@ -59,23 +69,24 @@ func main() {
 	})
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
 	matches, last_updated := updateMatches(&pb.Matches{}, time.Date(2000, time.November, 10, 23, 0, 0, 0, time.UTC))
-
+	completed := completedMatches(matches)
 	maxAge := "max-age=5000"
 	api := router.Group("/api")
 	{
 		api.GET("/matches", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
 			matches, last_updated = updateMatches(matches, last_updated)
+			completed = completedMatches(matches)
 			c.ProtoBuf(http.StatusOK, matches)
 		})
 		api.GET("/playerstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
-			player_stats := data.PlayerStats(matches)
+			player_stats := data.PlayerStats(completed)
 			c.ProtoBuf(http.StatusOK, player_stats)
 		})
 		api.GET("/generalstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
-			general := data.GeneralStats(matches)
+			general := data.GeneralStats(completed)
 			c.ProtoBuf(http.StatusOK, general)
 		})
 		api.GET("/listmaps", func(c *gin.Context) {
@@ -99,17 +110,17 @@ func main() {
 		})
 		api.GET("/teamstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
-			ts := data.TeamStats(matches)
+			ts := data.TeamStats(completed)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
 		api.GET("/mapstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
-			ts := data.MapStats(matches)
+			ts := data.MapStats(completed)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
 		api.GET("/pairstats", func(c *gin.Context) {
 			// c.Header("Cache-Control", maxAge)
-			ts := data.PairStats(matches)
+			ts := data.PairStats(completed)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
 		api.GET("/details/:matchid", func(c *gin.Context) {

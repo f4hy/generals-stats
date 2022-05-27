@@ -55,7 +55,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
   const date: string = props.match.timestamp
     ? props.match.timestamp.toDateString()
     : "unknown"
-  const header =
+  let header =
     "Match Id" +
     props.match.id +
     " Date: " +
@@ -74,15 +74,32 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
     (p) => p.team !== props.match.winningTeam
   )
   const losingTeam = losers[0].team
+  const paperprops: any = { width: "99%", maxWidth: 1600, borderRadius: "20px" }
+  if (props.match.incomplete) {
+    paperprops["bgcolor"] = "text.disabled"
+    paperprops["borderColor"] = "red"
+  }
+  const showTeam = props.match.winningTeam != 0 ? "block" : "none"
+  const showTeamSpacing = props.match.winningTeam != 0 ? 4 : 6
   return (
-    <Paper sx={{ width: "99%", maxWidth: 1600 }}>
+    <Paper elevation={3} sx={paperprops} variant="outlined">
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
+        {props.match.notes.length ? (
+          <Typography color="warning.main" style={{ fontWeight: "bold" }}>
+            {props.match.notes}
+          </Typography>
+        ) : null}
+        {props.match.incomplete.length ? (
+          <Typography color="error.main" style={{ fontWeight: "bold" }}>
+            {props.match.incomplete}
+          </Typography>
+        ) : null}
       </ListItem>
       <Grid container spacing={{ sx: 0, md: 1, width: "99%" }}>
         <Grid item xs={12} md={10}>
           <Grid container spacing={{ sx: 0, md: 1 }} sx={{ width: "99%" }}>
-            <Grid item xs={4} sx={{ display: { xs: "none", md: "block" } }}>
+            <Grid item xs={4} sx={{ display: { xs: "none", md: showTeam } }}>
               <MatchCard
                 title={
                   <Typography variant="h5">
@@ -94,7 +111,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
               />
             </Grid>
             {winners.map((p) => (
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} md={showTeamSpacing}>
                 <MatchCard
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
@@ -116,7 +133,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
               item
               xs={6}
               md={4}
-              sx={{ display: { xs: "none", md: "block" } }}
+              sx={{ display: { xs: "none", md: showTeam } }}
             >
               <MatchCard
                 title={
@@ -127,7 +144,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
               />
             </Grid>
             {losers.map((p) => (
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} md={showTeamSpacing}>
                 <MatchCard
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
@@ -154,7 +171,7 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
       <Button variant="contained" onClick={() => setDetails(!details)}>
         Match Details
       </Button>
-      {details ? <ShowMatchDetails id={props.match.id} /> : <Divider />}
+      {details ? <ShowMatchDetails id={props.match.id} /> : null}
     </Paper>
   )
 }
@@ -171,7 +188,6 @@ export default function DisplayMatches() {
       {matchList.matches.map((m) => (
         <>
           <DisplayMatchInfo match={m} key={m.id} />
-          <Divider />
         </>
       ))}
     </>

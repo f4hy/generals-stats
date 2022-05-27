@@ -47,6 +47,8 @@ message MatchInfo {
   repeated Player players = 5;
   double duration_minutes = 6;
   string filename = 7;
+  string incomplete = 8;
+  string notes = 9;
 }
 
 message Matches {

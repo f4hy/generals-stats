@@ -5,7 +5,7 @@ go 1.18
 
 require (
 	github.com/aws/aws-sdk-go v1.44.10
-	github.com/bill-rich/cncstats v0.0.0-20220509171825-d742c59b0eca
+	github.com/bill-rich/cncstats v0.0.0-20220510225333-8dbc7fed9f96
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.7.7

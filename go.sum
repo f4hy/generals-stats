@@ -1,7 +1,7 @@
 github.com/aws/aws-sdk-go v1.44.10 h1:ohCdgQpJ9ojzm0fOk7ykrMTgTpHJBk5nnA7X+HzmnOA=
 github.com/aws/aws-sdk-go v1.44.10/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
-github.com/bill-rich/cncstats v0.0.0-20220509171825-d742c59b0eca h1:mT6DcTzYoHzFsb97X84KZ1dTrbxgK3dFWf9uYcN+k6s=
-github.com/bill-rich/cncstats v0.0.0-20220509171825-d742c59b0eca/go.mod h1:SfIHvXALcXBxUdPNmxkcdZEXaEasjYk1Uk+n9/70ER0=
+github.com/bill-rich/cncstats v0.0.0-20220510225333-8dbc7fed9f96 h1:42fmHj3vu6fyHO/EDbC97kfgj+CfHztdV56SKWA7aus=
+github.com/bill-rich/cncstats v0.0.0-20220510225333-8dbc7fed9f96/go.mod h1:SfIHvXALcXBxUdPNmxkcdZEXaEasjYk1Uk+n9/70ER0=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
