@@ -60,16 +60,16 @@ func general_parse(generalstr string) (pb.General, error) {
 }
 
 func player_parse(playername string) string {
-	if playername == "Modus" {
+	if playername == "Modus" || playername == "Brendan" {
 		return "Brendan"
 	}
-	if playername == "OneThree111" {
+	if playername == "OneThree111" || playername == "Bill" {
 		return "Bill"
 	}
-	if playername == "jbb" {
+	if playername == "jbb" || playername == "Jared" {
 		return "Jared"
 	}
-	if playername == "Ye_Ole_Seans" {
+	if playername == "Ye_Ole_Seans" || playername == "Sean" {
 		return "Sean"
 	}
 	log.Fatal("unkown player" + playername)
@@ -167,19 +167,20 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
 		if strings.Contains(b.OrderName, "Upgrade") {
-			_, prs := upgrades[b.PlayerName]
+			player := player_parse(b.PlayerName)
+			_, prs := upgrades[player]
 			if !prs {
-				upgrades[b.PlayerName] = &pb.Upgrades{}
+				upgrades[player] = &pb.Upgrades{}
 			}
 			details := b.Details
 			upgrade := pb.UpgradeEvent{
-				PlayerName:  b.PlayerName,
+				PlayerName:  player_parse(player),
 				Timecode:    int64(b.TimeCode),
 				UpgradeName: details.Name,
 				Cost:        int64(details.Cost),
 				AtMinute:    float64(b.TimeCode) * minPerTimestep,
 			}
-			upgrades[b.PlayerName].Upgrades = append(upgrades[b.PlayerName].Upgrades, &upgrade)
+			upgrades[player].Upgrades = append(upgrades[player].Upgrades, &upgrade)
 		}
 	}
 	log.Println("done parsing upgrades")
