@@ -162,15 +162,17 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
                 />
               </Grid>
             ))}
+            <Grid item xs={12} md={12}>
+              <Button variant="contained" onClick={() => setDetails(!details)}>
+                Match Details
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12} md={2}>
           <Map mapname={props.match.map} />
         </Grid>
       </Grid>
-      <Button variant="contained" onClick={() => setDetails(!details)}>
-        Match Details
-      </Button>
       {details ? <ShowMatchDetails id={props.match.id} /> : null}
     </Paper>
   )
