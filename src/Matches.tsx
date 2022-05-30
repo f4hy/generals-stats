@@ -67,12 +67,13 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
     " Duration " +
     props.match.durationMinutes.toFixed(2) +
     " minutes"
-  const winners = props.match.players.filter(
-    (p) => p.team === props.match.winningTeam
+  const winners = _.sortBy(
+    props.match.players.filter((p) => p.team === props.match.winningTeam),
+    ["team", "name"]
   )
   const losers = _.sortBy(
     props.match.players.filter((p) => p.team !== props.match.winningTeam),
-    (p) => p.team
+    ["team", "name"]
   )
 
   const losingTeam = losers[0].team

@@ -202,7 +202,8 @@ func parse_file(filename string) (match_and_details, error) {
 	}
 	replay.Header.FileName = filename
 	h := replay.Header
-	date := time.Date(h.Year, time.Month(h.Month), h.Day, h.Hour, h.Minute, h.Second, h.Millisecond, time.UTC)
+	loc, _ := time.LoadLocation("Pacific/Honolulu")
+	date := time.Date(h.Year, time.Month(h.Month), h.Day, h.Hour, h.Minute, h.Second, h.Millisecond, loc)
 	timestamp := timestamppb.New(date)
 	start := time.Unix(int64(replay.Header.TimeStampBegin), 0)
 	end := time.Unix(int64(replay.Header.TimeStampEnd), 0)
@@ -254,6 +255,7 @@ func parse_file(filename string) (match_and_details, error) {
 	details.Apms = apm
 	details.UpgradeEvents = upgrades
 	match.DurationMinutes = minutes
+	addMatchNotes(&match)
 	return match_and_details{&match, &details}, nil
 }
 
@@ -286,9 +288,20 @@ func saveMatch(m *match_and_details) error {
 	return nil
 }
 
+func addMatchNotes(match *pb.MatchInfo) {
+	notes := map[int64]string{
+		2624432546: "EMP <3 Chinook",
+		1569540457: "LOL top vs bot",
+	}
+	note, prs := notes[match.Id]
+	if prs {
+		match.Notes = match.Notes + note
+	}
+}
+
 func knownAborted(matchId int64) string {
 	aborted := map[int64]string{
-		1650483008: "I dont remember",
+		1650483008: "I dont raemember",
 		593943529:  "Baby Early",
 		722564743:  "Baby Early",
 		1649130810: "Baby Early",
@@ -304,6 +317,7 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 	overrides := map[int64]pb.Team{
 		3125981705: pb.Team_THREE,
 		3952919954: pb.Team_ONE,
+		1178219525: pb.Team_THREE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs

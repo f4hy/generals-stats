@@ -77,7 +77,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
   const data = props.stats.teamStats.reduce(reducer, initial)
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <ResponsiveContainer width="90%" height={500}>
+      <ResponsiveContainer width="95%" height={500}>
         <LineChart
           height={300}
           data={data}
@@ -111,7 +111,7 @@ function DisplayTeamStat(props: {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <h3>{props.title}</h3>
-      <ResponsiveContainer width="90%" height={300}>
+      <ResponsiveContainer width="95%" height={300}>
         <BarChart data={data} layout="vertical">
           <Bar dataKey="wins" fill="#8884d8" />
           <YAxis dataKey="team" label="team" type="category" />
