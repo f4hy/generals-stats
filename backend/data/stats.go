@@ -206,10 +206,31 @@ type genpair struct {
 	gen2 pb.General
 }
 
+type factionpair struct {
+	fac1 pb.Faction
+	fac2 pb.Faction
+}
+
 type pairResult struct {
 	team pb.Team
 	pair genpair
 	won  bool
+}
+type pairFactionResult struct {
+	team pb.Team
+	pair factionpair
+	won  bool
+}
+
+func pairToFpair(p pairResult) pairFactionResult {
+	return pairFactionResult{
+		team: p.team,
+		pair: factionpair{
+			fac1: getFaction(p.pair.gen1),
+			fac2: getFaction(p.pair.gen2),
+		},
+		won: p.won,
+	}
 }
 
 func getPairs(match *pb.MatchInfo) []pairResult {
@@ -248,7 +269,9 @@ func getPairs(match *pb.MatchInfo) []pairResult {
 func PairStats(matches *pb.Matches) *pb.TeamPairs {
 	var pairstats pb.TeamPairs
 	pairstats.TeamPairs = make(map[string]*pb.PairsWinLosses)
+	pairstats.FactionPairs = make(map[string]*pb.PairFactionWinLosses)
 	teamMap := make(map[pb.Team]map[genpair]*pb.WinLoss)
+	factionMap := make(map[pb.Team]map[factionpair]*pb.WinLoss)
 
 	for _, m := range matches.Matches {
 		for _, p := range getPairs(m) {
@@ -267,6 +290,23 @@ func PairStats(matches *pb.Matches) *pb.TeamPairs {
 			} else {
 				wl.Losses += 1
 			}
+			// no same for faction pairs
+			fmap, prs := factionMap[p.team]
+			if !prs {
+				factionMap[p.team] = make(map[factionpair]*pb.WinLoss)
+			}
+			fmap = factionMap[p.team]
+			fpair := pairToFpair(p)
+			wl, prs = fmap[fpair.pair]
+			if !prs {
+				fmap[fpair.pair] = &pb.WinLoss{}
+			}
+			wl = fmap[fpair.pair]
+			if p.won {
+				wl.Wins += 1
+			} else {
+				wl.Losses += 1
+			}
 		}
 	}
 	for team, pairmap := range teamMap {
@@ -278,10 +318,22 @@ func PairStats(matches *pb.Matches) *pb.TeamPairs {
 				Winloss:  wl,
 			})
 		}
-		log.Print("Team??", team)
-		log.Print("Team str??", team.String())
 		teamstr := team.String()
 		pairstats.TeamPairs[teamstr] = &pairwinlosses
 	}
+
+	for team, pairmap := range factionMap {
+		pairwinlosses := pb.PairFactionWinLosses{}
+		for pair, wl := range pairmap {
+			pairwinlosses.Pairwl = append(pairwinlosses.Pairwl, &pb.PairFactionWinLoss{
+				Faction1: pair.fac1,
+				Faction2: pair.fac2,
+				Winloss:  wl,
+			})
+		}
+		teamstr := team.String()
+		pairstats.FactionPairs[teamstr] = &pairwinlosses
+	}
+	log.Print("pair stats")
 	return &pairstats
 }

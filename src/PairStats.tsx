@@ -15,9 +15,14 @@ import {
 import DisplayGeneral from "./Generals"
 import {
   General,
+  Faction,
   generalToJSON,
+  PairWinLoss,
+  PairFactionWinLoss,
   PairsWinLosses,
+  PairFactionWinLosses,
   TeamPairs,
+  factionToJSON,
 } from "./proto/match"
 import useMediaQuery from "@mui/material/useMediaQuery"
 
@@ -34,7 +39,7 @@ function getPairStats(callback: (m: TeamPairs) => void) {
   )
 }
 
-const empty = { teamPairs: {} }
+const empty = { teamPairs: {}, factionPairs: {} }
 
 function DisplayPair(props: { general1: General; general2: General }) {
   const g1 = props.general1
@@ -47,17 +52,29 @@ function DisplayPair(props: { general1: General; general2: General }) {
   )
 }
 
-function PairBarChart(props: { pairdata: PairsWinLosses; team: string }) {
+function pairString(pair: PairWinLoss | PairFactionWinLoss): string {
+  if ((pair as PairWinLoss).general1 !== undefined) {
+    const pwl = pair as PairWinLoss
+    return generalToJSON(pwl.general1) + " : " + generalToJSON(pwl.general2)
+  }
+  const pfwl = pair as PairFactionWinLoss
+  return factionToJSON(pfwl.faction1) + " : " + factionToJSON(pfwl.faction2)
+}
+
+function PairBarChart(props: {
+  pairdata: PairsWinLosses | PairFactionWinLosses
+  team: string
+}) {
   const d = props.pairdata.pairwl ?? []
   const data = d.map((pwl) => ({
     wins: pwl?.winloss?.wins ?? 0,
     losses: (pwl?.winloss?.losses ?? 0) * -1,
-    pair: generalToJSON(pwl.general1) + " : " + generalToJSON(pwl.general2),
+    pair: pairString(pwl),
   }))
   const sorted = _.sortBy(data, (d) => -(d.losses + d.wins * 1.001))
   const isBig = useMediaQuery("(min-width:1200px)")
 
-  const chunks = _.chunk(sorted, isBig ? 64 : 16)
+  const chunks = _.chunk(sorted, isBig ? 70 : 16)
   return (
     <Paper>
       <Typography variant="h3">Team {props.team} pairs!</Typography>
@@ -105,6 +122,9 @@ export default function DisplayPairstats() {
   return (
     <>
       <Box sx={{ flexGrow: 1, maxWidth: 1600 }}>
+        {teams.map((team) => (
+          <PairBarChart pairdata={pairstats.factionPairs[team]} team={team} />
+        ))}
         {teams.map((team) => (
           <PairBarChart pairdata={pairstats.teamPairs[team]} team={team} />
         ))}
