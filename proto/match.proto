@@ -168,11 +168,21 @@ message PairWinLoss{
   General general2 = 2;
   WinLoss winloss = 3;
 }
+message PairFactionWinLoss{
+  Faction faction1 = 1;
+  Faction faction2 = 2;
+  WinLoss winloss = 3;
+}
 
 message PairsWinLosses{
   repeated PairWinLoss pairwl = 1;
 }
 
+message PairFactionWinLosses{
+  repeated PairFactionWinLoss pairwl = 1;
+}
+
 message TeamPairs{
   map<string, PairsWinLosses> team_pairs = 1;
+  map<string, PairFactionWinLosses> faction_pairs = 2;
 }

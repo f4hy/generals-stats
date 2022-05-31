@@ -327,17 +327,33 @@ export interface PairWinLoss {
   winloss: WinLoss | undefined
 }
 
+export interface PairFactionWinLoss {
+  faction1: Faction
+  faction2: Faction
+  winloss: WinLoss | undefined
+}
+
 export interface PairsWinLosses {
   pairwl: PairWinLoss[]
 }
 
+export interface PairFactionWinLosses {
+  pairwl: PairFactionWinLoss[]
+}
+
 export interface TeamPairs {
   teamPairs: { [key: string]: PairsWinLosses }
+  factionPairs: { [key: string]: PairFactionWinLosses }
 }
 
 export interface TeamPairs_TeamPairsEntry {
   key: string
   value: PairsWinLosses | undefined
+}
+
+export interface TeamPairs_FactionPairsEntry {
+  key: string
+  value: PairFactionWinLosses | undefined
 }
 
 function createBasePlayer(): Player {
@@ -2295,6 +2311,88 @@ export const PairWinLoss = {
   },
 }
 
+function createBasePairFactionWinLoss(): PairFactionWinLoss {
+  return { faction1: 0, faction2: 0, winloss: undefined }
+}
+
+export const PairFactionWinLoss = {
+  encode(
+    message: PairFactionWinLoss,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.faction1 !== 0) {
+      writer.uint32(8).int32(message.faction1)
+    }
+    if (message.faction2 !== 0) {
+      writer.uint32(16).int32(message.faction2)
+    }
+    if (message.winloss !== undefined) {
+      WinLoss.encode(message.winloss, writer.uint32(26).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PairFactionWinLoss {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePairFactionWinLoss()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.faction1 = reader.int32() as any
+          break
+        case 2:
+          message.faction2 = reader.int32() as any
+          break
+        case 3:
+          message.winloss = WinLoss.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PairFactionWinLoss {
+    return {
+      faction1: isSet(object.faction1) ? factionFromJSON(object.faction1) : 0,
+      faction2: isSet(object.faction2) ? factionFromJSON(object.faction2) : 0,
+      winloss: isSet(object.winloss)
+        ? WinLoss.fromJSON(object.winloss)
+        : undefined,
+    }
+  },
+
+  toJSON(message: PairFactionWinLoss): unknown {
+    const obj: any = {}
+    message.faction1 !== undefined &&
+      (obj.faction1 = factionToJSON(message.faction1))
+    message.faction2 !== undefined &&
+      (obj.faction2 = factionToJSON(message.faction2))
+    message.winloss !== undefined &&
+      (obj.winloss = message.winloss
+        ? WinLoss.toJSON(message.winloss)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PairFactionWinLoss>, I>>(
+    object: I
+  ): PairFactionWinLoss {
+    const message = createBasePairFactionWinLoss()
+    message.faction1 = object.faction1 ?? 0
+    message.faction2 = object.faction2 ?? 0
+    message.winloss =
+      object.winloss !== undefined && object.winloss !== null
+        ? WinLoss.fromPartial(object.winloss)
+        : undefined
+    return message
+  },
+}
+
 function createBasePairsWinLosses(): PairsWinLosses {
   return { pairwl: [] }
 }
@@ -2357,8 +2455,76 @@ export const PairsWinLosses = {
   },
 }
 
+function createBasePairFactionWinLosses(): PairFactionWinLosses {
+  return { pairwl: [] }
+}
+
+export const PairFactionWinLosses = {
+  encode(
+    message: PairFactionWinLosses,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.pairwl) {
+      PairFactionWinLoss.encode(v!, writer.uint32(10).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): PairFactionWinLosses {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePairFactionWinLosses()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.pairwl.push(
+            PairFactionWinLoss.decode(reader, reader.uint32())
+          )
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PairFactionWinLosses {
+    return {
+      pairwl: Array.isArray(object?.pairwl)
+        ? object.pairwl.map((e: any) => PairFactionWinLoss.fromJSON(e))
+        : [],
+    }
+  },
+
+  toJSON(message: PairFactionWinLosses): unknown {
+    const obj: any = {}
+    if (message.pairwl) {
+      obj.pairwl = message.pairwl.map((e) =>
+        e ? PairFactionWinLoss.toJSON(e) : undefined
+      )
+    } else {
+      obj.pairwl = []
+    }
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PairFactionWinLosses>, I>>(
+    object: I
+  ): PairFactionWinLosses {
+    const message = createBasePairFactionWinLosses()
+    message.pairwl =
+      object.pairwl?.map((e) => PairFactionWinLoss.fromPartial(e)) || []
+    return message
+  },
+}
+
 function createBaseTeamPairs(): TeamPairs {
-  return { teamPairs: {} }
+  return { teamPairs: {}, factionPairs: {} }
 }
 
 export const TeamPairs = {
@@ -2370,6 +2536,12 @@ export const TeamPairs = {
       TeamPairs_TeamPairsEntry.encode(
         { key: key as any, value },
         writer.uint32(10).fork()
+      ).ldelim()
+    })
+    Object.entries(message.factionPairs).forEach(([key, value]) => {
+      TeamPairs_FactionPairsEntry.encode(
+        { key: key as any, value },
+        writer.uint32(18).fork()
       ).ldelim()
     })
     return writer
@@ -2391,6 +2563,15 @@ export const TeamPairs = {
             message.teamPairs[entry1.key] = entry1.value
           }
           break
+        case 2:
+          const entry2 = TeamPairs_FactionPairsEntry.decode(
+            reader,
+            reader.uint32()
+          )
+          if (entry2.value !== undefined) {
+            message.factionPairs[entry2.key] = entry2.value
+          }
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -2409,6 +2590,14 @@ export const TeamPairs = {
             return acc
           }, {})
         : {},
+      factionPairs: isObject(object.factionPairs)
+        ? Object.entries(object.factionPairs).reduce<{
+            [key: string]: PairFactionWinLosses
+          }>((acc, [key, value]) => {
+            acc[key] = PairFactionWinLosses.fromJSON(value)
+            return acc
+          }, {})
+        : {},
     }
   },
 
@@ -2418,6 +2607,12 @@ export const TeamPairs = {
     if (message.teamPairs) {
       Object.entries(message.teamPairs).forEach(([k, v]) => {
         obj.teamPairs[k] = PairsWinLosses.toJSON(v)
+      })
+    }
+    obj.factionPairs = {}
+    if (message.factionPairs) {
+      Object.entries(message.factionPairs).forEach(([k, v]) => {
+        obj.factionPairs[k] = PairFactionWinLosses.toJSON(v)
       })
     }
     return obj
@@ -2432,6 +2627,14 @@ export const TeamPairs = {
     }>((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = PairsWinLosses.fromPartial(value)
+      }
+      return acc
+    }, {})
+    message.factionPairs = Object.entries(object.factionPairs ?? {}).reduce<{
+      [key: string]: PairFactionWinLosses
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = PairFactionWinLosses.fromPartial(value)
       }
       return acc
     }, {})
@@ -2508,6 +2711,83 @@ export const TeamPairs_TeamPairsEntry = {
     message.value =
       object.value !== undefined && object.value !== null
         ? PairsWinLosses.fromPartial(object.value)
+        : undefined
+    return message
+  },
+}
+
+function createBaseTeamPairs_FactionPairsEntry(): TeamPairs_FactionPairsEntry {
+  return { key: "", value: undefined }
+}
+
+export const TeamPairs_FactionPairsEntry = {
+  encode(
+    message: TeamPairs_FactionPairsEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key)
+    }
+    if (message.value !== undefined) {
+      PairFactionWinLosses.encode(
+        message.value,
+        writer.uint32(18).fork()
+      ).ldelim()
+    }
+    return writer
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): TeamPairs_FactionPairsEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseTeamPairs_FactionPairsEntry()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string()
+          break
+        case 2:
+          message.value = PairFactionWinLosses.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): TeamPairs_FactionPairsEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value)
+        ? PairFactionWinLosses.fromJSON(object.value)
+        : undefined,
+    }
+  },
+
+  toJSON(message: TeamPairs_FactionPairsEntry): unknown {
+    const obj: any = {}
+    message.key !== undefined && (obj.key = message.key)
+    message.value !== undefined &&
+      (obj.value = message.value
+        ? PairFactionWinLosses.toJSON(message.value)
+        : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<TeamPairs_FactionPairsEntry>, I>>(
+    object: I
+  ): TeamPairs_FactionPairsEntry {
+    const message = createBaseTeamPairs_FactionPairsEntry()
+    message.key = object.key ?? ""
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? PairFactionWinLosses.fromPartial(object.value)
         : undefined
     return message
   },
