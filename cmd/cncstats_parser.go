@@ -59,21 +59,21 @@ func general_parse(generalstr string) (pb.General, error) {
 	return result, nil
 }
 
-func player_parse(playername string) string {
+func player_parse(playername string) (string, error) {
 	if playername == "Modus" || playername == "Brendan" {
-		return "Brendan"
+		return "Brendan", nil
 	}
 	if playername == "OneThree111" || playername == "Bill" {
-		return "Bill"
+		return "Bill", nil
 	}
 	if playername == "jbb" || playername == "Jared" {
-		return "Jared"
+		return "Jared", nil
 	}
 	if playername == "Ye_Ole_Seans" || playername == "Sean" {
-		return "Sean"
+		return "Sean", nil
 	}
-	log.Fatal("unkown player" + playername)
-	return ""
+	log.Print("unkown player" + playername)
+	return "", errors.New("Unknown Player " + playername)
 }
 
 func getPlayer(psummary *object.PlayerSummary) (*pb.Player, error) {
@@ -81,8 +81,12 @@ func getPlayer(psummary *object.PlayerSummary) (*pb.Player, error) {
 	if err != nil {
 		return &pb.Player{}, err
 	}
+	playername, err := player_parse(psummary.Name)
+	if err != nil {
+		return &pb.Player{}, err
+	}
 	return &pb.Player{
-		Name:    player_parse(psummary.Name),
+		Name:    playername,
 		General: general,
 		Team:    pb.Team(psummary.Team),
 	}, nil
@@ -145,7 +149,8 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 		}
 
 		if !strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum") {
-			counts[player_parse(b.PlayerName)] += 1
+			playername, _ := player_parse(b.PlayerName)
+			counts[playername] += 1
 		}
 	}
 	apms := []*pb.APM{}
@@ -166,15 +171,16 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float
 	log.Println("Parsing the body")
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
+		playername, _ := player_parse(b.PlayerName)
 		if strings.Contains(b.OrderName, "Upgrade") {
-			player := player_parse(b.PlayerName)
+			player := playername
 			_, prs := upgrades[player]
 			if !prs {
 				upgrades[player] = &pb.Upgrades{}
 			}
 			details := b.Details
 			upgrade := pb.UpgradeEvent{
-				PlayerName:  player_parse(player),
+				PlayerName:  playername,
 				Timecode:    int64(b.TimeCode),
 				UpgradeName: details.Name,
 				Cost:        int64(details.Cost),
@@ -308,6 +314,9 @@ func knownAborted(matchId int64) string {
 		1897002896: "Baby Early",
 		629393234:  "Baby Midgame",
 		2541574142: "Missmatch epic quad game",
+		1140820264: "Missmatch :(",
+		4174957573: "Disconnect :( :(",
+		1015461230: "Disconnect :( :(",
 	}
 	reason := aborted[matchId]
 	return reason
@@ -318,6 +327,10 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 		3125981705: pb.Team_THREE,
 		3952919954: pb.Team_ONE,
 		1178219525: pb.Team_THREE,
+		2873364142: pb.Team_ONE,
+		1748101175: pb.Team_THREE,
+		1293260443: pb.Team_ONE,
+		463237658: pb.Team_ONE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs
