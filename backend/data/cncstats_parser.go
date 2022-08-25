@@ -167,7 +167,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 }
 
 func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float64) map[string]*pb.Upgrades {
-	log.Println("Parsing the body")
+	// log.Println("Parsing the body")
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
 		playername, _ := player_parse(b.PlayerName)
@@ -188,7 +188,7 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float
 			upgrades[player].Upgrades = append(upgrades[player].Upgrades, &upgrade)
 		}
 	}
-	log.Println("done parsing upgrades")
+	// log.Println("done parsing upgrades")
 	return upgrades
 }
 
@@ -217,7 +217,7 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
 	apm, upgrades, id, err := processBody(replay.Body, minutes, numTimeStamps)
 	match_id := int64(timestamp.Seconds)
-	log.Print("Old id was", match_id, "new id", id)
+	// log.Print("Old id was", match_id, "new id", id)
 	details := pb.MatchDetails{
 		MatchId: id,
 	}
@@ -360,7 +360,7 @@ func ParseJsons() {
 	failed := []string{}
 	for file, json_data := range json_data_map {
 		if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
-			log.Println("parsing: ", file)
+			// log.Println("parsing: ", file)
 			if err != nil {
 				log.Println("Could not get", file)
 			}
@@ -404,7 +404,7 @@ func ParseJsons() {
 		}
 	}
 	for id, data := range allParsed {
-		log.Print("Saving matchid", id)
+		// log.Print("Saving matchid", id)
 		saveAll(data)
 	}
 }

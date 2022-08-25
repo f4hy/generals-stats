@@ -3,7 +3,7 @@ package data
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"github.com/gocolly/colly/debug"
+	// "github.com/gocolly/colly/debug"
 	"strings"
 	"time"
 )
@@ -13,7 +13,7 @@ func scrape(include_last bool) map[string][]byte {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.gentool.net"),
 		colly.Async(true),
-		colly.Debugger(&debug.LogDebugger{}),
+		// colly.Debugger(&debug.LogDebugger{}),
 	)
 	replay_data := make(map[string][]byte)
 
