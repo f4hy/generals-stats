@@ -358,9 +358,9 @@ func ParseJsons() {
 
 	allParsed := make(map[int64]*match_and_details)
 	failed := []string{}
-	for _, json_path := range json_data_map {
+	for _, json_path := range jsons {
 		_, file := filepath.Split(json_path)
-		bytes, err := GetJson(s)
+		json_data, err := GetJson(file)
 		if err != nil {
 			log.Println("Could not get json", json_path)
 			continue

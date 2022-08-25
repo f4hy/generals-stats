@@ -39,7 +39,7 @@ func ListReplays() ([]string, error) {
 }
 
 func GetReplay(replayname string) ([]byte, error) {
-	log.Debug("getting replay: ", replayname)
+	// log.Info("getting replay: ", replayname)
 	return s3.GetS3Data(replayPath + "/" + replayname)
 }
 
@@ -53,7 +53,7 @@ func ListJsons() ([]string, error) {
 }
 
 func GetJson(jsonname string) ([]byte, error) {
-	log.Debug("getting json: ", jsonname)
+	// log.Info("getting json: ", jsonname)
 	return s3.GetS3Data(jsonPath + "/" + jsonname)
 }
 
