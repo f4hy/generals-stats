@@ -28,20 +28,18 @@ function getGeneralStats(callback: (m: GeneralStats) => void) {
   )
 }
 
-
 function DisplayOverallGeneralStat(props: { stats: GeneralStats }) {
   const data = props.stats.generalStats.map((x) => {
     const wins = x?.total?.wins ?? 0
     const losses = x?.total?.losses ?? 0
-    const tot = (losses + wins)
+    const tot = losses + wins
     const rate = (wins / (tot > 0 ? tot : 1)) * 100
     return {
       wins: wins,
       losses: losses,
       name: General[x.general] + ":" + rate.toFixed() + "%",
     }
-  }
-  )
+  })
   return (
     <ResponsiveContainer width="99%" height={350}>
       <BarChart data={data} layout="horizontal">

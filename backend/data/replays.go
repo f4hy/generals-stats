@@ -119,7 +119,7 @@ func SaveReplays(include_last_month bool) (savecount int, fail error) {
 		return 0, err
 	}
 	for _, replay_path := range replays {
-		_, replay_name := filepath.Split(replay_path)		
+		_, replay_name := filepath.Split(replay_path)
 		if strings.Contains(replay_name, "OneThree") && strings.Contains(replay_name, "Modus") && strings.Contains(replay_name, "jbb") {
 			exists, _ := jsonExistsForReplay(replay_name, jsons)
 			if !exists {

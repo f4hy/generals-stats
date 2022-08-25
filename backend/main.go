@@ -42,7 +42,7 @@ func completedMatches(all *pb.Matches) *pb.Matches {
 	return &completed
 }
 
-func scrape_and_prase(){
+func scrape_and_prase() {
 	data.SaveReplays(false)
 	data.ParseJsons()
 }
@@ -52,7 +52,7 @@ func updateMatches(existing *pb.Matches, last_time time.Time) (*pb.Matches, time
 	if elapsed.Minutes() < 5 {
 		return existing, last_time
 	}
-	if(elapsed.Minutes() > 30){
+	if elapsed.Minutes() > 30 {
 		go scrape_and_prase()
 	}
 

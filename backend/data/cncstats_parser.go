@@ -144,7 +144,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 				id = int64(checksum)
 			} else {
 				log.Println("checksum was not a float", b.Arguments[0])
-				return apms, upgrades, id, errors.New("checksum was not a float") 
+				return apms, upgrades, id, errors.New("checksum was not a float")
 			}
 		}
 
@@ -331,7 +331,7 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 		2873364142: pb.Team_ONE,
 		1748101175: pb.Team_THREE,
 		1293260443: pb.Team_ONE,
-		463237658: pb.Team_ONE,
+		463237658:  pb.Team_ONE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs
@@ -344,29 +344,28 @@ func ParseJsons() {
 		log.Fatal("Could not fetch jsons")
 	}
 	json_data_map := make(map[string][]byte)
-	for _, json_path := range jsons{
+	for _, json_path := range jsons {
 		_, s := filepath.Split(json_path)
 		bytes, err := GetJson(s)
-		if(err != nil){
+		if err != nil {
 			log.Println("Could not get json", json_path)
 			continue
 		}
 
 		json_data_map[s] = bytes
-		
+
 	}
-	
-	
+
 	allParsed := make(map[int64]*match_and_details)
-	failed:= []string{}
+	failed := []string{}
 	for file, json_data := range json_data_map {
 		if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
 			log.Println("parsing: ", file)
-			if(err != nil){
+			if err != nil {
 				log.Println("Could not get", file)
 			}
 			parsed, err := parse_data(file, json_data)
-			if(err != nil){				
+			if err != nil {
 				log.Println("Could not parse", file)
 				failed = append(failed, file)
 			}
@@ -392,7 +391,7 @@ func ParseJsons() {
 				id := result.Id
 				if val, ok := allParsed[id]; ok {
 					log.Print("filename\n", parsed.info.Filename, "\nexisting\n", val.info.Filename)
-					if(strings.Contains(file, "day_Modus_")){
+					if strings.Contains(file, "day_Modus_") {
 						allParsed[id] = &parsed
 					}
 				} else {
