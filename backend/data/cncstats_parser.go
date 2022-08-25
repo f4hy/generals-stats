@@ -343,22 +343,28 @@ func ParseJsons() {
 	if err != nil {
 		log.Fatal("Could not fetch jsons")
 	}
-	json_data_map := make(map[string][]byte)
-	for _, json_path := range jsons {
-		_, s := filepath.Split(json_path)
+	// json_data_map := make(map[string][]byte)
+	// for _, json_path := range jsons {
+	// 	_, s := filepath.Split(json_path)
+	// 	bytes, err := GetJson(s)
+	// 	if err != nil {
+	// 		log.Println("Could not get json", json_path)
+	// 		continue
+	// 	}
+
+	// 	json_data_map[s] = bytes
+
+	// }
+
+	allParsed := make(map[int64]*match_and_details)
+	failed := []string{}
+	for _, json_path := range json_data_map {
+		_, file := filepath.Split(json_path)
 		bytes, err := GetJson(s)
 		if err != nil {
 			log.Println("Could not get json", json_path)
 			continue
 		}
-
-		json_data_map[s] = bytes
-
-	}
-
-	allParsed := make(map[int64]*match_and_details)
-	failed := []string{}
-	for file, json_data := range json_data_map {
 		if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
 			// log.Println("parsing: ", file)
 			if err != nil {

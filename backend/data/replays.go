@@ -35,12 +35,11 @@ func ListReplays() ([]string, error) {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i] < results[j]
 	})
-	log.Info("replays")
 	return results, err
 }
 
 func GetReplay(replayname string) ([]byte, error) {
-	log.Info("getting replay: ", replayname)
+	log.Debug("getting replay: ", replayname)
 	return s3.GetS3Data(replayPath + "/" + replayname)
 }
 
@@ -50,12 +49,11 @@ func ListJsons() ([]string, error) {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i] < results[j]
 	})
-	log.Info("jsons")
 	return results, err
 }
 
 func GetJson(jsonname string) ([]byte, error) {
-	log.Info("getting json: ", jsonname)
+	log.Debug("getting json: ", jsonname)
 	return s3.GetS3Data(jsonPath + "/" + jsonname)
 }
 
