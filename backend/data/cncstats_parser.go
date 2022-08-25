@@ -216,7 +216,7 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
 	apm, upgrades, id, err := processBody(replay.Body, minutes, numTimeStamps)
-	match_id := int64(timestamp.Seconds)
+	// match_id := int64(timestamp.Seconds)
 	// log.Print("Old id was", match_id, "new id", id)
 	details := pb.MatchDetails{
 		MatchId: id,
@@ -403,7 +403,7 @@ func ParseJsons() {
 			log.Print("Not a 2v2 of our squad")
 		}
 	}
-	for id, data := range allParsed {
+	for _, data := range allParsed {
 		// log.Print("Saving matchid", id)
 		saveAll(data)
 	}
