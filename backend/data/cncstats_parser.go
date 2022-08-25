@@ -1,20 +1,19 @@
-package main
+package data
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/bill-rich/cncstats/pkg/zhreplay"
 	"github.com/bill-rich/cncstats/pkg/zhreplay/body"
 	"github.com/bill-rich/cncstats/pkg/zhreplay/object"
-	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/samber/lo"
 	"google.golang.org/protobuf/proto"
@@ -132,8 +131,9 @@ func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
-func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades, int64) {
+func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades, int64, error) {
 	counts := make(map[string]int64)
+	apms := []*pb.APM{}
 	minutePerTimestemp := minutes / float64(timesteps)
 	upgrades := getUpgradeEvents(body, minutePerTimestemp)
 	var id int64
@@ -143,9 +143,9 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 			if ok {
 				id = int64(checksum)
 			} else {
-				log.Fatal("checksum was not a float", b.Arguments[0])
+				log.Println("checksum was not a float", b.Arguments[0])
+				return apms, upgrades, id, errors.New("checksum was not a float") 
 			}
-
 		}
 
 		if !strings.Contains(b.OrderName, "Select") && !strings.Contains(b.OrderName, "Checksum") {
@@ -153,7 +153,6 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 			counts[playername] += 1
 		}
 	}
-	apms := []*pb.APM{}
 	for player_name, count := range counts {
 		apm := &pb.APM{
 			PlayerName:  player_name,
@@ -164,7 +163,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 		apms = append(apms, apm)
 	}
 
-	return apms, upgrades, id
+	return apms, upgrades, id, nil
 }
 
 func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float64) map[string]*pb.Upgrades {
@@ -198,13 +197,12 @@ type match_and_details struct {
 	detail *pb.MatchDetails
 }
 
-func parse_file(filename string) (match_and_details, error) {
-	data, err := ioutil.ReadFile(filename)
+func parse_data(filename string, data []byte) (match_and_details, error) {
 	replay := zhreplay.ReplayEasyUnmarshall{}
-	err = json.Unmarshal(data, &replay)
+	err := json.Unmarshal(data, &replay)
 	if err != nil {
-		fmt.Println("error:", err)
-		log.Fatal("Failed to unmarshal")
+		fmt.Println("Failed to unmarshal:", err)
+		return match_and_details{}, err
 	}
 	replay.Header.FileName = filename
 	h := replay.Header
@@ -217,7 +215,7 @@ func parse_file(filename string) (match_and_details, error) {
 	minutes := end.Sub(start).Minutes()
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
-	apm, upgrades, id := processBody(replay.Body, minutes, numTimeStamps)
+	apm, upgrades, id, err := processBody(replay.Body, minutes, numTimeStamps)
 	match_id := int64(timestamp.Seconds)
 	log.Print("Old id was", match_id, "new id", id)
 	details := pb.MatchDetails{
@@ -265,7 +263,7 @@ func parse_file(filename string) (match_and_details, error) {
 	return match_and_details{&match, &details}, nil
 }
 
-func saveMatch(m *match_and_details) error {
+func saveAll(m *match_and_details) error {
 	result := m.info
 	details := m.detail
 	// fmt.Println("Match result:", result.Timestamp.AsTime())
@@ -285,9 +283,9 @@ func saveMatch(m *match_and_details) error {
 	}
 	detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
 	err = os.WriteFile(detailpath, details_bytes, 0644)
-	// data.SaveMatch(result)
+	SaveMatch(result)
 	// data.SaveDetails(details)
-	_ = data.SaveDetails
+	SaveDetails(details)
 	// _ = result
 	// _ = data.SaveMatch
 	// data.SaveCosts(costs)
@@ -339,20 +337,39 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 	return team, prs
 }
 
-func main() {
-	files, err := ioutil.ReadDir("./jsons/")
+func ParseJsons() {
+
+	jsons, err := ListJsons()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Could not fetch jsons")
 	}
+	json_data_map := make(map[string][]byte)
+	for _, json_path := range jsons{
+		_, s := filepath.Split(json_path)
+		bytes, err := GetJson(s)
+		if(err != nil){
+			log.Println("Could not get json", json_path)
+			continue
+		}
 
+		json_data_map[s] = bytes
+		
+	}
+	
+	
 	allParsed := make(map[int64]*match_and_details)
-
-	for _, file := range files {
-		fmt.Println(file.Name(), file.IsDir())
-		if strings.Contains(file.Name(), ".json") && strings.Contains(file.Name(), "2v2") && strings.Contains(file.Name(), "jbb") {
-			log.Println("parsing: ", file.Name())
-
-			parsed, err := parse_file("./jsons/" + file.Name())
+	failed:= []string{}
+	for file, json_data := range json_data_map {
+		if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
+			log.Println("parsing: ", file)
+			if(err != nil){
+				log.Println("Could not get", file)
+			}
+			parsed, err := parse_data(file, json_data)
+			if(err != nil){				
+				log.Println("Could not parse", file)
+				failed = append(failed, file)
+			}
 			result := parsed.info
 			abortReason := knownAborted(result.Id)
 			if abortReason != "" {
@@ -369,14 +386,15 @@ func main() {
 				result.Incomplete = ""
 			}
 			if err != nil {
-				fmt.Println("could not parse file", file.Name())
+				fmt.Println("could not parse file", file)
 			} else {
 				// saveMatch(parsed)
 				id := result.Id
 				if val, ok := allParsed[id]; ok {
 					log.Print("filename\n", parsed.info.Filename, "\nexisting\n", val.info.Filename)
-					// log.Fatal("Id already processed", id, val.info.Id)
-					// log.Fatal("Id already processed", result.Timestamp, val.info.Id)
+					if(strings.Contains(file, "day_Modus_")){
+						allParsed[id] = &parsed
+					}
 				} else {
 					allParsed[id] = &parsed
 				}
@@ -388,6 +406,6 @@ func main() {
 	}
 	for id, data := range allParsed {
 		log.Print("Saving matchid", id)
-		saveMatch(data)
+		saveAll(data)
 	}
 }

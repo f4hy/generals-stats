@@ -42,11 +42,20 @@ func completedMatches(all *pb.Matches) *pb.Matches {
 	return &completed
 }
 
+func scrape_and_prase(){
+	data.SaveReplays(false)
+	data.ParseJsons()
+}
+
 func updateMatches(existing *pb.Matches, last_time time.Time) (*pb.Matches, time.Time) {
 	elapsed := time.Since(last_time)
 	if elapsed.Minutes() < 5 {
 		return existing, last_time
 	}
+	if(elapsed.Minutes() > 30){
+		go scrape_and_prase()
+	}
+
 	matches, err := data.GetMatches()
 	if err != nil {
 		log.Error("Failed to get matches, keeping cache: ", err.Error())
@@ -98,6 +107,41 @@ func main() {
 				return
 			}
 			c.JSON(http.StatusOK, maps)
+		})
+		api.GET("/listreplays", func(c *gin.Context) {
+			c.Header("Cache-Control", maxAge)
+			log.Infof("listing replays")
+			replays, err := data.ListReplays()
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			log.Infof("Found replays %d", len(replays))
+			c.JSON(http.StatusOK, replays)
+		})
+		api.GET("/scrape", func(c *gin.Context) {
+			// c.Header("Cache-Control", maxAge)
+			saved, err := data.SaveReplays(true)
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			log.Infof("Done Scraping")
+			c.JSON(http.StatusOK, saved)
+		})
+		api.GET("/reparse", func(c *gin.Context) {
+			// c.Header("Cache-Control", maxAge)
+			replays, err := data.ListJsons()
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			data.ParseJsons()
+			log.Infof("Done parsing")
+			c.JSON(http.StatusOK, replays)
 		})
 		api.GET("/map/:mapname", func(c *gin.Context) {
 			mapurl, err := data.GetMap(c.Param("mapname"))

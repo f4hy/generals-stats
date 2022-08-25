@@ -35,6 +35,7 @@ func AddDataToS3(filePath string, databuffer []byte) error {
 		ServerSideEncryption: aws.String("AES256"),
 	})
 	if err != nil {
+		log.Infof("Failed to data to S3 file (%s): %s", filePath, err)
 		return err
 	}
 
@@ -99,6 +100,7 @@ func List(path string) ([]string, error) {
 		Prefix:  aws.String(path),
 		MaxKeys: aws.Int64(1000),
 	}
+	log.Infof("Listing %s", input)
 	results, err := svc.ListObjectsV2(input)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
