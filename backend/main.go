@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+var last_fetched time.Time
+var last_scraped time.Time
+
 func init() {
 	flag.Usage = func() { flag.PrintDefaults() }
 	flag.Set("minloglevel", "3")
@@ -22,6 +25,8 @@ func init() {
 	flag.Set("stderrthreshold", "WARNING")
 	flag.Set("v", "0")
 	flag.Parse()
+	last_fetched = time.Date(2000, time.November, 10, 23, 0, 0, 0, time.UTC)
+	last_scraped = time.Now().Add(time.Hour)
 }
 
 func getEnv(key, fallback string) string {
@@ -47,22 +52,22 @@ func scrape_and_prase() {
 	data.ParseJsons()
 }
 
-func updateMatches(existing *pb.Matches, last_time time.Time) (*pb.Matches, time.Time) {
-	elapsed := time.Since(last_time)
-	if elapsed.Minutes() < 5 {
-		return existing, last_time
+func updateMatches(existing *pb.Matches) *pb.Matches {
+	if time.Since(last_fetched).Minutes() < 5 {
+		return existing
 	}
-	if elapsed.Minutes() > 30 {
+	if time.Since(last_scraped).Minutes() > 30 {
+		last_scraped = time.Now()
 		go scrape_and_prase()
 	}
-
 	matches, err := data.GetMatches()
 	if err != nil {
 		log.Error("Failed to get matches, keeping cache: ", err.Error())
-		return existing, last_time
+		return existing
 	}
 	log.Info("Updating match data")
-	return matches, time.Now()
+	last_fetched = time.Now()
+	return matches
 }
 
 func main() {
@@ -77,14 +82,14 @@ func main() {
 		})
 	})
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
-	matches, last_updated := updateMatches(&pb.Matches{}, time.Date(2000, time.November, 10, 23, 0, 0, 0, time.UTC))
+	matches := updateMatches(&pb.Matches{})
 	completed := completedMatches(matches)
 	maxAge := "max-age=5000"
 	api := router.Group("/api")
 	{
 		api.GET("/matches", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
-			matches, last_updated = updateMatches(matches, last_updated)
+			matches = updateMatches(matches)
 			completed = completedMatches(matches)
 			c.ProtoBuf(http.StatusOK, matches)
 		})
