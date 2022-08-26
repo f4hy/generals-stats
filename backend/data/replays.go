@@ -81,8 +81,8 @@ func parseAndSaveReplay(replay_name string, replay_data []byte, existing_jsons [
 	return nil
 }
 
-func SaveReplays(include_last_month bool) (savecount int, fail error) {
-	scraped_replays := scrape(include_last_month)
+func SaveReplays(whole_month bool) (savecount int, fail error) {
+	scraped_replays := scrape(whole_month)
 	replays, err := ListReplays()
 	if err != nil {
 		return 0, err

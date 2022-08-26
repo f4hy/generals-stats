@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func scrape(include_last bool) map[string][]byte {
+func scrape(whole_month bool) map[string][]byte {
 	// Instantiate default collector
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.gentool.net"),
@@ -17,7 +17,7 @@ func scrape(include_last bool) map[string][]byte {
 	)
 	replay_data := make(map[string][]byte)
 
-	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 3})
+	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 2})
 	// c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 2})
 	// On every a element which has href attribute call callback
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
@@ -70,13 +70,22 @@ func scrape(include_last bool) map[string][]byte {
 		}
 	})
 	// c.Visit("http://www.gentool.net/data/zh/")
-	year, month, _ := time.Now().Date()
-	last_month := month - 1
-	this_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s", year, int(month), month)
-	c.Visit(this_url)
-	if include_last {
-		last := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s", year, int(last_month), last_month)
+	if(whole_month){
+		year, month, _ := time.Now().Date()
+		this_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s", year, int(month), month)
+		c.Visit(this_url)
+		last_year, last_month, _  := time.Now().AddDate(0,-1,0).Date()
+		last := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s", last_year, int(last_month), last_month)
 		fmt.Println("Last month url", last)
+	}	else{
+		year, month, day := time.Now().Date()
+		this_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s/%02d_%s", year, int(month), month, day, time.Now().Weekday())
+		c.Visit(this_url)
+		if(day != 1){
+			last_year, last_month, yesterday := time.Now().AddDate(0,0,-1).Date()
+			last_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s/%02d_%s", last_year, int(last_month), last_month, yesterday, time.Now().Weekday())			
+			c.Visit(last_url)
+		}
 	}
 	// c.Visit(last)
 	c.Wait()
