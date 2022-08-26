@@ -82,8 +82,8 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
     paperprops["bgcolor"] = "text.disabled"
     paperprops["borderColor"] = "red"
   }
-  const showTeam = props.match.winningTeam != 0 ? "block" : "none"
-  const showTeamSpacing = props.match.winningTeam != 0 ? 4 : 6
+  const showTeam = props.match.winningTeam !== 0 ? "block" : "none"
+  const showTeamSpacing = props.match.winningTeam !== 0 ? 4 : 6
   return (
     <Paper elevation={3} sx={paperprops} variant="outlined">
       <ListItem key="match">

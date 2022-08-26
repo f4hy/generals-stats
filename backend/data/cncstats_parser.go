@@ -409,8 +409,8 @@ func ParseJsons() {
 			log.Print("Not a 2v2 of our squad")
 		}
 	}
-	for _, data := range allParsed {
-		// log.Print("Saving matchid", id)
+	for id, data := range allParsed {
+		log.Print("Saving matchid", id)
 		saveAll(data)
 	}
 }
