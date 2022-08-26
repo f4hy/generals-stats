@@ -127,7 +127,7 @@ func main() {
 		})
 		api.GET("/scrape", func(c *gin.Context) {
 			// c.Header("Cache-Control", maxAge)
-			saved, err := data.SaveReplays(false)
+			saved, err := data.SaveReplays(true)
 			if err != nil {
 				log.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, err)
