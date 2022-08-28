@@ -39,15 +39,15 @@ function getPairStats(callback: (m: TeamPairs) => void) {
 const empty = { teamPairs: {}, factionPairs: {} }
 
 /* function DisplayPair(props: { general1: General; general2: General }) {
-*   const g1 = props.general1
-*   const g2 = props.general2
-*   return (
-*     <div>
-*       <DisplayGeneral general={g1} />
-*       <DisplayGeneral general={g2} />
-*     </div>
-*   )
-* } */
+ *   const g1 = props.general1
+ *   const g2 = props.general2
+ *   return (
+ *     <div>
+ *       <DisplayGeneral general={g1} />
+ *       <DisplayGeneral general={g2} />
+ *     </div>
+ *   )
+ * } */
 
 function pairString(pair: PairWinLoss | PairFactionWinLoss): string {
   if ((pair as PairWinLoss).general1 !== undefined) {

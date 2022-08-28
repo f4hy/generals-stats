@@ -15,8 +15,8 @@ import Map from "./Map"
 import { Matches, MatchInfo } from "./proto/match"
 import ShowMatchDetails from "./ShowMatchDetails"
 
-function getMatches(callback: (m: Matches) => void) {
-  fetch("/api/matches").then((r) =>
+function getMatches(count: number, callback: (m: Matches) => void) {
+  fetch("/api/matches/" + count).then((r) =>
     r
       .blob()
       .then((b) => b.arrayBuffer())
@@ -49,14 +49,14 @@ function MatchCard(props: {
   )
 }
 
-function DisplayMatchInfo(props: { match: MatchInfo }) {
+function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
   const [details, setDetails] = React.useState<boolean>(false)
 
   const date: string = props.match.timestamp
     ? props.match.timestamp.toDateString()
     : "unknown"
   let header =
-    "Match Id" +
+    " Match Id" +
     props.match.id +
     " Date: " +
     date +
@@ -75,6 +75,9 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
     props.match.players.filter((p) => p.team !== props.match.winningTeam),
     ["team", "name"]
   )
+  if (losers.length === 0) {
+    return <div>Loading {props.idx}</div>
+  }
 
   const losingTeam = losers[0].team
   const paperprops: any = { width: "99%", maxWidth: 1600, borderRadius: "20px" }
@@ -184,17 +187,24 @@ function DisplayMatchInfo(props: { match: MatchInfo }) {
 const empty = { matches: [] }
 
 export default function DisplayMatches() {
+  const [getAll, setGetAll] = React.useState<boolean>(false)
   const [matchList, setMatchList] = React.useState<Matches>(empty)
+  const partialCount = 50
+  const maxCount = 1000
   React.useEffect(() => {
-    getMatches(setMatchList)
-  }, [])
+    getMatches(getAll ? maxCount : partialCount, setMatchList)
+  }, [getAll])
+  const showAll = () => {
+    setGetAll(true)
+  }
   return (
     <>
-      {matchList.matches.map((m) => (
+      {matchList.matches.map((m, idx) => (
         <>
-          <DisplayMatchInfo match={m} key={m.id} />
+          <DisplayMatchInfo match={m} key={m.id} idx={idx} />
         </>
       ))}
+      {getAll ? null : <Button onClick={() => showAll()}>Show All</Button>}
     </>
   )
 }

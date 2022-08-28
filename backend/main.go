@@ -3,16 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
+
 	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
 )
 
 var last_fetched time.Time
@@ -70,6 +71,13 @@ func updateMatches(existing *pb.Matches) *pb.Matches {
 	return matches
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func main() {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
@@ -87,11 +95,21 @@ func main() {
 	maxAge := "max-age=5000"
 	api := router.Group("/api")
 	{
-		api.GET("/matches", func(c *gin.Context) {
+		api.GET("/matches/:count", func(c *gin.Context) {
+			count_str := c.Param("count")
+			count, err := strconv.Atoi(count_str)
+			if err != nil {
+				log.Error(err)
+				count = 5000
+			}
 			c.Header("Cache-Control", maxAge)
 			matches = updateMatches(matches)
 			completed = completedMatches(matches)
-			c.ProtoBuf(http.StatusOK, matches)
+			upper := min(len(matches.Matches), count)
+			log.Infof("Upper %v", upper)
+			limited := matches.Matches[:upper]
+			requested := &pb.Matches{Matches: limited}
+			c.ProtoBuf(http.StatusOK, requested)
 		})
 		api.GET("/playerstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)

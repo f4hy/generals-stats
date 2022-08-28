@@ -2,11 +2,13 @@ package data
 
 import (
 	"fmt"
+	"os"
+	"sort"
+
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
-	"os"
 )
 
 var (
@@ -75,6 +77,9 @@ func GetMatches() (*pb.Matches, error) {
 		match := <-c
 		matches = append(matches, match)
 	}
+	sort.Slice(matches, func(i, j int) bool {
+		return matches[i].Timestamp.AsTime().After(matches[j].Timestamp.AsTime())
+	})
 	return &pb.Matches{
 		Matches: matches,
 	}, nil
