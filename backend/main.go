@@ -21,6 +21,7 @@ var last_scraped time.Time
 var matches *pb.Matches
 
 func init() {
+	matches = &pb.Matches{}
 	flag.Usage = func() { flag.PrintDefaults() }
 	flag.Set("minloglevel", "3")
 	flag.Set("logtostderr", "true")
