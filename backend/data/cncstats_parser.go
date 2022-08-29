@@ -34,6 +34,13 @@ func init() {
 	log.SetOutput(mw)
 
 	DebugLogger = log.New(os.Stderr, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	if err := os.MkdirAll("parsed-matches", os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+	if err := os.MkdirAll("match-details", os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func general_parse(generalstr string) (pb.General, error) {
