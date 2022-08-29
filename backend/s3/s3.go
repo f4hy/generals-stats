@@ -18,11 +18,8 @@ const (
 )
 
 func AddDataToS3(filePath string, databuffer []byte) error {
-	log.Infof("Adding data to S3 file (%s)", filePath)
+	log.V(1).Infof("Adding data to S3 file (%s)", filePath)
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
-	if log.V(2) {
-		log.Infof("Writing %s : %s \n", filePath, string(databuffer))
-	}
 
 	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(S3_BUCKET),
@@ -35,16 +32,16 @@ func AddDataToS3(filePath string, databuffer []byte) error {
 		ServerSideEncryption: aws.String("AES256"),
 	})
 	if err != nil {
-		log.Infof("Failed to data to S3 file (%s): %s", filePath, err)
+		log.Errorf("Failed to data to S3 file (%s): %s", filePath, err)
 		return err
 	}
 
-	log.Infof("Successfully added data to S3 file (%s)", filePath)
+	log.V(1).Infof("Successfully added data to S3 file (%s)", filePath)
 	return nil
 }
 
 func GetS3Data(filePath string) ([]byte, error) {
-	log.Infof("Retrieving data from S3 file (%s)", filePath)
+	log.V(1).Infof("Retrieving data from S3 file (%s)", filePath)
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
 	if err != nil {
 		return nil, err
@@ -54,22 +51,17 @@ func GetS3Data(filePath string) ([]byte, error) {
 		Key:    aws.String(filePath),
 	})
 	if err != nil {
+		log.Error("Error getting object %v", filePath)
 		return nil, err
 	}
-	if log.V(2) {
-		log.Infof("Got Obj: %v", rawObject)
-		log.Infof("Body: %s", rawObject.Body)
-	}
+	log.V(2).Infof("Got Obj: %v", rawObject)
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(rawObject.Body)
 	if err != nil {
 		return nil, err
 	}
 	bytes := buf.Bytes()
-	if log.V(2) {
-		fmt.Printf("Fetched %s : %s \n", filePath, bytes)
-	}
-	log.Infof("Successfully retrieved data from S3 file (%s)", filePath)
+	log.V(1).Infof("Successfully retrieved data from S3 file (%s)", filePath)
 	return bytes, nil
 }
 
@@ -77,7 +69,7 @@ func GetS3Data(filePath string) ([]byte, error) {
 // by the front end
 func GetPresignedUrl(path string) (string, error) {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
-	log.Infof("Getting presigned url for ", path)
+	log.V(1).Infof("Getting presigned url for ", path)
 	req, _ := s3.New(s).GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(S3_BUCKET),
 		Key:    aws.String(path),
@@ -85,10 +77,10 @@ func GetPresignedUrl(path string) (string, error) {
 	urlStr, err := req.Presign(15 * time.Minute)
 
 	if err != nil {
-		log.Infof("Failed to sign request", err)
+		log.Errorf("Failed to sign request", err)
 		return urlStr, err
 	}
-	log.Infof("The URL is", urlStr)
+	log.V(1).Infof("The URL is", urlStr)
 	return urlStr, nil
 }
 
@@ -100,7 +92,7 @@ func List(path string) ([]string, error) {
 		Prefix:  aws.String(path),
 		MaxKeys: aws.Int64(1000),
 	}
-	log.Infof("Listing %s", input)
+	log.V(1).Infof("Listing %s", input)
 	results, err := svc.ListObjectsV2(input)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {

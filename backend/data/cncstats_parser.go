@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bill-rich/cncstats/pkg/zhreplay"
@@ -318,6 +319,7 @@ func knownAborted(matchId int64) string {
 		1015461230: "Disconnect :( :(",
 		2421832733: "Missmatch :(",
 		4233126343: "Missmatch :(",
+		3060818251: "Missmatch :( :(",
 	}
 	reason := aborted[matchId]
 	return reason
@@ -337,6 +339,66 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 	return team, prs
 }
 
+func ParseJson(json_path string) (match_and_details, error) {
+	_, file := filepath.Split(json_path)
+	json_data, err := GetJson(file)
+	if err != nil {
+		log.Println("Could not get json", json_path)
+		return match_and_details{}, err
+	}
+	if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
+		// log.Println("parsing: ", file)
+		if err != nil {
+			log.Println("Could not get", file)
+		}
+		parsed, err := parse_data(file, json_data)
+		if err != nil {
+			log.Println("Could not parse", file)
+			return parsed, err
+		}
+		result := parsed.info
+		abortReason := knownAborted(result.Id)
+		if abortReason != "" {
+			log.Print("Aborted Match.")
+			parsed.info.Incomplete = abortReason
+		}
+		team, needOverride := winnerOverride(result.Id)
+		if needOverride {
+			result.WinningTeam = team
+			result.Notes = "Overriding auto detected team with team " + team.String()
+			if result.Incomplete != "" {
+				result.Notes += " autodetect error: " + result.Incomplete
+			}
+			result.Incomplete = ""
+		}
+		if err != nil {
+			fmt.Println("could not parse file", file)
+			return parsed, err
+		} else {
+			return parsed, nil
+		}
+
+	}
+	log.Print("Not a 2v2 of our squad")
+	return match_and_details{}, errors.New("Not a 2v2 of our squad")
+}
+
+func parseWorker(id int, jsons <-chan string, results chan<- match_and_details, failure chan<- string, group *sync.WaitGroup) {
+	log.Printf("Starting worker %v", id)
+	for json := range jsons {
+		log.Printf("worker %v parsing %v", id, json)
+		parsed, err := ParseJson(json)
+		if err != nil {
+			log.Printf("worker %v error on  %v", id, json)
+			failure <- err.Error()
+		} else {
+			results <- parsed
+		}
+	}
+	log.Printf("worker %v done", id)
+	group.Done()
+}
+
 func ParseJsons() {
 
 	jsons, err := ListJsons()
@@ -345,72 +407,66 @@ func ParseJsons() {
 	}
 	// json_data_map := make(map[string][]byte)
 	// for _, json_path := range jsons {
-	// 	_, s := filepath.Split(json_path)
-	// 	bytes, err := GetJson(s)
-	// 	if err != nil {
-	// 		log.Println("Could not get json", json_path)
-	// 		continue
-	// 	}
+	//      _, s := filepath.Split(json_path)
+	//      bytes, err := GetJson(s)
+	//      if err != nil {
+	//              log.Println("Could not get json", json_path)
+	//              continue
+	//      }
 
-	// 	json_data_map[s] = bytes
+	//      json_data_map[s] = bytes
 
 	// }
 
-	allParsed := make(map[int64]*match_and_details)
-	failed := []string{}
-	for _, json_path := range jsons {
-		_, file := filepath.Split(json_path)
-		json_data, err := GetJson(file)
-		if err != nil {
-			log.Println("Could not get json", json_path)
-			continue
-		}
-		if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
-			// log.Println("parsing: ", file)
-			if err != nil {
-				log.Println("Could not get", file)
-			}
-			parsed, err := parse_data(file, json_data)
-			if err != nil {
-				log.Println("Could not parse", file)
-				failed = append(failed, file)
-			}
-			result := parsed.info
-			abortReason := knownAborted(result.Id)
-			if abortReason != "" {
-				log.Print("Aborted Match.")
-				parsed.info.Incomplete = abortReason
-			}
-			team, needOverride := winnerOverride(result.Id)
-			if needOverride {
-				result.WinningTeam = team
-				result.Notes = "Overriding auto detected team with team " + team.String()
-				if result.Incomplete != "" {
-					result.Notes += " autodetect error: " + result.Incomplete
-				}
-				result.Incomplete = ""
-			}
-			if err != nil {
-				fmt.Println("could not parse file", file)
-			} else {
-				// saveMatch(parsed)
-				id := result.Id
-				if val, ok := allParsed[id]; ok {
-					log.Print("filename\n", parsed.info.Filename, "\nexisting\n", val.info.Filename)
-					if strings.Contains(file, "day_Modus_") {
-						allParsed[id] = &parsed
-					}
-				} else {
-					allParsed[id] = &parsed
-				}
-			}
+	numJobs := len(jsons)
+	var jobGroup sync.WaitGroup
+	jobs := make(chan string, numJobs)
+	results := make(chan match_and_details, numJobs)
+	failures := make(chan string, numJobs)
 
+	for w := 1; w <= 8; w++ {
+		jobGroup.Add(1)
+		go parseWorker(w, jobs, results, failures, &jobGroup)
+	}
+	for _, json_path := range jsons {
+		jobs <- json_path
+	}
+	close(jobs)
+	log.Printf("waiting til done")
+	jobGroup.Wait()
+	close(results)
+	close(failures)
+	log.Printf("done! processing results")
+
+	failed := []string{}
+	for fail := range failures {
+		failed = append(failed, fail)
+	}
+	allParsed := make(map[int64]*match_and_details)
+	for parsed := range results {
+		// saveMatch(parsed)
+		id := parsed.info.Id
+		file := parsed.info.Filename
+		log.Printf("file name %v", file)
+		if val, ok := allParsed[id]; ok {
+			log.Print("filename\n", parsed.info.Filename, "\nexisting\n", val.info.Filename)
+			if strings.Contains(file, "day_Modus_") {
+				allParsed[id] = &parsed
+			}
 		} else {
-			log.Print("Not a 2v2 of our squad")
+			allParsed[id] = &parsed
 		}
 	}
+
+	var wg sync.WaitGroup
 	for id, data := range allParsed {
-		log.Print("Saving matchid", id)
-		saveAll(data)
+		wg.Add(1)
+		id, data := id, data
+		go func() {
+			defer wg.Done()
+			log.Print("Saving matchid", id)
+			saveAll(data)
+		}()
 	}
+	wg.Wait()
 }

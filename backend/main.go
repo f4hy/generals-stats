@@ -18,16 +18,25 @@ import (
 
 var last_fetched time.Time
 var last_scraped time.Time
+var matches *pb.Matches
 
 func init() {
 	flag.Usage = func() { flag.PrintDefaults() }
 	flag.Set("minloglevel", "3")
 	flag.Set("logtostderr", "true")
-	flag.Set("stderrthreshold", "WARNING")
-	flag.Set("v", "0")
+	isdev := os.Getenv("DEV") != ""
+	if isdev {
+		flag.Set("stderrthreshold", "INFO")
+		flag.Set("v", "1")
+	} else {
+		flag.Set("stderrthreshold", "WARNING")
+		flag.Set("v", "0")
+	}
+
 	flag.Parse()
 	last_fetched = time.Date(2000, time.November, 10, 23, 0, 0, 0, time.UTC)
-	last_scraped = time.Now().Add(time.Hour)
+	updateMatches()
+	last_scraped = time.Now()
 }
 
 func getEnv(key, fallback string) string {
@@ -49,25 +58,41 @@ func completedMatches(all *pb.Matches) *pb.Matches {
 }
 
 func scrape_and_prase() {
-	data.SaveReplays(false)
+	since := time.Now()
+	for _, m := range matches.Matches {
+		ts := m.Timestamp.AsTime()
+		if ts.Before(since) {
+			since = ts
+		}
+	}
+
+	data.SaveReplays(since)
+	log.Info("Scraped")
 	data.ParseJsons()
+	log.Info("ReParsed")
+	last_scraped = time.Now()
 }
 
-func updateMatches(existing *pb.Matches) *pb.Matches {
-	if time.Since(last_fetched).Minutes() < 5 {
-		return existing
-	}
-	if time.Since(last_scraped).Minutes() > 30 {
+func updateMatches() *pb.Matches {
+	since_scraped := time.Since(last_scraped).Minutes()
+	log.Infof("since last scraped %v", since_scraped)
+	if since_scraped > 30 {
 		last_scraped = time.Now()
 		go scrape_and_prase()
 	}
-	matches, err := data.GetMatches()
+	since_fetched := time.Since(last_fetched).Minutes()
+	log.Infof("since last fetched %v", since_fetched)
+	if since_fetched < 5 {
+		return matches
+	}
+	fetched, err := data.GetMatches()
 	if err != nil {
 		log.Error("Failed to get matches, keeping cache: ", err.Error())
-		return existing
+		return matches
 	}
 	log.Info("Updating match data")
 	last_fetched = time.Now()
+	matches = fetched
 	return matches
 }
 
@@ -90,8 +115,15 @@ func main() {
 		})
 	})
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
-	matches := updateMatches(&pb.Matches{})
+	matches := updateMatches()
 	completed := completedMatches(matches)
+	ticker := time.NewTicker(time.Minute * 30)
+	go func() {
+		for tick := range ticker.C {
+			log.Infof("scraping from timer %v", tick)
+			scrape_and_prase()
+		}
+	}()
 	maxAge := "max-age=5000"
 	api := router.Group("/api")
 	{
@@ -103,7 +135,7 @@ func main() {
 				count = 5000
 			}
 			c.Header("Cache-Control", maxAge)
-			matches = updateMatches(matches)
+			matches = updateMatches()
 			completed = completedMatches(matches)
 			upper := min(len(matches.Matches), count)
 			log.Infof("Upper %v", upper)
@@ -143,9 +175,15 @@ func main() {
 			log.Infof("Found replays %d", len(replays))
 			c.JSON(http.StatusOK, replays)
 		})
-		api.GET("/scrape", func(c *gin.Context) {
+		api.GET("/scrape/:days", func(c *gin.Context) {
 			// c.Header("Cache-Control", maxAge)
-			saved, err := data.SaveReplays(true)
+			days_str := c.Param("days")
+			days, err := strconv.Atoi(days_str)
+			if err != nil {
+				log.Error(err)
+				days = 2
+			}
+			saved, err := data.SaveReplays(time.Now().AddDate(0, 0, -days))
 			if err != nil {
 				log.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, err)

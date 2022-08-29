@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
@@ -81,8 +82,8 @@ func parseAndSaveReplay(replay_name string, replay_data []byte, existing_jsons [
 	return nil
 }
 
-func SaveReplays(whole_month bool) (savecount int, fail error) {
-	scraped_replays := scrape(whole_month)
+func SaveReplays(since time.Time) (savecount int, fail error) {
+	scraped_replays := scrape(since)
 	replays, err := ListReplays()
 	if err != nil {
 		return 0, err
