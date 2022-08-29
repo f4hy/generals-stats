@@ -72,6 +72,13 @@ func scrape_and_prase() {
 	data.ParseJsons()
 	log.Info("ReParsed")
 	last_scraped = time.Now()
+	fetched, err := data.GetMatches()
+	if err != nil {
+		log.Error("Failed to get matches, keeping cache: ", err.Error())
+	} else {
+		matches = fetched
+	}
+
 }
 
 func updateMatches() *pb.Matches {
