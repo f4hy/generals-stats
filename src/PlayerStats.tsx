@@ -61,19 +61,31 @@ function PlayerListItem(props: { playerStatWL: GeneralWL }) {
 
 function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
   const sorted = props.stat.stats.sort((s1, s2) => s1.general - s2.general)
-  const data = sorted.map((p) => ({
-    general: General[p.general],
-    wins: p.winLoss?.wins ?? 0,
-    losses: p.winLoss?.losses ?? 0,
-  }))
+  const data = sorted.map((p) => {
+    const wins = p.winLoss?.wins ?? 0
+    const losses = p.winLoss?.losses ?? 0
+    const tot = wins + losses
+    const rate = (wins / (tot > 0 ? tot : 1)) * 100
+    return {
+      general: General[p.general] + ":" + rate.toFixed() + "%",
+      wins: wins,
+      losses: losses,
+    }
+  })
   const faction_sorted = props.stat.factionStats.sort(
     (s1, s2) => s1.faction - s2.faction
   )
-  const faction_data = faction_sorted.map((p) => ({
-    faction: Faction[p.faction],
-    wins: p.winLoss?.wins ?? 0,
-    losses: p.winLoss?.losses ?? 0,
-  }))
+  const faction_data = faction_sorted.map((p) => {
+    const wins = p.winLoss?.wins ?? 0
+    const losses = p.winLoss?.losses ?? 0
+    const tot = wins + losses
+    const rate = (wins / (tot > 0 ? tot : 1)) * 100
+    return {
+      faction: Faction[p.faction] + ":" + rate.toFixed() + "%",
+      wins: p.winLoss?.wins ?? 0,
+      losses: p.winLoss?.losses ?? 0,
+    }
+  })
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
@@ -103,8 +115,8 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
               <Bar dataKey="losses" fill="#FF7043" />
               <XAxis
                 dataKey="general"
-                height={80}
-                angle={90}
+                height={130}
+                angle={60}
                 textAnchor="begin"
                 minTickGap={0}
                 interval={0}

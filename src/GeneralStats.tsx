@@ -59,15 +59,23 @@ function DisplayGeneralStat(props: { stat: GeneralStat; max: number }) {
     s1.playerName.localeCompare(s2.playerName, "en")
   )
   const overall = props.stat.total
-  let data = sorted.map((s) => ({
+  let pdata = sorted.map((s) => ({
     name: s.playerName,
     wins: s.winLoss?.wins ?? 0,
     losses: s.winLoss?.losses ?? 0,
   }))
-  data = [
+  const data = [
     { name: "overall", wins: overall?.wins ?? 0, losses: overall?.losses ?? 0 },
-    ...data,
-  ]
+    ...pdata,
+  ].map((x) => {
+    const tot = x.losses + x.wins
+    const rate = (x.wins / (tot > 0 ? tot : 1)) * 100
+    return {
+      wins: x.wins,
+      losses: x.losses,
+      name: x.name + ":" + rate.toFixed() + "%",
+    }
+  })
   return (
     <Box sx={{ flexGrow: 1 }}>
       <DisplayGeneral general={props.stat.general} />
