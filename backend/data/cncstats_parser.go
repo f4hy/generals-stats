@@ -363,6 +363,7 @@ func ParseJson(json_path string) (match_and_details, error) {
 			log.Println("Could not parse", file)
 			return parsed, err
 		}
+		parsed.info.Filename = file
 		result := parsed.info
 		abortReason := knownAborted(result.Id)
 		if abortReason != "" {
