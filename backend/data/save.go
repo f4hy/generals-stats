@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"time"
 
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
@@ -66,6 +67,7 @@ func GetMatches() (*pb.Matches, error) {
 	if err != nil {
 		return nil, err
 	}
+	start := time.Now()
 	var matches []*pb.MatchInfo
 	c := make(chan *pb.MatchInfo)
 	for _, matchpath := range listing {
@@ -73,10 +75,11 @@ func GetMatches() (*pb.Matches, error) {
 		go getMatch(c, matchpath)
 	}
 	for i := range listing {
-		log.Infof("recieving match %d", i)
+		log.V(2).Infof("recieving match %d", i)
 		match := <-c
 		matches = append(matches, match)
 	}
+	log.Infof("Getting matches took %v", time.Since(start))
 	sort.Slice(matches, func(i, j int) bool {
 		return matches[i].Timestamp.AsTime().After(matches[j].Timestamp.AsTime())
 	})

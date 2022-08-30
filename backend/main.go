@@ -69,7 +69,7 @@ func scrape_and_prase() {
 
 	data.SaveReplays(since)
 	log.Info("Scraped")
-	data.ParseJsons()
+	data.ParseJsons(false)
 	log.Info("ReParsed")
 	last_scraped = time.Now()
 	fetched, err := data.GetMatches()
@@ -208,7 +208,7 @@ func main() {
 				c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
-			data.ParseJsons()
+			data.ParseJsons(false)
 			log.Infof("Done parsing")
 			c.JSON(http.StatusOK, replays)
 		})

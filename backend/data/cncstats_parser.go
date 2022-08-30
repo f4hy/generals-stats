@@ -4,9 +4,7 @@ import (
         "encoding/json"
         "errors"
         "fmt"
-        "io"
-        "log"
-        "os"
+	log "github.com/golang/glog"
         "path/filepath"
         "strings"
         "sync"
@@ -17,31 +15,10 @@ import (
         "github.com/bill-rich/cncstats/pkg/zhreplay/object"
         pb "github.com/f4hy/generals-stats/backend/proto"
         "github.com/samber/lo"
-        // "google.golang.org/protobuf/proto"
         timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var (
-        DebugLogger *log.Logger
-)
 
-func init() {
-        logfile, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_WRONLY, 0666)
-        if err != nil {
-                log.Fatal(err)
-        }
-        mw := io.MultiWriter(os.Stdout, logfile)
-        log.SetOutput(mw)
-
-        DebugLogger = log.New(os.Stderr, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
-        if err := os.MkdirAll("parsed-matches", os.ModePerm); err != nil {
-                log.Fatal(err)
-        }
-        if err := os.MkdirAll("match-details", os.ModePerm); err != nil {
-                log.Fatal(err)
-        }
-
-}
 
 func general_parse(generalstr string) (pb.General, error) {
 
@@ -79,7 +56,7 @@ func player_parse(playername string) (string, error) {
         if playername == "Ye_Ole_Seans" || playername == "Sean" {
                 return "Sean", nil
         }
-        log.Print("unkown player" + playername)
+        log.Warningf("unkown player: %v" , playername)
         return "", errors.New("Unknown Player " + playername)
 }
 
@@ -151,7 +128,7 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
                         if ok {
                                 id = int64(checksum)
                         } else {
-                                log.Println("checksum was not a float", b.Arguments[0])
+                                log.Infof("checksum was not a float: %v", b.Arguments[0])
                                 return apms, upgrades, id, errors.New("checksum was not a float")
                         }
                 }
@@ -240,7 +217,7 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
         })
         if !found {
                 match.Incomplete = "No winner detected in replay"
-                log.Println("no winnner?? time", minutes)
+                log.Warningf("no winnner?? time: %v", minutes)
         } else {
                 match.WinningTeam = pb.Team(winner.Team)
         }
@@ -274,32 +251,11 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 func saveAll(m *match_and_details) error {
         result := m.info
         details := m.detail
-        // fmt.Println("Match result:", result.Timestamp.AsTime())
-        // fmt.Println("details :", details)
-        // result_bytes, err := proto.Marshal(result)
-        // if err != nil {
-        //         panic(err)
-        // }
-        // resultpath := fmt.Sprintf("parsed-matches/%d.proto", result.Id)
-        // err = os.WriteFile(resultpath, result_bytes, 0644)
-        // if err != nil {
-        //         panic(err)
-        // }
-        // details_bytes, err := proto.Marshal(details)
-        // if err != nil {
-        //         panic(err)
-        // }
-        // detailpath := fmt.Sprintf("match-details/%d.proto", result.Id)
-        // err = os.WriteFile(detailpath, details_bytes, 0644)
         err:= SaveMatch(result)
-	if(err != nil){
-		return err
-	}
-        // data.SaveDetails(details)
+        if(err != nil){
+                return err
+        }
         err = SaveDetails(details)
-        // _ = result
-        // _ = data.SaveMatch
-        // data.SaveCosts(costs)
         return err
 }
 
@@ -310,10 +266,13 @@ func save(id int64, matchdata match_and_details, group *sync.WaitGroup) error {
         if(id != matchdata.detail.MatchId){
                 log.Fatalf("%v detail ids don't match %v != %v", matchdata.info.Filename, id, matchdata.detail.MatchId)
         }
-        log.Print("Saving matchid", id)
+        log.V(1).Infof("Saving matchid %v", id)
         err:=saveAll(&matchdata)
-	defer group.Done()
-	return err
+	if(err!= nil){
+		log.Fatalf("Failed to save match[%v] %v", id, err)
+	}
+        defer group.Done()
+        return err
 }
 
 func addMatchNotes(match *pb.MatchInfo) {
@@ -366,24 +325,24 @@ func ParseJson(json_path string) (match_and_details, error) {
         _, file := filepath.Split(json_path)
         json_data, err := GetJson(file)
         if err != nil {
-                log.Println("Could not get json", json_path)
+                log.Warning("Could not get json", json_path)
                 return match_and_details{}, err
         }
         if strings.Contains(file, ".json") && strings.Contains(file, "2v2") && strings.Contains(file, "jbb") {
                 // log.Println("parsing: ", file)
                 if err != nil {
-                        log.Println("Could not get", file)
+                        log.Warning("Could not get", file)
                 }
                 parsed, err := parse_data(file, json_data)
                 if err != nil {
-                        log.Println("Could not parse", file)
+                        log.Warning("Could not parse", file)
                         return parsed, err
                 }
                 parsed.info.Filename = file
                 result := parsed.info
                 abortReason := knownAborted(result.Id)
                 if abortReason != "" {
-                        log.Print("Aborted Match.")
+                        log.Warning("Aborted Match.")
                         parsed.info.Incomplete = abortReason
                 }
                 team, needOverride := winnerOverride(result.Id)
@@ -403,53 +362,50 @@ func ParseJson(json_path string) (match_and_details, error) {
                 }
 
         }
-        log.Print("Not a 2v2 of our squad")
+        log.Info("Not a 2v2 of our squad")
         return match_and_details{}, errors.New("Not a 2v2 of our squad")
 }
 
 func parseWorker(id int, jsons <-chan string, results chan<- match_and_details, failure chan<- string, group *sync.WaitGroup) {
-        log.Printf("Starting worker %v", id)
+        log.V(1).Infof("Starting worker %v", id)
         for json := range jsons {
-                log.Printf("worker %v parsing %v", id, json)
+                log.V(1).Infof("worker %v parsing %v", id, json)
                 parsed, err := ParseJson(json)
                 if err != nil {
-                        log.Printf("worker %v error on  %v", id, json)
+                        log.V(1).Infof("worker %v error on  %v", id, json)
                         failure <- fmt.Sprintf("%v error: %v", json, err.Error())
                 } else {
                         results <- parsed
                 }
         }
-        log.Printf("worker %v done", id)
+        log.Infof("worker %v done", id)
         group.Done()
 }
 
-func ParseJsons() {
+func ParseJsons(all bool) {
 
         jsons, err := ListJsons()
         if err != nil {
                 log.Fatal("Could not fetch jsons")
         }
-        // json_data_map := make(map[string][]byte)
-        // for _, json_path := range jsons {
-        //      _, s := filepath.Split(json_path)
-        //      bytes, err := GetJson(s)
-        //      if err != nil {
-        //              log.Println("Could not get json", json_path)
-        //              continue
-        //      }
+        this_month := time.Now().Month().String()
+        last_week_month := time.Now().AddDate(0,0,-7).Month().String()
 
-        //      json_data_map[s] = bytes
-
-        // }
+        if(!all){
+                jsons = lo.Filter(jsons, func(j string, i int) bool {
+			log.Info(j, this_month, last_week_month)
+                        return strings.Contains(j, this_month) || strings.Contains(j, last_week_month)
+                })
+        }
 
         numJobs := len(jsons)
-        log.Printf("Have %v jsons", len(jsons))
+        log.Infof("Have %v jsons", len(jsons))
         var jobGroup sync.WaitGroup
         jobs := make(chan string, numJobs)
         results := make(chan match_and_details, numJobs)
         failures := make(chan string, numJobs)
 
-        for w := 1; w <= 8; w++ {
+        for w := 1; w <= 16; w++ {
                 jobGroup.Add(1)
                 go parseWorker(w, jobs, results, failures, &jobGroup)
         }
@@ -457,11 +413,11 @@ func ParseJsons() {
                 jobs <- json_path
         }
         close(jobs)
-        log.Printf("waiting til done")
+        log.Info("waiting til done")
         jobGroup.Wait()
         close(results)
         close(failures)
-        log.Printf("done! processing results")
+        log.Info("done! processing results")
 
         failed := []string{}
         for fail := range failures {
@@ -472,8 +428,8 @@ func ParseJsons() {
                 id := result.info.Id
                 file := result.info.Filename
                 if val, ok := allParsed[id]; ok {
-                        log.Printf("filename %v %v", result.info.Id, result.info.Filename)
-                        log.Printf("existing %v %v", val.info.Id, val.info.Filename)
+                        log.V(1).Infof("filename %v %v", result.info.Id, result.info.Filename)
+                        log.V(1).Infof("existing %v %v", val.info.Id, val.info.Filename)
                         if strings.Contains(file, "day_Modus_") {
                                 allParsed[id] = result
                         }
@@ -482,18 +438,17 @@ func ParseJsons() {
                 }
         }
 
+	start_save:= time.Now()
         var saveGroup sync.WaitGroup
 
         for parsed_id, data_to_save := range allParsed {
-		saveGroup.Add(1)
-		err:= save(parsed_id, data_to_save, &saveGroup)
-		if(err != nil){
-			log.Fatalf("error %v", err)
-		}
+                saveGroup.Add(1)
+                go save(parsed_id, data_to_save, &saveGroup)
         }
-	saveGroup.Wait()
+        saveGroup.Wait()
+	log.V(1).Infof("Saving matches took %v", time.Since(start_save))
 
         for _, fail := range failed {
-                log.Print("Failure", fail)
+                log.Infof("Failure %v", fail)
         }
 }
