@@ -125,14 +125,14 @@ func main() {
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
 	matches := updateMatches()
 	completed := completedMatches(matches)
-	ticker := time.NewTicker(time.Minute * 30)
+	ticker := time.NewTicker(time.Minute * 15)
 	go func() {
 		for tick := range ticker.C {
 			log.Infof("scraping from timer %v", tick)
 			scrape_and_prase()
 		}
 	}()
-	maxAge := "max-age=5000"
+	maxAge := "max-age=500"
 	api := router.Group("/api")
 	{
 		api.GET("/matches/:count", func(c *gin.Context) {
