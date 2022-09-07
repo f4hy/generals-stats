@@ -1,7 +1,7 @@
 /* eslint-disable */
-import Long from "long"
-import * as _m0 from "protobufjs/minimal"
 import { Timestamp } from "../google/protobuf/timestamp"
+import Long from "long"
+import _m0 from "protobufjs/minimal"
 
 export const protobufPackage = "matches"
 
@@ -92,8 +92,9 @@ export function generalToJSON(object: General): string {
       return "STEALTH"
     case General.DEMO:
       return "DEMO"
+    case General.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -130,8 +131,9 @@ export function factionToJSON(object: Faction): string {
       return "ANYCHINA"
     case Faction.ANYGLA:
       return "ANYGLA"
+    case Faction.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -180,8 +182,9 @@ export function teamToJSON(object: Team): string {
       return "THREE"
     case Team.FOUR:
       return "FOUR"
+    case Team.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -354,6 +357,21 @@ export interface TeamPairs_TeamPairsEntry {
 export interface TeamPairs_FactionPairsEntry {
   key: string
   value: PairFactionWinLosses | undefined
+}
+
+export interface BaysCondition {
+  map: string | undefined
+  player: Player | undefined
+  team: Team
+}
+
+export interface BayesResult {
+  condition: BaysCondition | undefined
+  likelyhood: number
+}
+
+export interface BayesResults {
+  results: BayesResult[]
 }
 
 function createBasePlayer(): Player {
@@ -2793,6 +2811,216 @@ export const TeamPairs_FactionPairsEntry = {
   },
 }
 
+function createBaseBaysCondition(): BaysCondition {
+  return { map: undefined, player: undefined, team: 0 }
+}
+
+export const BaysCondition = {
+  encode(
+    message: BaysCondition,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.map !== undefined) {
+      writer.uint32(18).string(message.map)
+    }
+    if (message.player !== undefined) {
+      Player.encode(message.player, writer.uint32(42).fork()).ldelim()
+    }
+    if (message.team !== 0) {
+      writer.uint32(64).int32(message.team)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BaysCondition {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseBaysCondition()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 2:
+          message.map = reader.string()
+          break
+        case 5:
+          message.player = Player.decode(reader, reader.uint32())
+          break
+        case 8:
+          message.team = reader.int32() as any
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): BaysCondition {
+    return {
+      map: isSet(object.map) ? String(object.map) : undefined,
+      player: isSet(object.player) ? Player.fromJSON(object.player) : undefined,
+      team: isSet(object.team) ? teamFromJSON(object.team) : 0,
+    }
+  },
+
+  toJSON(message: BaysCondition): unknown {
+    const obj: any = {}
+    message.map !== undefined && (obj.map = message.map)
+    message.player !== undefined &&
+      (obj.player = message.player ? Player.toJSON(message.player) : undefined)
+    message.team !== undefined && (obj.team = teamToJSON(message.team))
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<BaysCondition>, I>>(
+    object: I
+  ): BaysCondition {
+    const message = createBaseBaysCondition()
+    message.map = object.map ?? undefined
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? Player.fromPartial(object.player)
+        : undefined
+    message.team = object.team ?? 0
+    return message
+  },
+}
+
+function createBaseBayesResult(): BayesResult {
+  return { condition: undefined, likelyhood: 0 }
+}
+
+export const BayesResult = {
+  encode(
+    message: BayesResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.condition !== undefined) {
+      BaysCondition.encode(message.condition, writer.uint32(10).fork()).ldelim()
+    }
+    if (message.likelyhood !== 0) {
+      writer.uint32(21).float(message.likelyhood)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BayesResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseBayesResult()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.condition = BaysCondition.decode(reader, reader.uint32())
+          break
+        case 2:
+          message.likelyhood = reader.float()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): BayesResult {
+    return {
+      condition: isSet(object.condition)
+        ? BaysCondition.fromJSON(object.condition)
+        : undefined,
+      likelyhood: isSet(object.likelyhood) ? Number(object.likelyhood) : 0,
+    }
+  },
+
+  toJSON(message: BayesResult): unknown {
+    const obj: any = {}
+    message.condition !== undefined &&
+      (obj.condition = message.condition
+        ? BaysCondition.toJSON(message.condition)
+        : undefined)
+    message.likelyhood !== undefined && (obj.likelyhood = message.likelyhood)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<BayesResult>, I>>(
+    object: I
+  ): BayesResult {
+    const message = createBaseBayesResult()
+    message.condition =
+      object.condition !== undefined && object.condition !== null
+        ? BaysCondition.fromPartial(object.condition)
+        : undefined
+    message.likelyhood = object.likelyhood ?? 0
+    return message
+  },
+}
+
+function createBaseBayesResults(): BayesResults {
+  return { results: [] }
+}
+
+export const BayesResults = {
+  encode(
+    message: BayesResults,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.results) {
+      BayesResult.encode(v!, writer.uint32(10).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BayesResults {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseBayesResults()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(BayesResult.decode(reader, reader.uint32()))
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): BayesResults {
+    return {
+      results: Array.isArray(object?.results)
+        ? object.results.map((e: any) => BayesResult.fromJSON(e))
+        : [],
+    }
+  },
+
+  toJSON(message: BayesResults): unknown {
+    const obj: any = {}
+    if (message.results) {
+      obj.results = message.results.map((e) =>
+        e ? BayesResult.toJSON(e) : undefined
+      )
+    } else {
+      obj.results = []
+    }
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<BayesResults>, I>>(
+    object: I
+  ): BayesResults {
+    const message = createBaseBayesResults()
+    message.results =
+      object.results?.map((e) => BayesResult.fromPartial(e)) || []
+    return message
+  },
+}
+
 declare var self: any | undefined
 declare var window: any | undefined
 declare var global: any | undefined
@@ -2826,10 +3054,9 @@ export type DeepPartial<T> = T extends Builtin
 type KeysOfUnion<T> = T extends T ? keyof T : never
 export type Exact<P, I extends P> = P extends Builtin
   ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<
-        Exclude<keyof I, KeysOfUnion<P>>,
-        never
-      >
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
+      [K in Exclude<keyof I, KeysOfUnion<P>>]: never
+    }
 
 function toTimestamp(date: Date): Timestamp {
   const seconds = date.getTime() / 1_000

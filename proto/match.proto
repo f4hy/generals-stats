@@ -186,3 +186,20 @@ message TeamPairs{
   map<string, PairsWinLosses> team_pairs = 1;
   map<string, PairFactionWinLosses> faction_pairs = 2;
 }
+
+message BaysCondition {
+  oneof mapOrPlayer {
+    string map = 2;
+    Player player = 5;    
+  }
+  Team team = 8;
+}
+
+message BayesResult {
+  BaysCondition condition = 1;
+  float likelyhood = 2;
+}
+
+message BayesResults {
+  repeated BayesResult results = 1;
+}
