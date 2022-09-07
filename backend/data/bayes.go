@@ -22,4 +22,14 @@ func Bayes(matches *pb.Matches)  {
                 teamRates[t] = float64(len(ms)) / float64(N)
 
 	}
+	likelycounts := make(map[pb.BaysCondition]int64)
+	for t, ms := range grouped{
+		for _, m := range ms{
+			cond := pb.BaysCondition{
+				Team: t,
+				MapOrPlayer: isBaysCondition_MapOrPlayer{m.Map},
+			}
+		}
+	}
+	
 }
