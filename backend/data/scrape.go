@@ -73,7 +73,7 @@ func scrape(since time.Time) map[string][]byte {
 
 	for i := since; i.Before(time.Now()); i = i.AddDate(0, 0, 1) {
 		year, month, day := i.Date()
-		this_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s/%02d_%s", year, int(month), month, day, time.Now().Weekday())
+		this_url := fmt.Sprintf("http://www.gentool.net/data/zh/%d_%02d_%s/%02d_%s", year, int(month), month, day, i.Weekday())
 		c.Visit(this_url)
 	}
 	c.Wait()
