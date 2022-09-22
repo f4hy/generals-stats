@@ -208,7 +208,7 @@ func main() {
 				c.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
-			data.ParseJsons(false)
+			data.ParseJsons(true)
 			log.Infof("Done parsing")
 			c.JSON(http.StatusOK, replays)
 		})
