@@ -190,7 +190,7 @@ export default function DisplayMatches() {
   const [getAll, setGetAll] = React.useState<boolean>(false)
   const [matchList, setMatchList] = React.useState<Matches>(empty)
   const partialCount = 50
-  const maxCount = 1000
+  const maxCount = 2000
   React.useEffect(() => {
     getMatches(getAll ? maxCount : partialCount, setMatchList)
   }, [getAll])
