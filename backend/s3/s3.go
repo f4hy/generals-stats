@@ -2,9 +2,7 @@ package s3
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	log "github.com/golang/glog"
@@ -86,32 +84,28 @@ func GetPresignedUrl(path string) (string, error) {
 
 func List(path string) ([]string, error) {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
-	svc := s3.New(s)
-	input := &s3.ListObjectsV2Input{
-		Bucket:  aws.String(S3_BUCKET),
-		Prefix:  aws.String(path),
-		MaxKeys: aws.Int64(2000),
-	}
-	log.V(1).Infof("Listing %s", input)
-	results, err := svc.ListObjectsV2(input)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case s3.ErrCodeNoSuchBucket:
-				fmt.Println(s3.ErrCodeNoSuchBucket, aerr.Error())
-			default:
-				fmt.Println(aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
-		}
-		return nil, err
+		log.Fatal("Failed to fetch s3")
 	}
+	svc := s3.New(s)
 	var asStrings []string
-	for _, listing := range results.Contents {
-		asStrings = append(asStrings, *listing.Key)
-	}
+	var continuationToken *string
+	for {
+		resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{
+			Bucket:  aws.String(S3_BUCKET),
+			Prefix:  aws.String(path),
+			ContinuationToken: continuationToken,
+		})
+		if err != nil {
+			log.Fatal("Failed to fetch s3")
+		}
+		for _, listing := range resp.Contents {
+			asStrings = append(asStrings, *listing.Key)
+		}
+		if !aws.BoolValue(resp.IsTruncated) {
+			break
+		}
+		continuationToken = resp.NextContinuationToken
+	}	
 	return asStrings, nil
 }
