@@ -15,6 +15,7 @@ func scrape(since time.Time) map[string][]byte {
 		colly.Async(true),
 		// colly.Debugger(&debug.LogDebugger{}),
 	)
+	c.SetRequestTimeout(2*time.Minute)
 	replay_data := make(map[string][]byte)
 
 	c.Limit(&colly.LimitRule{DomainGlob: "*", Parallelism: 2})
