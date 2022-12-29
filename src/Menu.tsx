@@ -24,6 +24,8 @@ import DisplayMatches from "./Matches"
 import DisplayPairStats from "./PairStats"
 import DisplayPlayerStats from "./PlayerStats"
 import DisplayTeamStats from "./TeamStats"
+import Wrapped from "./Wrapped"
+import RedeemIcon from "@mui/icons-material/Redeem"
 
 const drawerWidth = 190
 
@@ -79,6 +81,13 @@ export default function Menu() {
           text="Pair Stats"
           open={true}
           icon={<LooksTwoIcon />}
+          callback={setSelection}
+        />
+        <MenuItem
+          value="Wrapped"
+          text="Wrapped"
+          open={true}
+          icon={<RedeemIcon />}
           callback={setSelection}
         />
       </List>
@@ -169,6 +178,7 @@ type Selection =
   | "TeamStats"
   | "MapStats"
   | "PairStats"
+  | "Wrapped"
 
 interface MenuItemProps {
   open: boolean
@@ -192,8 +202,8 @@ function Main(props: { selection: Selection }) {
       return <DisplayMapStats />
     case "PairStats":
       return <DisplayPairStats />
-    /* case "AddMatch":
-     *   return <AddMatch />; */
+    case "Wrapped":
+      return <Wrapped />
     default:
       return <div>{props.selection}</div>
   }
