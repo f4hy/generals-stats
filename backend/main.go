@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-
+	"github.com/golang/protobuf/jsonpb"
 	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/gin-contrib/cors"
@@ -19,10 +19,18 @@ import (
 var last_fetched time.Time
 var last_scraped time.Time
 var matches *pb.Matches
+var marshaler jsonpb.Marshaler
 
 func init() {
 	matches = &pb.Matches{}
+	marshaler = jsonpb.Marshaler{
+        EnumsAsInts:  false,
+        EmitDefaults: true,
+        Indent:       "  ",
+        OrigName:     true,
+	}
 	flag.Usage = func() { flag.PrintDefaults() }
+	
 	flag.Set("minloglevel", "3")
 	flag.Set("logtostderr", "true")
 	isdev := os.Getenv("DEV") != ""
@@ -54,6 +62,9 @@ func completedMatches(all *pb.Matches) *pb.Matches {
 		if m.Incomplete == "" {
 			completed.Matches = append(completed.Matches, m)
 		}
+	}
+	for _, m := range completed.Matches {
+		go data.GetDetails(m.Id)
 	}
 	return &completed
 }
@@ -247,6 +258,24 @@ func main() {
 			}
 			ts, err := data.GetDetails(matchid)
 			c.ProtoBuf(http.StatusOK, ts)
+		})
+		api.GET("/wrapped/:player", func(c *gin.Context) {
+			player := c.Param("player")
+			wrap, err := data.Wrapped(completed, player)
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			j, err := marshaler.MarshalToString(wrap)
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			log.Infof("wrapped %v", j)
+			// c.JSON(http.StatusOK, j)
+			c.ProtoBuf(http.StatusOK, wrap)
 		})
 		api.POST("/saveMatch", func(c *gin.Context) {
 			match := &pb.MatchInfo{}

@@ -24,7 +24,7 @@ import DisplayMatches from "./Matches"
 import DisplayPairStats from "./PairStats"
 import DisplayPlayerStats from "./PlayerStats"
 import DisplayTeamStats from "./TeamStats"
-import Wrapped from "./Wrapped"
+import WrappedYear from "./Wrapped"
 import RedeemIcon from "@mui/icons-material/Redeem"
 
 const drawerWidth = 190
@@ -203,7 +203,7 @@ function Main(props: { selection: Selection }) {
     case "PairStats":
       return <DisplayPairStats />
     case "Wrapped":
-      return <Wrapped />
+      return <WrappedYear />
     default:
       return <div>{props.selection}</div>
   }

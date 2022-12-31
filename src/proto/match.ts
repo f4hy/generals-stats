@@ -1,7 +1,7 @@
 /* eslint-disable */
-import Long from "long"
-import * as _m0 from "protobufjs/minimal"
 import { Timestamp } from "../google/protobuf/timestamp"
+import Long from "long"
+import _m0 from "protobufjs/minimal"
 
 export const protobufPackage = "matches"
 
@@ -92,8 +92,9 @@ export function generalToJSON(object: General): string {
       return "STEALTH"
     case General.DEMO:
       return "DEMO"
+    case General.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -130,8 +131,9 @@ export function factionToJSON(object: Faction): string {
       return "ANYCHINA"
     case Faction.ANYGLA:
       return "ANYGLA"
+    case Faction.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -180,8 +182,9 @@ export function teamToJSON(object: Team): string {
       return "THREE"
     case Team.FOUR:
       return "FOUR"
+    case Team.UNRECOGNIZED:
     default:
-      return "UNKNOWN"
+      return "UNRECOGNIZED"
   }
 }
 
@@ -354,6 +357,20 @@ export interface TeamPairs_TeamPairsEntry {
 export interface TeamPairs_FactionPairsEntry {
   key: string
   value: PairFactionWinLosses | undefined
+}
+
+export interface Wrapped {
+  gamesPlayed: number
+  hoursPlayed: number
+  mostPlayed: General
+  mostPlayedWinrate: number
+  mostBuilt: string
+  mostBuiltSpent: number
+  mostBuiltCount: number
+  mostBuiltMore: number
+  bestGeneral: General
+  bestWinrate: number
+  bestAverage: number
 }
 
 function createBasePlayer(): Player {
@@ -2793,6 +2810,179 @@ export const TeamPairs_FactionPairsEntry = {
   },
 }
 
+function createBaseWrapped(): Wrapped {
+  return {
+    gamesPlayed: 0,
+    hoursPlayed: 0,
+    mostPlayed: 0,
+    mostPlayedWinrate: 0,
+    mostBuilt: "",
+    mostBuiltSpent: 0,
+    mostBuiltCount: 0,
+    mostBuiltMore: 0,
+    bestGeneral: 0,
+    bestWinrate: 0,
+    bestAverage: 0,
+  }
+}
+
+export const Wrapped = {
+  encode(
+    message: Wrapped,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.gamesPlayed !== 0) {
+      writer.uint32(8).int32(message.gamesPlayed)
+    }
+    if (message.hoursPlayed !== 0) {
+      writer.uint32(17).double(message.hoursPlayed)
+    }
+    if (message.mostPlayed !== 0) {
+      writer.uint32(24).int32(message.mostPlayed)
+    }
+    if (message.mostPlayedWinrate !== 0) {
+      writer.uint32(33).double(message.mostPlayedWinrate)
+    }
+    if (message.mostBuilt !== "") {
+      writer.uint32(42).string(message.mostBuilt)
+    }
+    if (message.mostBuiltSpent !== 0) {
+      writer.uint32(49).double(message.mostBuiltSpent)
+    }
+    if (message.mostBuiltCount !== 0) {
+      writer.uint32(56).int32(message.mostBuiltCount)
+    }
+    if (message.mostBuiltMore !== 0) {
+      writer.uint32(64).int32(message.mostBuiltMore)
+    }
+    if (message.bestGeneral !== 0) {
+      writer.uint32(72).int32(message.bestGeneral)
+    }
+    if (message.bestWinrate !== 0) {
+      writer.uint32(81).double(message.bestWinrate)
+    }
+    if (message.bestAverage !== 0) {
+      writer.uint32(89).double(message.bestAverage)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Wrapped {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseWrapped()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.gamesPlayed = reader.int32()
+          break
+        case 2:
+          message.hoursPlayed = reader.double()
+          break
+        case 3:
+          message.mostPlayed = reader.int32() as any
+          break
+        case 4:
+          message.mostPlayedWinrate = reader.double()
+          break
+        case 5:
+          message.mostBuilt = reader.string()
+          break
+        case 6:
+          message.mostBuiltSpent = reader.double()
+          break
+        case 7:
+          message.mostBuiltCount = reader.int32()
+          break
+        case 8:
+          message.mostBuiltMore = reader.int32()
+          break
+        case 9:
+          message.bestGeneral = reader.int32() as any
+          break
+        case 10:
+          message.bestWinrate = reader.double()
+          break
+        case 11:
+          message.bestAverage = reader.double()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): Wrapped {
+    return {
+      gamesPlayed: isSet(object.gamesPlayed) ? Number(object.gamesPlayed) : 0,
+      hoursPlayed: isSet(object.hoursPlayed) ? Number(object.hoursPlayed) : 0,
+      mostPlayed: isSet(object.mostPlayed)
+        ? generalFromJSON(object.mostPlayed)
+        : 0,
+      mostPlayedWinrate: isSet(object.mostPlayedWinrate)
+        ? Number(object.mostPlayedWinrate)
+        : 0,
+      mostBuilt: isSet(object.mostBuilt) ? String(object.mostBuilt) : "",
+      mostBuiltSpent: isSet(object.mostBuiltSpent)
+        ? Number(object.mostBuiltSpent)
+        : 0,
+      mostBuiltCount: isSet(object.mostBuiltCount)
+        ? Number(object.mostBuiltCount)
+        : 0,
+      mostBuiltMore: isSet(object.mostBuiltMore)
+        ? Number(object.mostBuiltMore)
+        : 0,
+      bestGeneral: isSet(object.bestGeneral)
+        ? generalFromJSON(object.bestGeneral)
+        : 0,
+      bestWinrate: isSet(object.bestWinrate) ? Number(object.bestWinrate) : 0,
+      bestAverage: isSet(object.bestAverage) ? Number(object.bestAverage) : 0,
+    }
+  },
+
+  toJSON(message: Wrapped): unknown {
+    const obj: any = {}
+    message.gamesPlayed !== undefined &&
+      (obj.gamesPlayed = Math.round(message.gamesPlayed))
+    message.hoursPlayed !== undefined && (obj.hoursPlayed = message.hoursPlayed)
+    message.mostPlayed !== undefined &&
+      (obj.mostPlayed = generalToJSON(message.mostPlayed))
+    message.mostPlayedWinrate !== undefined &&
+      (obj.mostPlayedWinrate = message.mostPlayedWinrate)
+    message.mostBuilt !== undefined && (obj.mostBuilt = message.mostBuilt)
+    message.mostBuiltSpent !== undefined &&
+      (obj.mostBuiltSpent = message.mostBuiltSpent)
+    message.mostBuiltCount !== undefined &&
+      (obj.mostBuiltCount = Math.round(message.mostBuiltCount))
+    message.mostBuiltMore !== undefined &&
+      (obj.mostBuiltMore = Math.round(message.mostBuiltMore))
+    message.bestGeneral !== undefined &&
+      (obj.bestGeneral = generalToJSON(message.bestGeneral))
+    message.bestWinrate !== undefined && (obj.bestWinrate = message.bestWinrate)
+    message.bestAverage !== undefined && (obj.bestAverage = message.bestAverage)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<Wrapped>, I>>(object: I): Wrapped {
+    const message = createBaseWrapped()
+    message.gamesPlayed = object.gamesPlayed ?? 0
+    message.hoursPlayed = object.hoursPlayed ?? 0
+    message.mostPlayed = object.mostPlayed ?? 0
+    message.mostPlayedWinrate = object.mostPlayedWinrate ?? 0
+    message.mostBuilt = object.mostBuilt ?? ""
+    message.mostBuiltSpent = object.mostBuiltSpent ?? 0
+    message.mostBuiltCount = object.mostBuiltCount ?? 0
+    message.mostBuiltMore = object.mostBuiltMore ?? 0
+    message.bestGeneral = object.bestGeneral ?? 0
+    message.bestWinrate = object.bestWinrate ?? 0
+    message.bestAverage = object.bestAverage ?? 0
+    return message
+  },
+}
+
 declare var self: any | undefined
 declare var window: any | undefined
 declare var global: any | undefined
@@ -2826,10 +3016,9 @@ export type DeepPartial<T> = T extends Builtin
 type KeysOfUnion<T> = T extends T ? keyof T : never
 export type Exact<P, I extends P> = P extends Builtin
   ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<
-        Exclude<keyof I, KeysOfUnion<P>>,
-        never
-      >
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
+      [K in Exclude<keyof I, KeysOfUnion<P>>]: never
+    }
 
 function toTimestamp(date: Date): Timestamp {
   const seconds = date.getTime() / 1_000

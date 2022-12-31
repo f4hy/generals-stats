@@ -186,3 +186,17 @@ message TeamPairs{
   map<string, PairsWinLosses> team_pairs = 1;
   map<string, PairFactionWinLosses> faction_pairs = 2;
 }
+
+message Wrapped{
+  int32 games_played = 1;
+  double hours_played = 2;
+  General most_played = 3;
+  double most_played_winrate = 4;
+  string most_built = 5;
+  double most_built_spent = 6;
+  int32 most_built_count = 7;
+  int32 most_built_more = 8;
+  General best_general = 9;
+  double best_winrate = 10;
+  double best_average = 11;
+}

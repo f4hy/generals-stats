@@ -1,28 +1,33 @@
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
+import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import _ from "lodash"
-import Paper from "@mui/material/Paper"
-import Typography from "@mui/material/Typography"
 import CircularProgress from "@mui/material/CircularProgress"
-import Stack from "@mui/material/Stack"
-import * as React from "react"
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
-import { MapStat, MapStats } from "./proto/match"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import NavigateNextIcon from "@mui/icons-material/NavigateNext"
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
 import IconButton from "@mui/material/IconButton"
+import Paper from "@mui/material/Paper"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
+import * as React from "react"
+import { Wrapped } from "./proto/match"
+import { General } from "./proto/match"
 
 const players = ["Bill", "Brendan", "Jared", "Sean"]
 const maxPage = 4
 const clamp = (num: number) => Math.min(Math.max(num, 0), maxPage)
+
+function getWrapped(player: string, callback: (m: Wrapped) => void) {
+  fetch("/api/wrapped/" + player).then((r) =>
+    r
+      .blob()
+      .then((b) => b.arrayBuffer())
+      .then((j) => {
+        const a = new Uint8Array(j)
+        const wrapped = Wrapped.decode(a)
+        console.log(JSON.stringify(wrapped))
+        callback(wrapped)
+      }).catch(e => alert(e)))
+}
+
 
 function color(n: number) {
   switch (n) {
@@ -39,7 +44,8 @@ function color(n: number) {
   }
 }
 
-function WrappedPage(props: { player: string | null; page: number }) {
+function WrappedPage(props: { player: string | null; page: number, data: Wrapped }) {
+  const w = props.data
   if (props.player === null) {
     return (
       <Typography variant="h2">Select your name for your wrapped</Typography>
@@ -52,34 +58,35 @@ function WrappedPage(props: { player: string | null; page: number }) {
       </Typography>
     )
   }
-  if (props.page == 1) {
+  if (props.page === 1) {
     return (
       <Stack spacing={8} direction="column">
         <Typography variant="h2">
-          Wow you have played ?? games of Generals.
+          {"Wow you have played " + w.gamesPlayed + " games of Generals."}
         </Typography>
-        <Typography variant="h2"> Thats ?? Hours of your life.</Typography>
+        <Typography variant="h2">{"Thats " + w.hoursPlayed.toFixed(2) + " Hours of your life."}</Typography>
       </Stack>
     )
   }
-  if (props.page == 2) {
+  if (props.page === 2) {
     return (
       <Stack spacing={8} direction="column">
-        <Typography variant="h2">Your most played General is ??.</Typography>{" "}
+        <Typography variant="h2">{"Your most played General is " + General[w.mostPlayed]}</Typography>{" "}
         <Typography variant="h2">
-          {" "}
-          You have a winrate of ??% with ??.
+          {"You have a winrate of " + (100*w.mostPlayedWinrate).toFixed(1) + "% with " + General[w.mostPlayed] + "."}
         </Typography>
       </Stack>
     )
   }
-  if (props.page == 3) {
+  if (props.page === 3) {
     return (
       <Stack spacing={8} direction="column">
-        <Typography variant="h2">Your most built unit is ??</Typography>{" "}
+        <Typography variant="h2">{"Your most built unit is " + w.mostBuilt }</Typography>
+        <Typography variant="h2">{"Building " + w.mostBuiltCount + " this year  and spending $" + w.mostBuiltSpent + " total"}</Typography>
         <Typography variant="h2">
-          {" "}
-          That is ?? more than anyone else and ?? total cost.
+
+          {w.mostBuiltMore > 0 ? "That is " + w.mostBuiltMore + " more than anyone else" : "That is " + (-w.mostBuiltMore) + " fewer than someone else"}
+	  
         </Typography>
       </Stack>
     )
@@ -88,11 +95,10 @@ function WrappedPage(props: { player: string | null; page: number }) {
     return (
       <Stack spacing={8} direction="column">
         <Typography variant="h2">
-          Your best General is ?? with a winrate of ??
-        </Typography>{" "}
+          {"Your relative best General is " + General[w.bestGeneral] + " with a winrate of " + (100*w.bestWinrate).toFixed(1) + "%"}
+        </Typography>
         <Typography variant="h2">
-          {" "}
-          Compared to the average for ?? of ??{" "}
+          {"Compared to the average for " + General[w.bestGeneral] + " of " + (100*w.bestAverage).toFixed(1) + "%"}
         </Typography>
       </Stack>
     )
@@ -100,10 +106,11 @@ function WrappedPage(props: { player: string | null; page: number }) {
   return <Typography variant="h2">Select your name for your wrapped</Typography>
 }
 
-export default function Wrapped() {
+export default function WrappedYear() {
   const [player, setPlayer] = React.useState<string | null>(null)
   const [progress, setProgress] = React.useState(0)
   const [page, setPage] = React.useState(0)
+  const [wrappedData, setWrappedData] = React.useState<Wrapped | null>(null)
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -119,7 +126,7 @@ export default function Wrapped() {
     return () => {
       clearInterval(timer)
     }
-  }, [])
+  }, [page])
 
   return (
     <Paper>
@@ -137,6 +144,7 @@ export default function Wrapped() {
                 setPlayer(p)
                 setProgress(0)
                 setPage(0)
+                getWrapped(p, setWrappedData)
               }}
             >
               {p}
@@ -154,7 +162,7 @@ export default function Wrapped() {
               justifyContent: "center",
             }}
           >
-            <WrappedPage player={player} page={page} />
+            {wrappedData ? <WrappedPage player={player} page={page} data={wrappedData} /> : null}
           </Box>
           <Stack
             spacing={2}

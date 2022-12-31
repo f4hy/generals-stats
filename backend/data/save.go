@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"sync"
 	"time"
 
 	pb "github.com/f4hy/generals-stats/backend/proto"
@@ -15,6 +16,9 @@ import (
 var (
 	matchDetails string = "match-details"
 	matchInfo    string = "parsed-matches"
+	cachedDetail map[int64]*pb.MatchDetails
+	cachedMatch  map[string]*pb.MatchInfo
+	mutex        = &sync.Mutex{}
 )
 
 func init() {
@@ -23,6 +27,8 @@ func init() {
 		matchDetails = "dev/match-details"
 		matchInfo = "dev/parsed-matches"
 	}
+	cachedDetail = make(map[int64]*pb.MatchDetails)
+	cachedMatch = make(map[string]*pb.MatchInfo)
 }
 
 func detailsPath(id int64) string {
@@ -54,10 +60,19 @@ func SaveMatch(match *pb.MatchInfo) error {
 }
 
 func getMatch(c chan *pb.MatchInfo, matchpath string) {
+	m, prs := cachedMatch[matchpath]
+	if prs {
+		log.Infof("match %s is cached", matchpath)
+		c <- m
+		return
+	}
 	log.Infof("fetching match %s", matchpath)
 	matchdata, _ := s3.GetS3Data(matchpath)
 	match := &pb.MatchInfo{}
 	proto.Unmarshal(matchdata, match)
+	mutex.Lock()
+	cachedMatch[matchpath] = match
+	mutex.Unlock()
 	c <- match
 }
 
@@ -89,6 +104,11 @@ func GetMatches() (*pb.Matches, error) {
 }
 
 func GetDetails(match_id int64) (*pb.MatchDetails, error) {
+	d, prs := cachedDetail[match_id]
+	if prs {
+		// log.Infof("details %v is cached", match_id)
+		return d, nil
+	}
 	path := detailsPath(match_id)
 	log.Infof("fetching match %s", path)
 	details := &pb.MatchDetails{}
@@ -97,5 +117,10 @@ func GetDetails(match_id int64) (*pb.MatchDetails, error) {
 		return details, err
 	}
 	err = proto.Unmarshal(costdata, details)
+	if err == nil {
+		mutex.Lock()
+		cachedDetail[match_id] = details
+		mutex.Unlock()
+	}
 	return details, err
 }

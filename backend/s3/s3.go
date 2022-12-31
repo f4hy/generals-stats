@@ -92,8 +92,8 @@ func List(path string) ([]string, error) {
 	var continuationToken *string
 	for {
 		resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{
-			Bucket:  aws.String(S3_BUCKET),
-			Prefix:  aws.String(path),
+			Bucket:            aws.String(S3_BUCKET),
+			Prefix:            aws.String(path),
 			ContinuationToken: continuationToken,
 		})
 		if err != nil {
@@ -106,6 +106,6 @@ func List(path string) ([]string, error) {
 			break
 		}
 		continuationToken = resp.NextContinuationToken
-	}	
+	}
 	return asStrings, nil
 }
