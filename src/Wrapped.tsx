@@ -25,9 +25,10 @@ function getWrapped(player: string, callback: (m: Wrapped) => void) {
         const wrapped = Wrapped.decode(a)
         console.log(JSON.stringify(wrapped))
         callback(wrapped)
-      }).catch(e => alert(e)))
+      })
+      .catch((e) => alert(e))
+  )
 }
-
 
 function color(n: number) {
   switch (n) {
@@ -44,7 +45,11 @@ function color(n: number) {
   }
 }
 
-function WrappedPage(props: { player: string | null; page: number, data: Wrapped }) {
+function WrappedPage(props: {
+  player: string | null
+  page: number
+  data: Wrapped
+}) {
   const w = props.data
   if (props.player === null) {
     return (
@@ -64,16 +69,24 @@ function WrappedPage(props: { player: string | null; page: number, data: Wrapped
         <Typography variant="h2">
           {"Wow you have played " + w.gamesPlayed + " games of Generals."}
         </Typography>
-        <Typography variant="h2">{"Thats " + w.hoursPlayed.toFixed(2) + " Hours of your life."}</Typography>
+        <Typography variant="h2">
+          {"Thats " + w.hoursPlayed.toFixed(2) + " Hours of your life."}
+        </Typography>
       </Stack>
     )
   }
   if (props.page === 2) {
     return (
       <Stack spacing={8} direction="column">
-        <Typography variant="h2">{"Your most played General is " + General[w.mostPlayed]}</Typography>{" "}
         <Typography variant="h2">
-          {"You have a winrate of " + (100*w.mostPlayedWinrate).toFixed(1) + "% with " + General[w.mostPlayed] + "."}
+          {"Your most played General is " + General[w.mostPlayed]}
+        </Typography>{" "}
+        <Typography variant="h2">
+          {"You have a winrate of " +
+            (100 * w.mostPlayedWinrate).toFixed(1) +
+            "% with " +
+            General[w.mostPlayed] +
+            "."}
         </Typography>
       </Stack>
     )
@@ -81,12 +94,20 @@ function WrappedPage(props: { player: string | null; page: number, data: Wrapped
   if (props.page === 3) {
     return (
       <Stack spacing={8} direction="column">
-        <Typography variant="h2">{"Your most built unit is " + w.mostBuilt }</Typography>
-        <Typography variant="h2">{"Building " + w.mostBuiltCount + " this year  and spending $" + w.mostBuiltSpent + " total"}</Typography>
         <Typography variant="h2">
-
-          {w.mostBuiltMore > 0 ? "That is " + w.mostBuiltMore + " more than anyone else" : "That is " + (-w.mostBuiltMore) + " fewer than someone else"}
-	  
+          {"Your most built unit is " + w.mostBuilt}
+        </Typography>
+        <Typography variant="h2">
+          {"Building " +
+            w.mostBuiltCount +
+            " this year  and spending $" +
+            w.mostBuiltSpent +
+            " total"}
+        </Typography>
+        <Typography variant="h2">
+          {w.mostBuiltMore > 0
+            ? "That is " + w.mostBuiltMore + " more than anyone else"
+            : "That is " + -w.mostBuiltMore + " fewer than someone else"}
         </Typography>
       </Stack>
     )
@@ -95,10 +116,18 @@ function WrappedPage(props: { player: string | null; page: number, data: Wrapped
     return (
       <Stack spacing={8} direction="column">
         <Typography variant="h2">
-          {"Your relative best General is " + General[w.bestGeneral] + " with a winrate of " + (100*w.bestWinrate).toFixed(1) + "%"}
+          {"Your relative best General is " +
+            General[w.bestGeneral] +
+            " with a winrate of " +
+            (100 * w.bestWinrate).toFixed(1) +
+            "%"}
         </Typography>
         <Typography variant="h2">
-          {"Compared to the average for " + General[w.bestGeneral] + " of " + (100*w.bestAverage).toFixed(1) + "%"}
+          {"Compared to the average for " +
+            General[w.bestGeneral] +
+            " of " +
+            (100 * w.bestAverage).toFixed(1) +
+            "%"}
         </Typography>
       </Stack>
     )
@@ -162,7 +191,9 @@ export default function WrappedYear() {
               justifyContent: "center",
             }}
           >
-            {wrappedData ? <WrappedPage player={player} page={page} data={wrappedData} /> : null}
+            {wrappedData ? (
+              <WrappedPage player={player} page={page} data={wrappedData} />
+            ) : null}
           </Box>
           <Stack
             spacing={2}

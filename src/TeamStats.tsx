@@ -36,10 +36,10 @@ function roundUpNearest5(num: number) {
   return Math.ceil(num / 5) * 5
 }
 
-/* interface OverTime {
- *     sum: {[team: string]: number}
- *     running: ({date: string, data: {[team: string]: number}})[]
- * } */
+function roundTo(num: number, places: number = 15) {
+  return Math.round(num * places * 10) / (10 * places)
+}
+
 interface OverTime {
   date: string
   team1: 0
@@ -72,11 +72,39 @@ function RecordOverTime(props: { stats: TeamStats }) {
     if (next.team === 3) {
       toAdd.team3 += next.wins
     }
+
     return [...acc, toAdd]
   }
   const data = props.stats.teamStats.reduce(reducer, initial)
+  const rates = data.map((x) => ({
+    date: x.date,
+    team1: 100 * x.team1 / (x.team1 + x.team3),
+    team3: 100 * x.team3 / (x.team1 + x.team3),
+  }))
   return (
     <Box sx={{ flexGrow: 1 }}>
+      <Typography>Win Rate</Typography>
+      <ResponsiveContainer width="95%" height={500}>
+        <LineChart
+          height={300}
+          data={rates}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip  formatter={(v: number) => (v.toFixed(2)+"%")} />
+          <Legend />
+          <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
+          <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
+        </LineChart>
+      </ResponsiveContainer>
+      <Typography>Wins</Typography>
       <ResponsiveContainer width="95%" height={500}>
         <LineChart
           height={300}
@@ -91,7 +119,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
-          <Tooltip />
+          <Tooltip/>
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
@@ -109,17 +137,19 @@ function DisplayTeamStat(props: {
   /* const data = [props.stats.reduce((acc, s) => ({teamname: `${s.team}`, [s.team]: s.wins, ...acc}), {})] */
   const data = props.stats.sort((x1, x2) => x1.team - x2.team) //.reduce((o, x)=> ({...o, ["team"+ x.team]: x.wins}), {"a": 1})];
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <h3>{props.title}</h3>
-      <ResponsiveContainer width="95%" height={300}>
-        <BarChart data={data} layout="vertical">
-          <Bar dataKey="wins" fill="#8884d8" />
-          <YAxis dataKey="team" label="team" type="category" />
-          <XAxis label="wins" type="number" domain={[0, props.max]} />
-          <Tooltip cursor={false} />
-        </BarChart>
-      </ResponsiveContainer>
-    </Box>
+    <>
+      <Box sx={{ flexGrow: 1 }}>
+        <h3>{props.title}</h3>
+        <ResponsiveContainer width="95%" height={300}>
+          <BarChart data={data} layout="vertical">
+            <Bar dataKey="wins" fill="#8884d8" />
+            <YAxis dataKey="team" label="team" type="category" />
+            <XAxis label="wins" type="number" domain={[0, props.max]} />
+            <Tooltip cursor={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
+    </>
   )
 }
 
@@ -139,9 +169,22 @@ export default function DisplayTeamStats() {
     )
   )
   const ordered = _.sortBy(grouped, (s) => -s[0])
+  const matches = teamStats.teamStats.reduce((acc, x) => acc + x.wins, 0)
+  const teamSum: { [team: string]: number } = teamStats.teamStats.reduce(
+    (acc: { [team: string]: number }, x) => ({
+      ...acc,
+      [x.team]: (acc[x.team] ?? 0) + x.wins,
+    }),
+    {}
+  )
   return (
     <Paper>
-      <Typography variant="h2">Team Records by session.</Typography>
+      <Typography variant="h2">{matches} games played! </Typography>
+      {Object.keys(teamSum).map((x: any) => (
+        <Typography variant="h2">
+          Team {x} has {teamSum[x]} wins. {(100*teamSum[x] / matches).toFixed(2)}%{" "}
+        </Typography>
+      ))}
       <RecordOverTime stats={teamStats} />
       {ordered.map(([date, m]) => (
         <>
