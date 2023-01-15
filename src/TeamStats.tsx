@@ -45,10 +45,13 @@ interface OverTime {
   team1: 0
   team3: 0
 }
+function pad(n: number): string {
+  return n.toString().padStart(2, "0")
+}
 
 function datemsgtoString(datemsg: DateMessage | undefined) {
   if (datemsg) {
-    return `${datemsg.Year}-${datemsg.Month}-${datemsg.Day}`
+    return `${datemsg.Year}-${pad(datemsg.Month)}-${pad(datemsg.Day)}`
   }
   return "unknown"
 }
@@ -75,11 +78,13 @@ function RecordOverTime(props: { stats: TeamStats }) {
 
     return [...acc, toAdd]
   }
-  const data = props.stats.teamStats.reduce(reducer, initial)
+  const data = _.orderBy(props.stats.teamStats, (ts) =>
+    datemsgtoString(ts.date)
+  ).reduce(reducer, initial)
   const rates = data.map((x) => ({
     date: x.date,
-    team1: 100 * x.team1 / (x.team1 + x.team3),
-    team3: 100 * x.team3 / (x.team1 + x.team3),
+    team1: (100 * x.team1) / (x.team1 + x.team3),
+    team3: (100 * x.team3) / (x.team1 + x.team3),
   }))
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -98,7 +103,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis domain={[0, 100]} />
-          <Tooltip  formatter={(v: number) => (v.toFixed(2)+"%")} />
+          <Tooltip formatter={(v: number) => v.toFixed(2) + "%"} />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
@@ -119,7 +124,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
-          <Tooltip/>
+          <Tooltip />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
@@ -162,13 +167,9 @@ export default function DisplayTeamStats() {
   }, [])
   const max = teamStats.teamStats.reduce((max, s) => Math.max(max, s.wins), 0)
   const grouped = Object.entries(
-    _.groupBy(
-      teamStats.teamStats,
-      (ts: TeamStat) =>
-        `${ts.date?.Year ?? 0}-${ts.date?.Month ?? 0}-${ts.date?.Day ?? 0}`
-    )
+    _.groupBy(teamStats.teamStats, (ts: TeamStat) => datemsgtoString(ts.date))
   )
-  const ordered = _.sortBy(grouped, (s) => -s[0])
+  const ordered = _.orderBy(grouped, (s) => s[0], ["desc"])
   const matches = teamStats.teamStats.reduce((acc, x) => acc + x.wins, 0)
   const teamSum: { [team: string]: number } = teamStats.teamStats.reduce(
     (acc: { [team: string]: number }, x) => ({
@@ -182,7 +183,8 @@ export default function DisplayTeamStats() {
       <Typography variant="h2">{matches} games played! </Typography>
       {Object.keys(teamSum).map((x: any) => (
         <Typography variant="h2">
-          Team {x} has {teamSum[x]} wins. {(100*teamSum[x] / matches).toFixed(2)}%{" "}
+          Team {x} has {teamSum[x]} wins.{" "}
+          {((100 * teamSum[x]) / matches).toFixed(2)}%{" "}
         </Typography>
       ))}
       <RecordOverTime stats={teamStats} />
