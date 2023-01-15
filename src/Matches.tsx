@@ -88,7 +88,7 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
   const showTeam = props.match.winningTeam !== 0 ? "block" : "none"
   const showTeamSpacing = props.match.winningTeam !== 0 ? 4 : 6
   return (
-    <Paper elevation={3} sx={paperprops} variant="outlined">
+    <Paper sx={paperprops} variant="outlined">
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
         {props.match.notes.length ? (
@@ -119,6 +119,7 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
             {winners.map((p) => (
               <Grid item xs={6} md={showTeamSpacing}>
                 <MatchCard
+		    key={p.name + "-" + p.general + "-generalcard"}
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
                       50,
@@ -200,9 +201,7 @@ export default function DisplayMatches() {
   return (
     <>
       {matchList.matches.map((m, idx) => (
-        <>
           <DisplayMatchInfo match={m} key={m.id} idx={idx} />
-        </>
       ))}
       {getAll ? null : <Button onClick={() => showAll()}>Show All</Button>}
     </>

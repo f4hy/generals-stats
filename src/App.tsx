@@ -13,11 +13,9 @@ theme = responsiveFontSizes(theme, { factor: 4 })
 function App() {
   return (
     <div className="App">
-      <body>
         <ThemeProvider theme={theme}>
           <Menu />
         </ThemeProvider>
-      </body>
     </div>
   )
 }

@@ -36,10 +36,6 @@ function roundUpNearest5(num: number) {
   return Math.ceil(num / 5) * 5
 }
 
-function roundTo(num: number, places: number = 15) {
-  return Math.round(num * places * 10) / (10 * places)
-}
-
 interface OverTime {
   date: string
   team1: 0
@@ -142,9 +138,8 @@ function DisplayTeamStat(props: {
   /* const data = [props.stats.reduce((acc, s) => ({teamname: `${s.team}`, [s.team]: s.wins, ...acc}), {})] */
   const data = props.stats.sort((x1, x2) => x1.team - x2.team) //.reduce((o, x)=> ({...o, ["team"+ x.team]: x.wins}), {"a": 1})];
   return (
-    <>
       <Box sx={{ flexGrow: 1 }}>
-        <h3>{props.title}</h3>
+      <Typography variant="h4">{props.title}</Typography>
         <ResponsiveContainer width="95%" height={300}>
           <BarChart data={data} layout="vertical">
             <Bar dataKey="wins" fill="#8884d8" />
@@ -154,7 +149,6 @@ function DisplayTeamStat(props: {
           </BarChart>
         </ResponsiveContainer>
       </Box>
-    </>
   )
 }
 
