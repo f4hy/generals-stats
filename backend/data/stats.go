@@ -24,6 +24,12 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
         player_stat_map := make(map[string]map[pb.General]*pb.WinLoss)
         player_faction_stat_map := make(map[string]map[pb.Faction]*pb.WinLoss)
 
+	over_time := make(map[string]map[pb.General]([]*pb.PlayerRateOverTime))
+
+	sort.Slice(matches.Matches, func(i,j int) bool {
+		return matches.Matches[i].Timestamp.Seconds < matches.Matches[j].Timestamp.Seconds
+	})
+	
         for _, m := range matches.Matches {
                 for _, p := range m.Players {
                         faction := getFaction(p.General)
@@ -51,6 +57,26 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
                                 player_stat_map[p.Name][p.General].Losses += 1
                                 player_faction_stat_map[p.Name][faction].Losses += 1
                         }
+
+			p_ot := over_time[p.Name]
+			ot := p_ot[p.General]
+			date := m.Timestamp.AsTime()
+			pbdate := pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
+			prev := ot[len(ot)-1]
+			next := pb.PlayerRateOverTime{
+					Date: &pbdate,
+				Wl: &pb.GeneralWL{
+					General: p.General,
+					WinLoss: prev.Wl.WinLoss,
+				},
+			}
+                        if m.WinningTeam == p.Team {
+				next.Wl.WinLoss.Wins += 1
+			} else{
+				next.Wl.WinLoss.Losses += 1
+			}
+			ot = append(ot, &next)
+			
                 }
         }
 
@@ -74,10 +100,19 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
                                 })
                         }
                 }
+		pot := over_time[player]
+		over_time := []*pb.PlayerRateOverTime{}
+		for _, ot := range pot {
+			for _, x := range ot {
+				over_time = append(over_time, x)
+			}
+		}
                 playerstat := pb.PlayerStat{
                         PlayerName:   player,
                         Stats:        generalWL,
                         FactionStats: factionWL,
+			OverTime: over_time,
+			
                 }
                 playerstats.PlayerStats = append(playerstats.PlayerStats, &playerstat)
         }

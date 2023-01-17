@@ -65,6 +65,11 @@ message GeneralWL {
   WinLoss win_loss = 2;
 }
 
+message PlayerRateOverTime {
+  Date date = 1;
+  GeneralWL wl = 2;  
+}
+
 message PlayerStat {
   string player_name = 1;
   repeated GeneralWL stats =2;
@@ -73,7 +78,9 @@ message PlayerStat {
     WinLoss win_loss = 2;
   }
   repeated FactionWL faction_stats =3;
+  repeated PlayerRateOverTime over_time = 4;
 }
+
 
 message PlayerStats {
   repeated PlayerStat player_stats = 1;

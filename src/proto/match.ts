@@ -220,10 +220,16 @@ export interface GeneralWL {
   winLoss: WinLoss | undefined
 }
 
+export interface PlayerRateOverTime {
+  date: DateMessage | undefined
+  wl: GeneralWL | undefined
+}
+
 export interface PlayerStat {
   playerName: string
   stats: GeneralWL[]
   factionStats: PlayerStat_FactionWL[]
+  overTime: PlayerRateOverTime[]
 }
 
 export interface PlayerStat_FactionWL {
@@ -795,8 +801,79 @@ export const GeneralWL = {
   },
 }
 
+function createBasePlayerRateOverTime(): PlayerRateOverTime {
+  return { date: undefined, wl: undefined }
+}
+
+export const PlayerRateOverTime = {
+  encode(
+    message: PlayerRateOverTime,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.date !== undefined) {
+      DateMessage.encode(message.date, writer.uint32(10).fork()).ldelim()
+    }
+    if (message.wl !== undefined) {
+      GeneralWL.encode(message.wl, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): PlayerRateOverTime {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBasePlayerRateOverTime()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.date = DateMessage.decode(reader, reader.uint32())
+          break
+        case 2:
+          message.wl = GeneralWL.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): PlayerRateOverTime {
+    return {
+      date: isSet(object.date) ? DateMessage.fromJSON(object.date) : undefined,
+      wl: isSet(object.wl) ? GeneralWL.fromJSON(object.wl) : undefined,
+    }
+  },
+
+  toJSON(message: PlayerRateOverTime): unknown {
+    const obj: any = {}
+    message.date !== undefined &&
+      (obj.date = message.date ? DateMessage.toJSON(message.date) : undefined)
+    message.wl !== undefined &&
+      (obj.wl = message.wl ? GeneralWL.toJSON(message.wl) : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<PlayerRateOverTime>, I>>(
+    object: I
+  ): PlayerRateOverTime {
+    const message = createBasePlayerRateOverTime()
+    message.date =
+      object.date !== undefined && object.date !== null
+        ? DateMessage.fromPartial(object.date)
+        : undefined
+    message.wl =
+      object.wl !== undefined && object.wl !== null
+        ? GeneralWL.fromPartial(object.wl)
+        : undefined
+    return message
+  },
+}
+
 function createBasePlayerStat(): PlayerStat {
-  return { playerName: "", stats: [], factionStats: [] }
+  return { playerName: "", stats: [], factionStats: [], overTime: [] }
 }
 
 export const PlayerStat = {
@@ -812,6 +889,9 @@ export const PlayerStat = {
     }
     for (const v of message.factionStats) {
       PlayerStat_FactionWL.encode(v!, writer.uint32(26).fork()).ldelim()
+    }
+    for (const v of message.overTime) {
+      PlayerRateOverTime.encode(v!, writer.uint32(34).fork()).ldelim()
     }
     return writer
   },
@@ -834,6 +914,11 @@ export const PlayerStat = {
             PlayerStat_FactionWL.decode(reader, reader.uint32())
           )
           break
+        case 4:
+          message.overTime.push(
+            PlayerRateOverTime.decode(reader, reader.uint32())
+          )
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -850,6 +935,9 @@ export const PlayerStat = {
         : [],
       factionStats: Array.isArray(object?.factionStats)
         ? object.factionStats.map((e: any) => PlayerStat_FactionWL.fromJSON(e))
+        : [],
+      overTime: Array.isArray(object?.overTime)
+        ? object.overTime.map((e: any) => PlayerRateOverTime.fromJSON(e))
         : [],
     }
   },
@@ -871,6 +959,13 @@ export const PlayerStat = {
     } else {
       obj.factionStats = []
     }
+    if (message.overTime) {
+      obj.overTime = message.overTime.map((e) =>
+        e ? PlayerRateOverTime.toJSON(e) : undefined
+      )
+    } else {
+      obj.overTime = []
+    }
     return obj
   },
 
@@ -882,6 +977,8 @@ export const PlayerStat = {
     message.stats = object.stats?.map((e) => GeneralWL.fromPartial(e)) || []
     message.factionStats =
       object.factionStats?.map((e) => PlayerStat_FactionWL.fromPartial(e)) || []
+    message.overTime =
+      object.overTime?.map((e) => PlayerRateOverTime.fromPartial(e)) || []
     return message
   },
 }
