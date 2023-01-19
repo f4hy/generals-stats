@@ -119,7 +119,7 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
             {winners.map((p) => (
               <Grid item xs={6} md={showTeamSpacing}>
                 <MatchCard
-		    key={p.name + "-" + p.general + "-generalcard"}
+                  key={p.name + "-" + p.general + "-generalcard"}
                   title={
                     <Typography variant="h5">{`${p.name.padEnd(
                       50,
@@ -201,7 +201,7 @@ export default function DisplayMatches() {
   return (
     <>
       {matchList.matches.map((m, idx) => (
-          <DisplayMatchInfo match={m} key={m.id} idx={idx} />
+        <DisplayMatchInfo match={m} key={m.id} idx={idx} />
       ))}
       {getAll ? null : <Button onClick={() => showAll()}>Show All</Button>}
     </>

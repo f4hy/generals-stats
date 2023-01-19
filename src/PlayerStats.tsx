@@ -1,4 +1,3 @@
-import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -7,12 +6,16 @@ import ListItem from "@mui/material/ListItem"
 import ListItemAvatar from "@mui/material/ListItemAvatar"
 import ListItemText from "@mui/material/ListItemText"
 import Paper from "@mui/material/Paper"
+import Typography from "@mui/material/Typography"
+import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
   BarChart,
-  ResponsiveContainer,
   CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -21,9 +24,12 @@ import DisplayGeneral from "./Generals"
 import {
   Faction,
   General,
+  GeneralWL,
+  PlayerRateOverTime,
   PlayerStat,
   PlayerStats,
-  GeneralWL,
+  WinLoss,
+  DateMessage,
 } from "./proto/match"
 
 function getPlayerStats(callback: (m: PlayerStats) => void) {
@@ -56,6 +62,58 @@ function PlayerListItem(props: { playerStatWL: GeneralWL }) {
         })`}
       />
     </ListItem>
+  )
+}
+function pad(n: number): string {
+  return n.toString().padStart(2, "0")
+}
+
+function datemsgtoString(datemsg: DateMessage | undefined) {
+  if (datemsg) {
+    return `${datemsg.Year}-${pad(datemsg.Month)}-${pad(datemsg.Day)}`
+  }
+  return "unknown"
+}
+
+function rate(wl: WinLoss | undefined): number {
+  if (wl) {
+    return (100 * wl.wins) / (wl.losses + wl.wins)
+  }
+  return 0
+}
+
+function GeneralStatOverTime(props: { ot: PlayerRateOverTime[] }) {
+  const grouped = Object.entries(_.groupBy(props.ot, (x) => x.wl?.general))
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container rowSpacing={3}>
+        {grouped.map(([g, data]) => (
+          <Grid item xs={3}>
+            <DisplayGeneral general={+g} />
+            <ResponsiveContainer width="99%" height={150}>
+              <LineChart
+                data={data.map((d) => ({
+                  date: datemsgtoString(d.date),
+                  rate: rate(d.wl?.winLoss),
+                }))}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip formatter={(v: number) => v.toFixed(2) + "%"} />
+                <Line dataKey="rate" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   )
 }
 
@@ -127,6 +185,7 @@ function DisplayPlayerStat(props: { stat: PlayerStat; max: number }) {
           </ResponsiveContainer>
         </Grid>
       </Grid>
+      <GeneralStatOverTime ot={props.stat.overTime} />
     </Box>
   )
 }

@@ -3,17 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-	"github.com/golang/protobuf/jsonpb"
 	data "github.com/f4hy/generals-stats/backend/data"
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
+	"github.com/golang/protobuf/jsonpb"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 )
 
 var last_fetched time.Time
@@ -24,13 +24,13 @@ var marshaler jsonpb.Marshaler
 func init() {
 	matches = &pb.Matches{}
 	marshaler = jsonpb.Marshaler{
-        EnumsAsInts:  false,
-        EmitDefaults: true,
-        Indent:       "  ",
-        OrigName:     true,
+		EnumsAsInts:  false,
+		EmitDefaults: true,
+		Indent:       "  ",
+		OrigName:     true,
 	}
 	flag.Usage = func() { flag.PrintDefaults() }
-	
+
 	flag.Set("minloglevel", "3")
 	flag.Set("logtostderr", "true")
 	isdev := os.Getenv("DEV") != ""
