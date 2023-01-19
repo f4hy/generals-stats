@@ -88,7 +88,7 @@ function GeneralStatOverTime(props: { ot: PlayerRateOverTime[] }) {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container rowSpacing={3}>
         {grouped.map(([g, data]) => (
-          <Grid item xs={3}>
+          <Grid item xs={12} lg={3}>
             <DisplayGeneral general={+g} />
             <ResponsiveContainer width="99%" height={150}>
               <LineChart
