@@ -45,10 +45,9 @@ func GetReplay(replayname string) ([]byte, error) {
 }
 
 func GetReplayUrl(replayname string) (string, error) {
-	// log.Info("getting replay: ", replayname)	
+	// log.Info("getting replay: ", replayname)
 	return s3.GetPresignedUrl(replayPath + "/" + replayname)
 }
-
 
 func ListJsons() ([]string, error) {
 	log.Info("getting jsons")

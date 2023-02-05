@@ -15,7 +15,7 @@ import DisplayGeneral from "./Generals"
 import Map from "./Map"
 import { Matches, MatchInfo } from "./proto/match"
 import ShowMatchDetails from "./ShowMatchDetails"
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download"
 
 function getMatches(count: number, callback: (m: Matches) => void) {
   fetch("/api/matches/" + count).then((r) =>
@@ -52,18 +52,17 @@ function MatchCard(props: {
 }
 
 function downloadURI(uri: string, name: string) {
-  var link = document.createElement("a");
-  link.download = name;
-  link.href = uri;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  var link = document.createElement("a")
+  link.download = name
+  link.href = uri
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 function downloadReplay(filename: string) {
   fetch("/api/getRepaly/" + filename).then((r) =>
-    r.text().then((url) => downloadURI(url, filename)
-    )
+    r.text().then((url) => downloadURI(url, filename))
   )
 }
 
@@ -78,9 +77,9 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
     props.match.id +
     " Date: " +
     date +
-    " on Map: " +
-    props.match.map +
-    "  winner:" +
+    " on Map: '" +
+    props.match.map.split("/").slice(-1) +
+    "'  Winner: Team" +
     props.match.winningTeam +
     " Duration " +
     props.match.durationMinutes.toFixed(2) +
@@ -193,7 +192,13 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
               </Button>
             </Grid>
             <Grid item xs={6} md={6}>
-              <Button variant="contained" onClick={() => downloadReplay(props.match.filename.replace(".json", ".rep"))} endIcon={<DownloadIcon />}>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  downloadReplay(props.match.filename.replace(".json", ".rep"))
+                }
+                endIcon={<DownloadIcon />}
+              >
                 Download Replay
               </Button>
             </Grid>
