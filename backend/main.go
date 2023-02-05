@@ -291,6 +291,16 @@ func main() {
 		api.GET("/health", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 		})
+		api.GET("/getReplay/:filename", func(c *gin.Context) {
+			filename := c.Param("filename")
+			url, err := data.GetReplayUrl(filename)
+			if err != nil {
+				log.Error(err)
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+			c.String(http.StatusOK, url)
+		})
 	}
 	fmt.Printf("Running in port %s", port)
 	// Start and run the server

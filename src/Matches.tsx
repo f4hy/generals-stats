@@ -1,6 +1,7 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import ThumbDownIcon from "@mui/icons-material/ThumbDown"
 import Button from "@mui/material/Button"
+import IconButton from "@mui/material/IconButton"
 import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
 import Grid from "@mui/material/Grid"
@@ -14,6 +15,7 @@ import DisplayGeneral from "./Generals"
 import Map from "./Map"
 import { Matches, MatchInfo } from "./proto/match"
 import ShowMatchDetails from "./ShowMatchDetails"
+import DownloadIcon from '@mui/icons-material/Download';
 
 function getMatches(count: number, callback: (m: Matches) => void) {
   fetch("/api/matches/" + count).then((r) =>
@@ -46,6 +48,22 @@ function MatchCard(props: {
         component="div"
       />
     </Card>
+  )
+}
+
+function downloadURI(uri: string, name: string) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function downloadReplay(filename: string) {
+  fetch("/api/getRepaly/" + filename).then((r) =>
+    r.text().then((url) => downloadURI(url, filename)
+    )
   )
 }
 
@@ -91,6 +109,7 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
     <Paper sx={paperprops} variant="outlined">
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
+        <ListItemText key="match-text" primary={props.match.filename.replace(".json", ".rep")} />
         {props.match.notes.length ? (
           <Typography color="warning.main" style={{ fontWeight: "bold" }}>
             {props.match.notes}
@@ -169,9 +188,14 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
                 />
               </Grid>
             ))}
-            <Grid item xs={12} md={12}>
+            <Grid item xs={6} md={6}>
               <Button variant="contained" onClick={() => setDetails(!details)}>
                 Match Details
+              </Button>
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <Button variant="contained" onClick={() => downloadReplay(props.match.filename.replace(".json", ".rep"))} endIcon={<DownloadIcon />}>
+                Download Replay
               </Button>
             </Grid>
           </Grid>
