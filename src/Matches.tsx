@@ -109,7 +109,6 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
     <Paper sx={paperprops} variant="outlined">
       <ListItem key="match">
         <ListItemText key="match-text" primary={header} />
-        <ListItemText key="match-text" primary={props.match.filename.replace(".json", ".rep")} />
         {props.match.notes.length ? (
           <Typography color="warning.main" style={{ fontWeight: "bold" }}>
             {props.match.notes}
