@@ -314,8 +314,21 @@ export interface UpgradeEvent {
   atMinute: number
 }
 
+export interface Spent {
+  playerName: string
+  accCost: number
+  atMinute: number
+}
+
 export interface Upgrades {
   upgrades: UpgradeEvent[]
+}
+
+export interface SpentOverTime {
+  buildings: Spent[]
+  units: Spent[]
+  upgrades: Spent[]
+  total: Spent[]
 }
 
 export interface MatchDetails {
@@ -323,6 +336,7 @@ export interface MatchDetails {
   costs: Costs[]
   apms: APM[]
   upgradeEvents: { [key: string]: Upgrades }
+  spent: SpentOverTime | undefined
 }
 
 export interface MatchDetails_UpgradeEventsEntry {
@@ -2091,6 +2105,73 @@ export const UpgradeEvent = {
   },
 }
 
+function createBaseSpent(): Spent {
+  return { playerName: "", accCost: 0, atMinute: 0 }
+}
+
+export const Spent = {
+  encode(message: Spent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.playerName !== "") {
+      writer.uint32(10).string(message.playerName)
+    }
+    if (message.accCost !== 0) {
+      writer.uint32(32).int64(message.accCost)
+    }
+    if (message.atMinute !== 0) {
+      writer.uint32(41).double(message.atMinute)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Spent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseSpent()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.playerName = reader.string()
+          break
+        case 4:
+          message.accCost = longToNumber(reader.int64() as Long)
+          break
+        case 5:
+          message.atMinute = reader.double()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): Spent {
+    return {
+      playerName: isSet(object.playerName) ? String(object.playerName) : "",
+      accCost: isSet(object.accCost) ? Number(object.accCost) : 0,
+      atMinute: isSet(object.atMinute) ? Number(object.atMinute) : 0,
+    }
+  },
+
+  toJSON(message: Spent): unknown {
+    const obj: any = {}
+    message.playerName !== undefined && (obj.playerName = message.playerName)
+    message.accCost !== undefined && (obj.accCost = Math.round(message.accCost))
+    message.atMinute !== undefined && (obj.atMinute = message.atMinute)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<Spent>, I>>(object: I): Spent {
+    const message = createBaseSpent()
+    message.playerName = object.playerName ?? ""
+    message.accCost = object.accCost ?? 0
+    message.atMinute = object.atMinute ?? 0
+    return message
+  },
+}
+
 function createBaseUpgrades(): Upgrades {
   return { upgrades: [] }
 }
@@ -2152,8 +2233,123 @@ export const Upgrades = {
   },
 }
 
+function createBaseSpentOverTime(): SpentOverTime {
+  return { buildings: [], units: [], upgrades: [], total: [] }
+}
+
+export const SpentOverTime = {
+  encode(
+    message: SpentOverTime,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.buildings) {
+      Spent.encode(v!, writer.uint32(10).fork()).ldelim()
+    }
+    for (const v of message.units) {
+      Spent.encode(v!, writer.uint32(18).fork()).ldelim()
+    }
+    for (const v of message.upgrades) {
+      Spent.encode(v!, writer.uint32(26).fork()).ldelim()
+    }
+    for (const v of message.total) {
+      Spent.encode(v!, writer.uint32(74).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SpentOverTime {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseSpentOverTime()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.buildings.push(Spent.decode(reader, reader.uint32()))
+          break
+        case 2:
+          message.units.push(Spent.decode(reader, reader.uint32()))
+          break
+        case 3:
+          message.upgrades.push(Spent.decode(reader, reader.uint32()))
+          break
+        case 9:
+          message.total.push(Spent.decode(reader, reader.uint32()))
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): SpentOverTime {
+    return {
+      buildings: Array.isArray(object?.buildings)
+        ? object.buildings.map((e: any) => Spent.fromJSON(e))
+        : [],
+      units: Array.isArray(object?.units)
+        ? object.units.map((e: any) => Spent.fromJSON(e))
+        : [],
+      upgrades: Array.isArray(object?.upgrades)
+        ? object.upgrades.map((e: any) => Spent.fromJSON(e))
+        : [],
+      total: Array.isArray(object?.total)
+        ? object.total.map((e: any) => Spent.fromJSON(e))
+        : [],
+    }
+  },
+
+  toJSON(message: SpentOverTime): unknown {
+    const obj: any = {}
+    if (message.buildings) {
+      obj.buildings = message.buildings.map((e) =>
+        e ? Spent.toJSON(e) : undefined
+      )
+    } else {
+      obj.buildings = []
+    }
+    if (message.units) {
+      obj.units = message.units.map((e) => (e ? Spent.toJSON(e) : undefined))
+    } else {
+      obj.units = []
+    }
+    if (message.upgrades) {
+      obj.upgrades = message.upgrades.map((e) =>
+        e ? Spent.toJSON(e) : undefined
+      )
+    } else {
+      obj.upgrades = []
+    }
+    if (message.total) {
+      obj.total = message.total.map((e) => (e ? Spent.toJSON(e) : undefined))
+    } else {
+      obj.total = []
+    }
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<SpentOverTime>, I>>(
+    object: I
+  ): SpentOverTime {
+    const message = createBaseSpentOverTime()
+    message.buildings = object.buildings?.map((e) => Spent.fromPartial(e)) || []
+    message.units = object.units?.map((e) => Spent.fromPartial(e)) || []
+    message.upgrades = object.upgrades?.map((e) => Spent.fromPartial(e)) || []
+    message.total = object.total?.map((e) => Spent.fromPartial(e)) || []
+    return message
+  },
+}
+
 function createBaseMatchDetails(): MatchDetails {
-  return { matchId: 0, costs: [], apms: [], upgradeEvents: {} }
+  return {
+    matchId: 0,
+    costs: [],
+    apms: [],
+    upgradeEvents: {},
+    spent: undefined,
+  }
 }
 
 export const MatchDetails = {
@@ -2176,6 +2372,9 @@ export const MatchDetails = {
         writer.uint32(34).fork()
       ).ldelim()
     })
+    if (message.spent !== undefined) {
+      SpentOverTime.encode(message.spent, writer.uint32(42).fork()).ldelim()
+    }
     return writer
   },
 
@@ -2204,6 +2403,9 @@ export const MatchDetails = {
             message.upgradeEvents[entry4.key] = entry4.value
           }
           break
+        case 5:
+          message.spent = SpentOverTime.decode(reader, reader.uint32())
+          break
         default:
           reader.skipType(tag & 7)
           break
@@ -2229,6 +2431,9 @@ export const MatchDetails = {
             return acc
           }, {})
         : {},
+      spent: isSet(object.spent)
+        ? SpentOverTime.fromJSON(object.spent)
+        : undefined,
     }
   },
 
@@ -2251,6 +2456,10 @@ export const MatchDetails = {
         obj.upgradeEvents[k] = Upgrades.toJSON(v)
       })
     }
+    message.spent !== undefined &&
+      (obj.spent = message.spent
+        ? SpentOverTime.toJSON(message.spent)
+        : undefined)
     return obj
   },
 
@@ -2269,6 +2478,10 @@ export const MatchDetails = {
       }
       return acc
     }, {})
+    message.spent =
+      object.spent !== undefined && object.spent !== null
+        ? SpentOverTime.fromPartial(object.spent)
+        : undefined
     return message
   },
 }

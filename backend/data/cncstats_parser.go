@@ -175,6 +175,55 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float
 	return upgrades
 }
 
+func getSpent(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) *pb.SpentOverTime {
+	minPerTimestep := minutes / float64(timesteps)
+	spent := pb.SpentOverTime{}
+	running_buildings := make(map[string]int64)
+	running_units := make(map[string]int64)
+	running_upgrades := make(map[string]int64)
+	running_total := make(map[string]int64)
+	for _, b := range body {
+		playername, _ := player_parse(b.PlayerName)
+		running_total[playername] += int64(b.Details.Cost)
+		tot := pb.Spent{
+			PlayerName: playername,
+			AccCost:    running_total[playername],
+			AtMinute:   float64(b.TimeCode) * minPerTimestep,
+		}
+		spent.Total = append(spent.Total, &tot)
+		if b.OrderName == "BuildUpgrade" {
+			running_upgrades[playername] += int64(b.Details.Cost)
+			up := pb.Spent{
+				PlayerName: playername,
+				AccCost:    running_upgrades[playername],
+				AtMinute:   float64(b.TimeCode) * minPerTimestep,
+			}
+			spent.Upgrades = append(spent.Upgrades, &up)
+
+		}
+		if b.OrderName == "CreateUnit" {
+			running_units[playername] += int64(b.Details.Cost)
+			unit := pb.Spent{
+				PlayerName: playername,
+				AccCost:    running_units[playername],
+				AtMinute:   float64(b.TimeCode) * minPerTimestep,
+			}
+			spent.Units = append(spent.Units, &unit)
+
+		}
+		if b.OrderName == "BuildObject" {
+			running_buildings[playername] += int64(b.Details.Cost)
+			building := pb.Spent{
+				PlayerName: playername,
+				AccCost:    running_buildings[playername],
+				AtMinute:   float64(b.TimeCode) * minPerTimestep,
+			}
+			spent.Buildings = append(spent.Buildings, &building)
+		}
+	}
+	return &spent
+}
+
 type match_and_details struct {
 	info   *pb.MatchInfo
 	detail *pb.MatchDetails
@@ -199,10 +248,12 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
 	apm, upgrades, id, err := processBody(replay.Body, minutes, numTimeStamps)
+	spent := getSpent(replay.Body, minutes, numTimeStamps)
 	// match_id := int64(timestamp.Seconds)
 	// log.Print("Old id was", match_id, "new id", id)
 	details := pb.MatchDetails{
 		MatchId: id,
+		Spent:   spent,
 	}
 	match := pb.MatchInfo{
 		Id:        id,

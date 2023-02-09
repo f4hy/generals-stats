@@ -16,3 +16,25 @@ export function TeamColor(name: string) {
       return "#444444"
   }
 }
+
+export function PlayerColor(name: string) {
+  const loname = name.toLocaleLowerCase()
+  switch (loname) {
+    case "1":
+    case "modus":
+    case "brendan":
+      return "#ff9aeb"
+    case "jbb":
+    case "jared":
+      return "#3ed12e"
+    case "3":
+    case "onethree111":
+    case "bill":
+      return "#9528bd"
+    case "ye_ole_seans":
+    case "sean":
+      return "#e5de0e"
+    default:
+      return "#444444"
+  }
+}
