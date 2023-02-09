@@ -7,9 +7,9 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
-  LineChart,
   Line,
+  LineChart,
+  ResponsiveContainer,
   Scatter,
   ScatterChart,
   Tooltip,
@@ -17,15 +17,9 @@ import {
   YAxis,
   ZAxis,
 } from "recharts"
-import { TeamColor, PlayerColor } from "./Colors"
+import { PlayerColor } from "./Colors"
 import CostBreakdown from "./CostBreakdown"
-import {
-  APM,
-  Spent,
-  MatchDetails,
-  SpentOverTime,
-  Upgrades,
-} from "./proto/match"
+import { APM, MatchDetails, Spent, Upgrades } from "./proto/match"
 
 function getDetails(id: number, callback: (m: MatchDetails) => void) {
   fetch("/api/details/" + id).then((r) =>
