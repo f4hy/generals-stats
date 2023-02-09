@@ -116,7 +116,10 @@ function SpendingChart(props: {
   }
 }
 
-function EventChart(props: { upgrades: { [name: string]: Upgrades } }) {
+function EventChart(props: {
+  upgrades: { [name: string]: Upgrades }
+  max: number
+}) {
   const names = Object.keys(props.upgrades).sort((x1, x2) =>
     x1.localeCompare(x2)
   )
@@ -135,7 +138,7 @@ function EventChart(props: { upgrades: { [name: string]: Upgrades } }) {
               {/* <LabelList dataKey="upgradeName" position="left" formatter={labelformater} offset={100} /> */}
             </Scatter>
           ))}
-          <XAxis type="number" dataKey="atMinute" />
+          <XAxis type="number" dataKey="atMinute" domain={[0, props.max]} />
           <YAxis
             type="number"
             dataKey="cost"
@@ -219,7 +222,7 @@ export default function ShowMatchDetails(props: { id: number }) {
         title="upgrades"
         max={maxMinute}
       />
-      <EventChart upgrades={details.upgradeEvents} />
+      <EventChart upgrades={details.upgradeEvents} max={maxMinute} />
       <ApmChart apms={details.apms} />
       <Divider />
       <CostBreakdown costs={details.costs} />
