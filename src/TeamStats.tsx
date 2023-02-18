@@ -11,6 +11,7 @@ import {
   Legend,
   Line,
   LineChart,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -137,12 +138,17 @@ function DisplayTeamStat(props: {
 }) {
   /* const data = [props.stats.reduce((acc, s) => ({teamname: `${s.team}`, [s.team]: s.wins, ...acc}), {})] */
   const data = props.stats.sort((x1, x2) => x1.team - x2.team) //.reduce((o, x)=> ({...o, ["team"+ x.team]: x.wins}), {"a": 1})];
+  const total = data.reduce((sum, c) => sum + c.wins, 0)
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Typography variant="h4">{props.title}</Typography>
+      <Typography variant="h4">
+        {props.title + " Played " + total + " games"}
+      </Typography>
       <ResponsiveContainer width="95%" height={300}>
         <BarChart data={data} layout="vertical">
-          <Bar dataKey="wins" fill="#8884d8" />
+          <Bar dataKey="wins" fill="#8884d8">
+            <LabelList dataKey="wins" position="right" />
+          </Bar>
           <YAxis dataKey="team" label="team" type="category" />
           <XAxis label="wins" type="number" domain={[0, props.max]} />
           <Tooltip cursor={false} />
