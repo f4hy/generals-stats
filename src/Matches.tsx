@@ -73,7 +73,7 @@ function DisplayMatchInfo(props: { match: MatchInfo; idx: number }) {
     ? props.match.timestamp.toDateString()
     : "unknown"
   let header =
-    " Match Id" +
+    " MatchId:" +
     props.match.id +
     " Date: " +
     date +
