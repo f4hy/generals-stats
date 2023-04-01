@@ -117,10 +117,10 @@ func GetDetails(match_id int64) (*pb.MatchDetails, error) {
 		return details, err
 	}
 	err = proto.Unmarshal(costdata, details)
-	if err == nil {
-		mutex.Lock()
-		cachedDetail[match_id] = details
-		mutex.Unlock()
-	}
+	// if err == nil {
+	// 	mutex.Lock()
+	// 	cachedDetail[match_id] = details
+	// 	mutex.Unlock()
+	// }
 	return details, err
 }
