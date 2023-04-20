@@ -1,7 +1,6 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import ThumbDownIcon from "@mui/icons-material/ThumbDown"
 import Button from "@mui/material/Button"
-import IconButton from "@mui/material/IconButton"
 import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
 import Grid from "@mui/material/Grid"

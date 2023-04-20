@@ -2,23 +2,24 @@ package data
 
 import (
 	"fmt"
-	"os"
-	"sort"
-	"sync"
-	"time"
-
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
+	"os"
+	"path/filepath"
+	"sort"
+	"sync"
+	"time"
 )
 
 var (
-	matchDetails string = "match-details"
-	matchInfo    string = "parsed-matches"
-	cachedDetail map[int64]*pb.MatchDetails
-	cachedMatch  map[string]*pb.MatchInfo
-	mutex        = &sync.Mutex{}
+	matchDetails     string = "match-details"
+	matchInfo        string = "parsed-matches"
+	matchDetailsPath        = filepath.Join(".", "cache", "matchDetails")
+	// cachedDetail map[int64]*pb.MatchDetails
+	cachedMatch map[string]*pb.MatchInfo
+	mutex       = &sync.Mutex{}
 )
 
 func init() {
@@ -27,8 +28,12 @@ func init() {
 		matchDetails = "dev/match-details"
 		matchInfo = "dev/parsed-matches"
 	}
-	cachedDetail = make(map[int64]*pb.MatchDetails)
 	cachedMatch = make(map[string]*pb.MatchInfo)
+	err := os.MkdirAll(matchDetailsPath, os.ModePerm)
+	if err != nil {
+		panic("could not make dir")
+	}
+
 }
 
 func detailsPath(id int64) string {
@@ -103,24 +108,38 @@ func GetMatches() (*pb.Matches, error) {
 	}, nil
 }
 
+func detailCachePath(match_id int64) string {
+	filename := fmt.Sprintf("details_%d.proto", match_id)
+	return filepath.Join(matchDetailsPath, filename)
+}
+
 func GetDetails(match_id int64) (*pb.MatchDetails, error) {
-	d, prs := cachedDetail[match_id]
-	if prs {
-		// log.Infof("details %v is cached", match_id)
-		return d, nil
-	}
-	path := detailsPath(match_id)
-	log.Infof("fetching match %s", path)
+	cachepath := detailCachePath(match_id)
 	details := &pb.MatchDetails{}
-	costdata, err := s3.GetS3Data(path)
-	if err != nil {
-		return details, err
+	_, err := os.Stat(cachepath)
+	if err == nil {
+		log.Infof("reading from cache %s", cachepath)
+		data, err := os.ReadFile(cachepath)
+		if err != nil {
+			return details, err
+		}
+		err = proto.Unmarshal(data, details)
+	} else {
+		path := detailsPath(match_id)
+		log.Infof("fetching match %s", path)
+		data, err := s3.GetS3Data(path)
+		if err != nil {
+			return details, err
+		}
+		err = proto.Unmarshal(data, details)
+		if err == nil {
+			mutex.Lock()
+			err := os.WriteFile(cachepath, data, 0644)
+			if err != nil {
+				return details, err
+			}
+			mutex.Unlock()
+		}
 	}
-	err = proto.Unmarshal(costdata, details)
-	// if err == nil {
-	// 	mutex.Lock()
-	// 	cachedDetail[match_id] = details
-	// 	mutex.Unlock()
-	// }
 	return details, err
 }
