@@ -75,22 +75,32 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 			if len(ot) > 0 {
 				prev = ot[len(ot)-1]
 			}
-			next := pb.PlayerRateOverTime{
-				Date: &pbdate,
-				Wl: &pb.GeneralWL{
-					General: p.General,
-					WinLoss: &pb.WinLoss{
-						Wins:   prev.Wl.WinLoss.Wins,
-						Losses: prev.Wl.WinLoss.Losses,
-					},
-				},
-			}
-			if m.WinningTeam == p.Team {
-				next.Wl.WinLoss.Wins += 1
+			if prev.Date != nil && prev.Date.Year == pbdate.Year && prev.Date.Month == pbdate.Month && prev.Date.Day == pbdate.Day {
+				if m.WinningTeam == p.Team {
+					prev.Wl.WinLoss.Wins += 1
+				} else {
+					prev.Wl.WinLoss.Losses += 1
+				}
+
 			} else {
-				next.Wl.WinLoss.Losses += 1
+
+				next := pb.PlayerRateOverTime{
+					Date: &pbdate,
+					Wl: &pb.GeneralWL{
+						General: p.General,
+						WinLoss: &pb.WinLoss{
+							Wins:   prev.Wl.WinLoss.Wins,
+							Losses: prev.Wl.WinLoss.Losses,
+						},
+					},
+				}
+				if m.WinningTeam == p.Team {
+					next.Wl.WinLoss.Wins += 1
+				} else {
+					next.Wl.WinLoss.Losses += 1
+				}
+				ot = append(ot, &next)
 			}
-			ot = append(ot, &next)
 			p_ot[p.General] = ot
 
 		}
@@ -402,7 +412,7 @@ func unitNameFormat(name string) string {
 	return name
 	// split := strings.Split(name, "_")
 	// if len(split) == 1 {
-	// 	return name
+	//      return name
 	// }
 	// return split[1]
 }
