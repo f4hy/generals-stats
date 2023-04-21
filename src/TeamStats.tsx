@@ -100,7 +100,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis domain={[0, 100]} />
-          <Tooltip formatter={(v: number) => v.toFixed(2) + "%"} />
+          <Tooltip formatter={(v) => (v as number).toFixed(2) + "%"} />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />

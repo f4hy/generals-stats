@@ -1,9 +1,13 @@
 import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import _ from "lodash"
 import * as React from "react"
+import Grid from "@mui/material/Grid"
+import Map from "./Map"
+
 import {
   Bar,
   BarChart,
@@ -96,28 +100,45 @@ function MapStatOverTime(props: { stat: MapResult[] }) {
   }
 
   return (
-    <Paper>
-      <Typography variant="h4">{first.map.split("/").pop()}</Typography>
-      <ResponsiveContainer width="99%" height={300}>
-        <LineChart
-          data={data}
-          layout="horizontal"
-          stackOffset="sign"
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
-          <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
-          <ReferenceLine y={0} stroke="#000" />
-          <XAxis dataKey="datestr" />
-          <YAxis label="wins" />
-          <Tooltip cursor={false} />
-        </LineChart>
-      </ResponsiveContainer>
+    <Paper elevation={6}>
+      <Grid container spacing={2}>
+        <Grid item xs={6} md={2}>
+          <Map mapname={first.map} />
+        </Grid>
+        <Grid item xs={6} md={10}>
+          <Typography variant="h4">{first.map.split("/").pop()}</Typography>
+          <ResponsiveContainer width="99%" height={300}>
+            <LineChart
+              data={data}
+              layout="horizontal"
+              stackOffset="sign"
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <Line
+                dataKey="team1"
+                stroke={TeamColor("1")}
+                strokeWidth={3}
+                label={{ position: "top" }}
+              />
+              <Line
+                dataKey="team3"
+                stroke={TeamColor("3")}
+                strokeWidth={3}
+                label={{ position: "top" }}
+              />
+              <ReferenceLine y={0} stroke="#000" />
+              <XAxis dataKey="datestr" />
+              <YAxis label="wins" />
+              <Tooltip cursor={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Grid>
+      </Grid>
     </Paper>
   )
 }
@@ -194,9 +215,11 @@ export default function DisplayMapstats() {
           </ResponsiveContainer>
         ))}
       </Box>
-      {Object.keys(mapstats.overTime).map((m) => (
-        <MapStatOverTime stat={mapstats.overTime[m].results} />
-      ))}
+      <Stack spacing={2}>
+        {Object.keys(mapstats.overTime).map((m) => (
+          <MapStatOverTime stat={mapstats.overTime[m].results} />
+        ))}
+      </Stack>
     </Paper>
   )
 }

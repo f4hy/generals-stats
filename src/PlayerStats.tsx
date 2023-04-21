@@ -104,9 +104,9 @@ function GeneralStatOverTime(props: { ot: PlayerRateOverTime[] }) {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(v: number) => v.toFixed(2) + "%"} />
+                <XAxis dataKey="date" type="category" />
+                <YAxis domain={[0, 100]} type="number" />
+                <Tooltip formatter={(v) => (v as number).toFixed(2) + "%"} />
                 <Line dataKey="rate" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
