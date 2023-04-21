@@ -102,10 +102,10 @@ function MapStatOverTime(props: { stat: MapResult[] }) {
   return (
     <Paper elevation={6}>
       <Grid container spacing={2}>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={1} md={2}>
           <Map mapname={first.map} />
         </Grid>
-        <Grid item xs={6} md={10}>
+        <Grid item xs={11} md={10}>
           <Typography variant="h4">{first.map.split("/").pop()}</Typography>
           <ResponsiveContainer width="99%" height={300}>
             <LineChart
