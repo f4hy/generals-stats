@@ -122,8 +122,19 @@ message MapStat {
   int32 wins =3;
 }
 
+message MapResult {
+  string map = 1;
+  Date date = 2;
+  Team winner = 3;
+}
+
+message MapResults {
+  repeated MapResult results = 1;
+}
+
 message MapStats {
   repeated MapStat map_stats=1;
+  map<string, MapResults> over_time=2;
 }
 
 message SaveResponse {

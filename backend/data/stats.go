@@ -3,6 +3,7 @@ package data
 import (
 	"log"
 	"sort"
+	"time"
 
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	"github.com/samber/lo"
@@ -16,6 +17,10 @@ func getFaction(general pb.General) pb.Faction {
 		return pb.Faction_ANYCHINA
 	}
 	return pb.Faction_ANYGLA
+}
+
+func timeToDate(date time.Time) pb.Date {
+	return pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
 }
 
 func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
@@ -65,7 +70,7 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 			p_ot := over_time[p.Name]
 			ot := p_ot[p.General]
 			date := m.Timestamp.AsTime()
-			pbdate := pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
+			pbdate := timeToDate(date)
 			prev := &pb.PlayerRateOverTime{
 				Wl: &pb.GeneralWL{
 					General: p.General,
@@ -246,11 +251,26 @@ type team_and_map struct {
 
 func MapStats(matches *pb.Matches) *pb.MapStats {
 	var teamstats pb.MapStats
+	over_time := make(map[string]*pb.MapResults)
 	team_map_map := make(map[team_and_map]int)
 
 	for _, m := range matches.Matches {
 		tam := team_and_map{team: m.WinningTeam, played_map: m.Map}
 		team_map_map[tam] += 1
+		_, prs := over_time[m.Map]
+		if !prs {
+			empt := make([]*pb.MapResult, 0, 1)
+			over_time[m.Map] = &pb.MapResults{
+				Results: empt,
+			}
+		}
+		date := timeToDate(m.Timestamp.AsTime())
+		next := &pb.MapResult{
+			Map:    m.Map,
+			Date:   &date,
+			Winner: m.WinningTeam,
+		}
+		over_time[m.Map].Results = append(over_time[m.Map].Results, next)
 	}
 	for t_and_m, wins := range team_map_map {
 		mapstats := &pb.MapStat{
@@ -260,6 +280,7 @@ func MapStats(matches *pb.Matches) *pb.MapStats {
 		}
 		teamstats.MapStats = append(teamstats.MapStats, mapstats)
 	}
+	teamstats.OverTime = over_time
 	return &teamstats
 }
 

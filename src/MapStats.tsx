@@ -1,18 +1,29 @@
 import Box from "@mui/material/Box"
-import _ from "lodash"
 import Paper from "@mui/material/Paper"
 import Typography from "@mui/material/Typography"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import _ from "lodash"
 import * as React from "react"
 import {
   Bar,
   BarChart,
+  Line,
+  LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts"
-import { MapStat, MapStats } from "./proto/match"
-import useMediaQuery from "@mui/material/useMediaQuery"
+import { TeamColor } from "./Colors"
+import {
+  DateMessage,
+  MapResult,
+  MapResults,
+  MapStat,
+  MapStats,
+  Team,
+} from "./proto/match"
 
 function getMapStats(callback: (m: MapStats) => void) {
   fetch("/api/mapstats").then((r) =>
@@ -26,12 +37,89 @@ function getMapStats(callback: (m: MapStats) => void) {
       })
   )
 }
-const empty = { mapStats: [] }
+const emptyOverTime: { [key: string]: MapResults } = {}
+const empty: MapStats = { mapStats: [], overTime: emptyOverTime }
 
 interface Red {
   map: string
   team1: number
   team3: number
+}
+function pad(n: number): string {
+  return n.toString().padStart(2, "0")
+}
+
+function datemsgtoString(datemsg: DateMessage | undefined) {
+  if (datemsg) {
+    return `${datemsg.Year}-${pad(datemsg.Month)}-${pad(datemsg.Day)}`
+  }
+  return "unknown"
+}
+
+function datemsgtoNum(datemsg: DateMessage | undefined) {
+  if (!datemsg) {
+    return 0
+  }
+  return (datemsg.Year * 12 + datemsg.Month) * 365 + datemsg.Day
+}
+
+interface MapWinOverTime {
+  datestr: string
+  team1: number
+  team3: number
+  games: number
+}
+
+function MapStatOverTime(props: { stat: MapResult[] }) {
+  if (props.stat.length < 3) {
+    return <></>
+  }
+  const sorted = _.sortBy(props.stat, (s) => datemsgtoNum(s.date))
+  const first = props.stat[0]
+  let data: MapWinOverTime[] = []
+  let team1 = 0
+  let team3 = 0
+  let games = 0
+  for (let index in sorted) {
+    games += 1
+    if (sorted[index].winner === Team.ONE) {
+      team1 += 1
+    }
+    if (sorted[index].winner === Team.THREE) {
+      team3 += 1
+    }
+    let datestr = datemsgtoString(sorted[index].date)
+    data = [
+      ...data,
+      { datestr: datestr, team1: team1, team3: team3, games: games },
+    ]
+  }
+
+  return (
+    <Paper>
+      <Typography variant="h4">{first.map.split("/").pop()}</Typography>
+      <ResponsiveContainer width="99%" height={300}>
+        <LineChart
+          data={data}
+          layout="horizontal"
+          stackOffset="sign"
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
+          <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
+          <ReferenceLine y={0} stroke="#000" />
+          <XAxis dataKey="datestr" />
+          <YAxis label="wins" />
+          <Tooltip cursor={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </Paper>
+  )
 }
 
 export default function DisplayMapstats() {
@@ -106,6 +194,9 @@ export default function DisplayMapstats() {
           </ResponsiveContainer>
         ))}
       </Box>
+      {Object.keys(mapstats.overTime).map((m) => (
+        <MapStatOverTime stat={mapstats.overTime[m].results} />
+      ))}
     </Paper>
   )
 }

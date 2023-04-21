@@ -278,8 +278,24 @@ export interface MapStat {
   wins: number
 }
 
+export interface MapResult {
+  map: string
+  date: DateMessage | undefined
+  winner: Team
+}
+
+export interface MapResults {
+  results: MapResult[]
+}
+
 export interface MapStats {
   mapStats: MapStat[]
+  overTime: { [key: string]: MapResults }
+}
+
+export interface MapStats_OverTimeEntry {
+  key: string
+  value: MapResults | undefined
 }
 
 export interface SaveResponse {
@@ -1639,8 +1655,146 @@ export const MapStat = {
   },
 }
 
+function createBaseMapResult(): MapResult {
+  return { map: "", date: undefined, winner: 0 }
+}
+
+export const MapResult = {
+  encode(
+    message: MapResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.map !== "") {
+      writer.uint32(10).string(message.map)
+    }
+    if (message.date !== undefined) {
+      DateMessage.encode(message.date, writer.uint32(18).fork()).ldelim()
+    }
+    if (message.winner !== 0) {
+      writer.uint32(24).int32(message.winner)
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MapResult {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMapResult()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.map = reader.string()
+          break
+        case 2:
+          message.date = DateMessage.decode(reader, reader.uint32())
+          break
+        case 3:
+          message.winner = reader.int32() as any
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MapResult {
+    return {
+      map: isSet(object.map) ? String(object.map) : "",
+      date: isSet(object.date) ? DateMessage.fromJSON(object.date) : undefined,
+      winner: isSet(object.winner) ? teamFromJSON(object.winner) : 0,
+    }
+  },
+
+  toJSON(message: MapResult): unknown {
+    const obj: any = {}
+    message.map !== undefined && (obj.map = message.map)
+    message.date !== undefined &&
+      (obj.date = message.date ? DateMessage.toJSON(message.date) : undefined)
+    message.winner !== undefined && (obj.winner = teamToJSON(message.winner))
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MapResult>, I>>(
+    object: I
+  ): MapResult {
+    const message = createBaseMapResult()
+    message.map = object.map ?? ""
+    message.date =
+      object.date !== undefined && object.date !== null
+        ? DateMessage.fromPartial(object.date)
+        : undefined
+    message.winner = object.winner ?? 0
+    return message
+  },
+}
+
+function createBaseMapResults(): MapResults {
+  return { results: [] }
+}
+
+export const MapResults = {
+  encode(
+    message: MapResults,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.results) {
+      MapResult.encode(v!, writer.uint32(10).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MapResults {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMapResults()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(MapResult.decode(reader, reader.uint32()))
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MapResults {
+    return {
+      results: Array.isArray(object?.results)
+        ? object.results.map((e: any) => MapResult.fromJSON(e))
+        : [],
+    }
+  },
+
+  toJSON(message: MapResults): unknown {
+    const obj: any = {}
+    if (message.results) {
+      obj.results = message.results.map((e) =>
+        e ? MapResult.toJSON(e) : undefined
+      )
+    } else {
+      obj.results = []
+    }
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MapResults>, I>>(
+    object: I
+  ): MapResults {
+    const message = createBaseMapResults()
+    message.results = object.results?.map((e) => MapResult.fromPartial(e)) || []
+    return message
+  },
+}
+
 function createBaseMapStats(): MapStats {
-  return { mapStats: [] }
+  return { mapStats: [], overTime: {} }
 }
 
 export const MapStats = {
@@ -1651,6 +1805,12 @@ export const MapStats = {
     for (const v of message.mapStats) {
       MapStat.encode(v!, writer.uint32(10).fork()).ldelim()
     }
+    Object.entries(message.overTime).forEach(([key, value]) => {
+      MapStats_OverTimeEntry.encode(
+        { key: key as any, value },
+        writer.uint32(18).fork()
+      ).ldelim()
+    })
     return writer
   },
 
@@ -1663,6 +1823,12 @@ export const MapStats = {
       switch (tag >>> 3) {
         case 1:
           message.mapStats.push(MapStat.decode(reader, reader.uint32()))
+          break
+        case 2:
+          const entry2 = MapStats_OverTimeEntry.decode(reader, reader.uint32())
+          if (entry2.value !== undefined) {
+            message.overTime[entry2.key] = entry2.value
+          }
           break
         default:
           reader.skipType(tag & 7)
@@ -1677,6 +1843,15 @@ export const MapStats = {
       mapStats: Array.isArray(object?.mapStats)
         ? object.mapStats.map((e: any) => MapStat.fromJSON(e))
         : [],
+      overTime: isObject(object.overTime)
+        ? Object.entries(object.overTime).reduce<{ [key: string]: MapResults }>(
+            (acc, [key, value]) => {
+              acc[key] = MapResults.fromJSON(value)
+              return acc
+            },
+            {}
+          )
+        : {},
     }
   },
 
@@ -1689,12 +1864,98 @@ export const MapStats = {
     } else {
       obj.mapStats = []
     }
+    obj.overTime = {}
+    if (message.overTime) {
+      Object.entries(message.overTime).forEach(([k, v]) => {
+        obj.overTime[k] = MapResults.toJSON(v)
+      })
+    }
     return obj
   },
 
   fromPartial<I extends Exact<DeepPartial<MapStats>, I>>(object: I): MapStats {
     const message = createBaseMapStats()
     message.mapStats = object.mapStats?.map((e) => MapStat.fromPartial(e)) || []
+    message.overTime = Object.entries(object.overTime ?? {}).reduce<{
+      [key: string]: MapResults
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = MapResults.fromPartial(value)
+      }
+      return acc
+    }, {})
+    return message
+  },
+}
+
+function createBaseMapStats_OverTimeEntry(): MapStats_OverTimeEntry {
+  return { key: "", value: undefined }
+}
+
+export const MapStats_OverTimeEntry = {
+  encode(
+    message: MapStats_OverTimeEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key)
+    }
+    if (message.value !== undefined) {
+      MapResults.encode(message.value, writer.uint32(18).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MapStats_OverTimeEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input)
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = createBaseMapStats_OverTimeEntry()
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string()
+          break
+        case 2:
+          message.value = MapResults.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MapStats_OverTimeEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value)
+        ? MapResults.fromJSON(object.value)
+        : undefined,
+    }
+  },
+
+  toJSON(message: MapStats_OverTimeEntry): unknown {
+    const obj: any = {}
+    message.key !== undefined && (obj.key = message.key)
+    message.value !== undefined &&
+      (obj.value = message.value ? MapResults.toJSON(message.value) : undefined)
+    return obj
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MapStats_OverTimeEntry>, I>>(
+    object: I
+  ): MapStats_OverTimeEntry {
+    const message = createBaseMapStats_OverTimeEntry()
+    message.key = object.key ?? ""
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? MapResults.fromPartial(object.value)
+        : undefined
     return message
   },
 }
