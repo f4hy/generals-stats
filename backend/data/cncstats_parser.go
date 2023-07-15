@@ -357,6 +357,7 @@ func knownAborted(matchId int64) string {
 		2606388828: "Disconnect",
 		2733966289: "Missmatch at end :(",
 		2627127515: "Missmatch!!",
+		2376772908: "Missmatch",
 	}
 	reason := aborted[matchId]
 	return reason
@@ -381,6 +382,7 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 		3707381344: pb.Team_THREE,
 		2890008785: pb.Team_ONE,
 		3599396223: pb.Team_THREE,
+		2501110320: pb.Team_ONE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs
