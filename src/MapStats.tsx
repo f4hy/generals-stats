@@ -182,7 +182,7 @@ export default function DisplayMapstats() {
     .reduce(reducer, initial)
     .sort((m1, m2) => redScore(m2) - redScore(m1))
   const chunks = _.chunk(data, isBig ? 64 : 16)
-  const sorted_over_time_keys = _.sortBy(Object.keys(mapstats.overTime), r => mapstats.overTime[r].results.length)
+  const sorted_over_time_keys = _.sortBy(Object.keys(mapstats.overTime), r => -mapstats.overTime[r].results.length)
   return (
     <Paper>
       <Typography variant="h2">Map stats.</Typography>
