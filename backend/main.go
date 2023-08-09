@@ -101,7 +101,7 @@ func updateMatches() *pb.Matches {
 	}
 	since_fetched := time.Since(last_fetched).Minutes()
 	log.Infof("since last fetched %v", since_fetched)
-	if since_fetched < 5 {
+	if since_fetched < 10 {
 		return matches
 	}
 	fetched, err := data.GetMatches()
@@ -136,7 +136,7 @@ func main() {
 	router.Use(static.Serve("/", static.LocalFile("build", true)))
 	matches := updateMatches()
 	completed := completedMatches(matches)
-	ticker := time.NewTicker(time.Minute * 15)
+	ticker := time.NewTicker(time.Minute * 30)
 	go func() {
 		for tick := range ticker.C {
 			log.Infof("scraping from timer %v", tick)
