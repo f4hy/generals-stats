@@ -80,7 +80,7 @@ func scrape_and_prase() {
 
 	data.SaveReplays(since)
 	log.Info("Scraped")
-	data.ParseJsons(false)
+	data.ParseJsons(true)
 	log.Info("ReParsed")
 	last_scraped = time.Now()
 	fetched, err := data.GetMatches()
