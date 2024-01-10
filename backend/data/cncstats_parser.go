@@ -248,6 +248,10 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 	// fmt.Println("data:", replay.Header.Metadata.MapFile)
 	numTimeStamps := int64(replay.Header.NumTimeStamps)
 	apm, upgrades, id, err := processBody(replay.Body, minutes, numTimeStamps)
+	if err != nil {
+		fmt.Println("Failed to parse the body")
+		return match_and_details{}, err
+	}
 	spent := getSpent(replay.Body, minutes, numTimeStamps)
 	// match_id := int64(timestamp.Seconds)
 	// log.Print("Old id was", match_id, "new id", id)
@@ -272,10 +276,9 @@ func parse_data(filename string, data []byte) (match_and_details, error) {
 	}
 
 	for _, i := range replay.Summary {
-		// fmt.Printf("Name: %s : %s: %t %d\n", i.Name, i.Side, i.Win, i.Team)
 		player, err := getPlayer(i)
 		if err != nil {
-			return match_and_details{&pb.MatchInfo{}, &details}, errors.New("Could not determine winner")
+			return match_and_details{&pb.MatchInfo{}, &details}, errors.New("could not determine winner")
 		}
 		match.Players = append(match.Players, player)
 		cost := &pb.Costs{
@@ -431,7 +434,7 @@ func ParseJson(json_path string) (match_and_details, error) {
 
 	}
 	log.Info("Not a 2v2 of our squad")
-	return match_and_details{}, errors.New("Not a 2v2 of our squad")
+	return match_and_details{}, errors.New("not a 2v2 of our squad")
 }
 
 func parseWorker(id int, jsons <-chan string, results chan<- match_and_details, failure chan<- string, group *sync.WaitGroup) {
