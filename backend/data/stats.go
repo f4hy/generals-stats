@@ -136,9 +136,7 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 		log.Printf("pot %v", pot)
 
 		for _, ot := range pot {
-			for _, x := range ot {
-				over_time = append(over_time, x)
-			}
+			over_time = append(over_time, ot...)
 		}
 		playerstat := pb.PlayerStat{
 			PlayerName:   player,
