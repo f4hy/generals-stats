@@ -95,13 +95,13 @@ func scrape_and_prase() {
 func updateMatches() *pb.Matches {
 	since_scraped := time.Since(last_scraped).Minutes()
 	log.Infof("since last scraped %v", since_scraped)
-	if since_scraped > 30 {
+	if since_scraped > 61 {
 		last_scraped = time.Now()
 		go scrape_and_prase()
 	}
 	since_fetched := time.Since(last_fetched).Minutes()
 	log.Infof("since last fetched %v", since_fetched)
-	if since_fetched < 10 {
+	if since_fetched < 20 {
 		return matches
 	}
 	fetched, err := data.GetMatches()
