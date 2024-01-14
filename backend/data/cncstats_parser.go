@@ -361,6 +361,11 @@ func knownAborted(matchId int64) string {
 		2733966289: "Missmatch at end :(",
 		2627127515: "Missmatch!!",
 		2376772908: "Missmatch",
+		4289543903: "Missmatch",
+		4088397075: "Missmatch",
+		2418485416: "Missmatch",
+		1078744849: "Missmatch",
+
 	}
 	reason := aborted[matchId]
 	return reason
