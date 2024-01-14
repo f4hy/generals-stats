@@ -520,6 +520,6 @@ func ParseJsons(all bool) {
 	log.V(1).Infof("Saving matches took %v", time.Since(start_save))
 
 	for _, fail := range failed {
-		log.Infof("Failure %v", fail)
+		log.Warningf("Failure %v", fail)
 	}
 }
