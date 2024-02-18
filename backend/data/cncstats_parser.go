@@ -531,4 +531,5 @@ func ParseJsons(all bool) {
 	for _, fail := range failed {
 		log.Warningf("Failure %v", fail)
 	}
+	log.Info("Finish parse")
 }
