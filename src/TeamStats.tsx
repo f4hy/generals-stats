@@ -1,3 +1,7 @@
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Paper from "@mui/material/Paper"
@@ -17,11 +21,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { DateMessage, TeamStat, TeamStats } from "./proto/match"
+import { DateMessage, TeamStat, TeamStats, Faction } from "./proto/match"
 import { TeamColor } from "./Colors"
 
-function getTeamStats(callback: (m: TeamStats) => void) {
-  fetch("/api/teamstats").then((r) =>
+function getTeamStats(querystr: string, callback: (m: TeamStats) => void) {
+  fetch("/api/teamstatsfiltered?" + querystr).then((r) =>
     r
       .blob()
       .then((b) => b.arrayBuffer())
@@ -158,13 +162,60 @@ function DisplayTeamStat(props: {
   )
 }
 
+function Selector(props: {name: string, param: string, setter: (v: string) => void}) {
+		const name = props.name
+		return (
+      <FormControl fullWidth>
+      <InputLabel id={`${name}-general-select`}>{name}'s Faction</InputLabel>
+      <Select
+        labelId={`${name}-label`}
+        id={`${name}-simple-select`}
+        value={props.param}
+        label={name}
+        onChange={(event: SelectChangeEvent) => props.setter((event.target.value.toString()) as string)
+        }
+      >
+        <MenuItem value={""}>Unset</MenuItem>
+        <MenuItem value={Faction.ANYUSA}>USA</MenuItem>
+        <MenuItem value={Faction.ANYCHINA}>China</MenuItem>
+        <MenuItem value={Faction.ANYGLA}>GLA</MenuItem>
+      </Select >
+    </FormControl>
+  )
+}
+
+
 const empty = { teamStats: [] }
 
 export default function DisplayTeamStats() {
   const [teamStats, setTeamStats] = React.useState<TeamStats>(empty)
+  const [brendan, setBrendan] = React.useState<string>("")
+  const [jared, setJared] = React.useState<string>("")
+  const [sean, setSean] = React.useState<string>("")
+  const [bill, setBill] = React.useState<string>("")
+  const [searchParams, setSearchParams] = React.useState<string>("")
   React.useEffect(() => {
-    getTeamStats(setTeamStats)
-  }, [])
+    getTeamStats(searchParams, setTeamStats)
+  }, [searchParams])
+
+  React.useEffect(() => {
+    const params = new URLSearchParams("")
+    if (brendan.length) {
+      params.append("Brendan", brendan)
+    }
+    if (bill.length) {
+      params.append("Bill", bill)
+    }
+    if (sean.length) {
+      params.append("Sean", sean)
+    }
+    if (jared.length) {
+      params.append("Jared", jared)
+    }
+    setSearchParams(params.toString())
+    getTeamStats(searchParams.toString(), setTeamStats)
+  }, [brendan, bill, sean, jared])
+
   const max = teamStats.teamStats.reduce((max, s) => Math.max(max, s.wins), 0)
   const grouped = Object.entries(
     _.groupBy(teamStats.teamStats, (ts: TeamStat) => datemsgtoString(ts.date))
@@ -178,9 +229,16 @@ export default function DisplayTeamStats() {
     }),
     {}
   )
+
+
+
   return (
     <Paper>
-      <Typography variant="h2">{matches} games played! </Typography>
+			  <Selector name="Brendan" param={brendan} setter={setBrendan}/>
+			  <Selector name="Bill" param={bill} setter={setBill}/>
+			  <Selector name="Sean" param={sean} setter={setSean}/>
+			  <Selector name="Jared" param={jared} setter={setJared}/>
+      <Typography variant="h2">{searchParams} {matches} games played! </Typography>
       {Object.keys(teamSum).map((x: any) => (
         <Typography variant="h2">
           Team {x} has {teamSum[x]} wins.{" "}
@@ -188,12 +246,14 @@ export default function DisplayTeamStats() {
         </Typography>
       ))}
       <RecordOverTime stats={teamStats} />
-      {ordered.map(([date, m]) => (
-        <>
-          <DisplayTeamStat stats={m} title={date} max={roundUpNearest5(max)} />
-          <Divider />
-        </>
-      ))}
+      {searchParams.length > 0 ? null :
+        ordered.map(([date, m]) => (
+          <>
+            <DisplayTeamStat stats={m} title={date} max={roundUpNearest5(max)} />
+            <Divider />
+          </>
+        ))
+      }
     </Paper>
   )
 }

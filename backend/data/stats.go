@@ -242,6 +242,68 @@ func TeamStats(matches *pb.Matches) *pb.TeamStats {
 	return &teamstats
 }
 
+type PlayerGeneral struct {
+	gen    pb.General
+	player string
+}
+
+type TeamStatFilter struct {
+	Playedmap string
+	Players   map[string]*pb.Faction
+}
+
+func TeamStatsFiltered(matches *pb.Matches, filters *TeamStatFilter) *pb.TeamStats {
+	var teamstats pb.TeamStats
+
+	filtered := lo.Filter(matches.Matches, func(match *pb.MatchInfo, index int) bool {
+		if filters.Playedmap != "" && filters.Playedmap != match.Map {
+			log.Print("Dropping match due to map")
+			return false
+		}
+		for filterPlayerName, filterGen := range filters.Players {
+			for _, player := range match.Players {
+				if player.Name == filterPlayerName && getFaction(player.General).Number() != filterGen.Number() {
+					log.Printf("Dropping match player %v not matching %v : %v", player.Name, &player.General, filterGen)
+					return false
+				}
+			}
+		}
+		return true
+	})
+	log.Printf("filtered %v down to %v", len(matches.Matches), len(filtered))
+
+	for _, m := range filtered {
+		winner := m.GetWinningTeam()
+		date := m.Timestamp.AsTime()
+		pbdate := pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
+		match, exists := lo.Find(teamstats.TeamStats, func(p *pb.TeamStat) bool {
+			dateEq := (pbdate.Year == p.Date.Year && pbdate.Month == p.Date.Month && pbdate.Day == p.Date.Day)
+			return p.Team == winner && dateEq
+		})
+		if exists {
+			match.Wins += 1
+		} else {
+			for _, t := range getTeams(m) {
+				ts := pb.TeamStat{
+					Date: &pbdate,
+					Team: t,
+					Wins: 0,
+				}
+				if t == winner {
+					ts.Wins = 1
+				}
+				teamstats.TeamStats = append(teamstats.TeamStats, &ts)
+			}
+		}
+	}
+	sort.Slice(teamstats.TeamStats, func(i, j int) bool {
+		di := teamstats.TeamStats[i].Date
+		dj := teamstats.TeamStats[j].Date
+		return (di.Year*1000 + di.Month*100 + di.Day) < (dj.Year*1000 + dj.Month*100 + dj.Day)
+	})
+	return &teamstats
+}
+
 type team_and_map struct {
 	team       pb.Team
 	played_map string

@@ -237,6 +237,31 @@ func main() {
 			ts := data.TeamStats(completed)
 			c.ProtoBuf(http.StatusOK, ts)
 		})
+		api.GET("/teamstatsfiltered", func(c *gin.Context) {
+			c.Header("Cache-Control", maxAge)
+			mapPlayed := ""
+			playerMap := make(map[string]*pb.Faction)
+			paramPairs := c.Request.URL.Query()
+			for key, values := range paramPairs {
+				if key == "map" {
+					mapPlayed = values[0]
+				} else {
+					faction, err := strconv.Atoi(values[0])
+					if err != nil {
+						log.Error(err)
+						c.AbortWithError(http.StatusInternalServerError, err)
+						return
+					}
+					gen := pb.Faction(faction)
+					playerMap[key] = &gen
+				}
+				fmt.Printf("key = %v, value(s) = %v\n", key, values)
+			}
+			filters := data.TeamStatFilter{Playedmap: mapPlayed, Players: playerMap}
+			fmt.Printf("filters = %v\n", filters)
+			ts := data.TeamStatsFiltered(completed, &filters)
+			c.ProtoBuf(http.StatusOK, ts)
+		})
 		api.GET("/mapstats", func(c *gin.Context) {
 			c.Header("Cache-Control", maxAge)
 			ts := data.MapStats(completed)
