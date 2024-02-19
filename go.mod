@@ -1,7 +1,7 @@
 module github.com/f4hy/generals-stats
 
 // +heroku goVersion go1.18
-go 1.19
+go 1.18
 
 require (
 	github.com/aws/aws-sdk-go v1.50.20
@@ -10,7 +10,7 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gocolly/colly v1.2.0
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.0.0
 	github.com/golang/protobuf v1.5.3
 	github.com/samber/lo v1.39.0
 	google.golang.org/protobuf v1.32.0
