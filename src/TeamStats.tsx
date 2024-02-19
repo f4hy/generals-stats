@@ -1,7 +1,7 @@
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
+import FormControl from "@mui/material/FormControl"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
 import Paper from "@mui/material/Paper"
@@ -162,28 +162,32 @@ function DisplayTeamStat(props: {
   )
 }
 
-function Selector(props: {name: string, param: string, setter: (v: string) => void}) {
-		const name = props.name
-		return (
-      <FormControl fullWidth>
+function Selector(props: {
+  name: string
+  param: string
+  setter: (v: string) => void
+}) {
+  const name = props.name
+  return (
+    <FormControl fullWidth>
       <InputLabel id={`${name}-general-select`}>{name}'s Faction</InputLabel>
       <Select
         labelId={`${name}-label`}
         id={`${name}-simple-select`}
         value={props.param}
         label={name}
-        onChange={(event: SelectChangeEvent) => props.setter((event.target.value.toString()) as string)
+        onChange={(event: SelectChangeEvent) =>
+          props.setter(event.target.value.toString() as string)
         }
       >
         <MenuItem value={""}>Unset</MenuItem>
         <MenuItem value={Faction.ANYUSA}>USA</MenuItem>
         <MenuItem value={Faction.ANYCHINA}>China</MenuItem>
         <MenuItem value={Faction.ANYGLA}>GLA</MenuItem>
-      </Select >
+      </Select>
     </FormControl>
   )
 }
-
 
 const empty = { teamStats: [] }
 
@@ -230,15 +234,15 @@ export default function DisplayTeamStats() {
     {}
   )
 
-
-
   return (
     <Paper>
-			  <Selector name="Brendan" param={brendan} setter={setBrendan}/>
-			  <Selector name="Bill" param={bill} setter={setBill}/>
-			  <Selector name="Sean" param={sean} setter={setSean}/>
-			  <Selector name="Jared" param={jared} setter={setJared}/>
-      <Typography variant="h2">{searchParams} {matches} games played! </Typography>
+      <Selector name="Brendan" param={brendan} setter={setBrendan} />
+      <Selector name="Bill" param={bill} setter={setBill} />
+      <Selector name="Sean" param={sean} setter={setSean} />
+      <Selector name="Jared" param={jared} setter={setJared} />
+      <Typography variant="h2">
+        {searchParams} {matches} games played!{" "}
+      </Typography>
       {Object.keys(teamSum).map((x: any) => (
         <Typography variant="h2">
           Team {x} has {teamSum[x]} wins.{" "}
@@ -246,14 +250,18 @@ export default function DisplayTeamStats() {
         </Typography>
       ))}
       <RecordOverTime stats={teamStats} />
-      {searchParams.length > 0 ? null :
-        ordered.map(([date, m]) => (
-          <>
-            <DisplayTeamStat stats={m} title={date} max={roundUpNearest5(max)} />
-            <Divider />
-          </>
-        ))
-      }
+      {searchParams.length > 0
+        ? null
+        : ordered.map(([date, m]) => (
+            <>
+              <DisplayTeamStat
+                stats={m}
+                title={date}
+                max={roundUpNearest5(max)}
+              />
+              <Divider />
+            </>
+          ))}
     </Paper>
   )
 }
