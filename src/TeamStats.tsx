@@ -11,9 +11,13 @@ import * as React from "react"
 import {
 	Bar,
 	BarChart,
-	CartesianGrid, LabelList, Legend,
+	CartesianGrid,
+	LabelList,
+	Legend,
 	Line,
-	LineChart, ReferenceLine, ResponsiveContainer,
+	LineChart,
+	ReferenceLine,
+	ResponsiveContainer,
 	Tooltip,
 	XAxis,
 	YAxis
@@ -39,9 +43,9 @@ function roundUpNearest5(num: number) {
 }
 
 interface OverTime {
-datestr: string
-date: Date
-time: number
+  datestr: string
+  date: Date
+  time: number
   team1: 0
   team3: 0
 }
@@ -57,30 +61,36 @@ function datemsgtoString(datemsg: DateMessage | undefined) {
 }
 function datemsgtoDate(datemsg: DateMessage | undefined): Date {
   if (datemsg) {
-return new Date(datemsg.Year, datemsg.Month, datemsg.Day-1)
+    return new Date(datemsg.Year, datemsg.Month, datemsg.Day - 1)
   }
   return new Date()
 }
 
-function addMonths(date: Date, months: number): Date{
-let newDate = new Date(date.setMonth(date.getMonth()+months));
-	return newDate
+function addMonths(date: Date, months: number): Date {
+  let newDate = new Date(date.setMonth(date.getMonth() + months))
+  return newDate
 }
 
-function timeFmt(time: number) : string {
-const date = new Date(time)
-	return `${date.toLocaleDateString()}`
+function timeFmt(time: number): string {
+  const date = new Date(time)
+  return `${date.toLocaleDateString()}`
 }
-function tickFmt(time: number) : string {
-const date = new Date(time)
-	return `${date.toLocaleDateString('en', {year: "2-digit", month: "short"})}`
+function tickFmt(time: number): string {
+  const date = new Date(time)
+  return `${date.toLocaleDateString("en", { year: "2-digit", month: "short" })}`
 }
 
 function RecordOverTime(props: { stats: TeamStats }) {
   const initial: OverTime[] = []
   function reducer(acc: OverTime[], next: TeamStat): OverTime[] {
-	  const datestr = datemsgtoString(next.date)
-	  const toAdd: OverTime = { datestr: datestr, date: datemsgtoDate(next.date), time: datemsgtoDate(next.date).getTime() , team1: 0, team3: 0 }
+    const datestr = datemsgtoString(next.date)
+    const toAdd: OverTime = {
+      datestr: datestr,
+      date: datemsgtoDate(next.date),
+      time: datemsgtoDate(next.date).getTime(),
+      team1: 0,
+      team3: 0,
+    }
     if (acc.length) {
       const last = acc[acc.length - 1]
       if (last.datestr === datestr) {
@@ -99,28 +109,32 @@ function RecordOverTime(props: { stats: TeamStats }) {
     return [...acc, toAdd]
   }
   const data = _.orderBy(props.stats.teamStats, (ts) =>
-	  datemsgtoString(ts.date)
+    datemsgtoString(ts.date)
   ).reduce(reducer, initial)
   const rates = data.map((x) => ({
-date: x.date ,
-time: x.date.getTime(),
+    date: x.date,
+    time: x.date.getTime(),
     team1: (100 * x.team1) / (x.team1 + x.team3),
     team3: (100 * x.team3) / (x.team1 + x.team3),
-}))
-const minDate = _.min(rates.map(d=> d.date)) ?? new Date()
-const maxDate = _.max(rates.map(d=> d.date))?? new Date()
-const nextFirst = (new Date(minDate.getTime())) 
-nextFirst.setMonth(minDate.getMonth()+1)
-nextFirst.setDate(1)
-	const ticks = Array(100).fill(0).map((v, i) => addMonths(new Date(nextFirst.getTime()), i) ).filter(v=> v<= maxDate).map(d => d.getTime())
-	const KC = (new Date(2023, 2, 10)).getTime()
+  }))
+  const minDate = _.min(rates.map((d) => d.date)) ?? new Date()
+  const maxDate = _.max(rates.map((d) => d.date)) ?? new Date()
+  const nextFirst = new Date(minDate.getTime())
+  nextFirst.setMonth(minDate.getMonth() + 1)
+  nextFirst.setDate(1)
+  const ticks = Array(100)
+    .fill(0)
+    .map((v, i) => addMonths(new Date(nextFirst.getTime()), i))
+    .filter((v) => v <= maxDate)
+    .map((d) => d.getTime())
+  const KC = new Date(2023, 2, 10).getTime()
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography>Win Rate</Typography>
       <ResponsiveContainer width="95%" height={500}>
         <LineChart
           height={300}
-						data={rates}
+          data={rates}
           margin={{
             top: 5,
             right: 30,
@@ -129,13 +143,30 @@ nextFirst.setDate(1)
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="time" scale="time" type="number" domain={[minDate.getTime(), maxDate.getTime()]}  tickFormatter={tickFmt} minTickGap={0} ticks={ticks}  />
+          <XAxis
+            dataKey="time"
+            scale="time"
+            type="number"
+            domain={[minDate.getTime(), maxDate.getTime()]}
+            tickFormatter={tickFmt}
+            minTickGap={0}
+            ticks={ticks}
+          />
           <YAxis domain={[0, 100]} />
-          <Tooltip formatter={(v) => (v as number).toFixed(2) + "%"} labelFormatter={timeFmt} />
+          <Tooltip
+            formatter={(v) => (v as number).toFixed(2) + "%"}
+            labelFormatter={timeFmt}
+          />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
-				  <ReferenceLine x={KC} label="KC" stroke="red" strokeWidth={2} strokeDasharray="3 6" />
+          <ReferenceLine
+            x={KC}
+            label="KC"
+            stroke="red"
+            strokeWidth={2}
+            strokeDasharray="3 6"
+          />
         </LineChart>
       </ResponsiveContainer>
       <Typography>Wins</Typography>
@@ -151,13 +182,30 @@ nextFirst.setDate(1)
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="time" scale="time" type="number" domain={[minDate.getTime(), maxDate.getTime()]}  tickFormatter={timeFmt} minTickGap={0} ticks={ticks}  />
+          <XAxis
+            dataKey="time"
+            scale="time"
+            type="number"
+            domain={[minDate.getTime(), maxDate.getTime()]}
+            tickFormatter={timeFmt}
+            minTickGap={0}
+            ticks={ticks}
+          />
           <YAxis />
-          <Tooltip formatter={(v) => (v as number).toFixed(2) + "%"} labelFormatter={timeFmt} />
+          <Tooltip
+            formatter={(v) => (v as number).toFixed(2) + "%"}
+            labelFormatter={timeFmt}
+          />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
-				  <ReferenceLine x={KC} label="KC" stroke="red" strokeWidth={2} strokeDasharray="3 6" />
+          <ReferenceLine
+            x={KC}
+            label="KC"
+            stroke="red"
+            strokeWidth={2}
+            strokeDasharray="3 6"
+          />
         </LineChart>
       </ResponsiveContainer>
     </Box>
@@ -268,10 +316,12 @@ export default function DisplayTeamStats() {
       <Selector name="Jared" param={jared} setter={setJared} />
       <Selector name="Bill" param={bill} setter={setBill} />
       <Selector name="Sean" param={sean} setter={setSean} />
-			{ searchParams.length > 0 ? <Typography variant="h4">Limiting matches to just those where {searchParams}</Typography> : null }
-      <Typography variant="h2">
-        {matches} games played!{" "}
-      </Typography>
+      {searchParams.length > 0 ? (
+        <Typography variant="h4">
+          Limiting matches to just those where {searchParams}
+        </Typography>
+      ) : null}
+      <Typography variant="h2">{matches} games played! </Typography>
       {Object.keys(teamSum).map((x: any) => (
         <Typography variant="h2">
           Team {x} has {teamSum[x]} wins.{" "}
