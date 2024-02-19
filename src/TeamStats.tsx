@@ -61,7 +61,7 @@ function datemsgtoString(datemsg: DateMessage | undefined) {
 }
 function datemsgtoDate(datemsg: DateMessage | undefined): Date {
   if (datemsg) {
-    return new Date(datemsg.Year, datemsg.Month, datemsg.Day - 1)
+    return new Date(datemsg.Year, datemsg.Month -1, datemsg.Day - 1)
   }
   return new Date()
 }
@@ -127,7 +127,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
     .map((v, i) => addMonths(new Date(nextFirst.getTime()), i))
     .filter((v) => v <= maxDate)
     .map((d) => d.getTime())
-  const KC = new Date(2023, 2, 10).getTime()
+  const KC = new Date(2023, 1, 10).getTime()
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography>Win Rate</Typography>
