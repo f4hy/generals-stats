@@ -1,5 +1,10 @@
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
+import DownloadIcon from "@mui/icons-material/Download"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import ThumbDownIcon from "@mui/icons-material/ThumbDown"
+import Accordion from "@mui/material/Accordion"
+import AccordionDetails from "@mui/material/AccordionDetails"
+import AccordionSummary from "@mui/material/AccordionSummary"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardHeader from "@mui/material/CardHeader"
@@ -14,12 +19,6 @@ import DisplayGeneral from "./Generals"
 import Map from "./Map"
 import { Matches, MatchInfo } from "./proto/match"
 import ShowMatchDetails from "./ShowMatchDetails"
-import DownloadIcon from "@mui/icons-material/Download"
-import Divider from "@mui/material/Divider"
-import Accordion from "@mui/material/Accordion"
-import AccordionDetails from "@mui/material/AccordionDetails"
-import AccordionSummary from "@mui/material/AccordionSummary"
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
 
 function getMatches(count: number, callback: (m: Matches) => void) {
   fetch("/api/matches/" + count).then((r) =>
@@ -236,7 +235,7 @@ export default function DisplayMatches() {
   return (
     <>
       {Object.entries(byDate).map(([date, group], idx) => (
-        <Accordion defaultExpanded={idx == 0}>
+        <Accordion defaultExpanded={idx === 0}>
           <AccordionSummary expandIcon={<ArrowDownwardIcon />}>
             <Typography>{date}</Typography>
           </AccordionSummary>

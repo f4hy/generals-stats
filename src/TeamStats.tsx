@@ -1,28 +1,25 @@
-import InputLabel from "@mui/material/InputLabel"
-import MenuItem from "@mui/material/MenuItem"
-import FormControl from "@mui/material/FormControl"
-import Select, { SelectChangeEvent } from "@mui/material/Select"
 import Box from "@mui/material/Box"
 import Divider from "@mui/material/Divider"
+import FormControl from "@mui/material/FormControl"
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
 import Paper from "@mui/material/Paper"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
 import * as React from "react"
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  LabelList,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+	Bar,
+	BarChart,
+	CartesianGrid, LabelList, Legend,
+	Line,
+	LineChart, ResponsiveContainer,
+	Tooltip,
+	XAxis,
+	YAxis
 } from "recharts"
-import { DateMessage, TeamStat, TeamStats, Faction } from "./proto/match"
 import { TeamColor } from "./Colors"
+import { DateMessage, Faction, TeamStat, TeamStats } from "./proto/match"
 
 function getTeamStats(querystr: string, callback: (m: TeamStats) => void) {
   fetch("/api/teamstatsfiltered?" + querystr).then((r) =>
@@ -217,7 +214,6 @@ export default function DisplayTeamStats() {
       params.append("Jared", jared)
     }
     setSearchParams(params.toString())
-    getTeamStats(searchParams.toString(), setTeamStats)
   }, [brendan, bill, sean, jared])
 
   const max = teamStats.teamStats.reduce((max, s) => Math.max(max, s.wins), 0)
