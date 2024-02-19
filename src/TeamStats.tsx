@@ -193,7 +193,6 @@ function RecordOverTime(props: { stats: TeamStats }) {
           />
           <YAxis />
           <Tooltip
-            formatter={(v) => (v as number).toFixed(2) + "%"}
             labelFormatter={timeFmt}
           />
           <Legend />
