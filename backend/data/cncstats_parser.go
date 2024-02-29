@@ -369,6 +369,7 @@ func knownAborted(matchId int64) string {
 		3505487053: "Mismatch",
 		137408485:  "Mismatch",
 		3213999161: "Mismatch",
+		3546411607: "Mismatch",
 	}
 	reason := aborted[matchId]
 	return reason
@@ -399,7 +400,8 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 		929574895:  pb.Team_ONE,
 		2335927854: pb.Team_THREE,
 		4000802867: pb.Team_THREE,
-		354171420: pb.Team_ONE,
+		354171420:  pb.Team_ONE,
+		4018143823: pb.Team_ONE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs
@@ -489,7 +491,7 @@ func ParseJsons(all bool) {
 	results := make(chan match_and_details, numJobs)
 	failures := make(chan string, numJobs)
 
-	for w := 1; w <= 2; w++ {
+	for w := 1; w <= 6; w++ {
 		jobGroup.Add(1)
 		go parseWorker(w, jobs, results, failures, &jobGroup)
 	}
