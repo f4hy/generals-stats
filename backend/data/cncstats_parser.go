@@ -370,6 +370,7 @@ func knownAborted(matchId int64) string {
 		137408485:  "Mismatch",
 		3213999161: "Mismatch",
 		3546411607: "Mismatch",
+		919932587:  "Brendan forced to step away :(",
 	}
 	reason := aborted[matchId]
 	return reason
