@@ -18,6 +18,10 @@ const (
 func AddDataToS3(filePath string, databuffer []byte) error {
 	log.V(1).Infof("Adding data to S3 file (%s)", filePath)
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
+	if err != nil {
+		log.Errorf("Failed to create s3 session %s", err)
+		return err
+	}
 
 	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(S3_BUCKET),
@@ -49,7 +53,7 @@ func GetS3Data(filePath string) ([]byte, error) {
 		Key:    aws.String(filePath),
 	})
 	if err != nil {
-		log.Error("Error getting object %v", filePath)
+		log.Errorf("Error getting object %v", filePath)
 		return nil, err
 	}
 	log.V(2).Infof("Got Obj: %v", rawObject)
@@ -67,7 +71,7 @@ func GetS3Data(filePath string) ([]byte, error) {
 // by the front end
 func GetPresignedUrl(path string) (string, error) {
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
-	log.V(1).Infof("Getting presigned url for ", path)
+	log.V(1).Infof("Getting presigned url for %s", path)
 	req, _ := s3.New(s).GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(S3_BUCKET),
 		Key:    aws.String(path),
@@ -75,10 +79,10 @@ func GetPresignedUrl(path string) (string, error) {
 	urlStr, err := req.Presign(15 * time.Minute)
 
 	if err != nil {
-		log.Errorf("Failed to sign request", err)
+		log.Errorf("Failed to sign request %s", err)
 		return urlStr, err
 	}
-	log.V(1).Infof("The URL is", urlStr)
+	log.V(1).Infof("The URL is %s", urlStr)
 	return urlStr, nil
 }
 

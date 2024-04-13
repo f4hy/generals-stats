@@ -311,7 +311,7 @@ func saveAll(m *match_and_details) error {
 	return err
 }
 
-func save(id int64, matchdata match_and_details, group *sync.WaitGroup) error {
+func save(id int64, matchdata match_and_details, group *sync.WaitGroup) {
 	if id != matchdata.info.Id {
 		log.Fatalf("%v info ids don't match %v != %v", matchdata.info.Filename, id, matchdata.info.Id)
 	}
@@ -324,7 +324,6 @@ func save(id int64, matchdata match_and_details, group *sync.WaitGroup) error {
 		log.Fatalf("Failed to save match[%v] %v", id, err)
 	}
 	defer group.Done()
-	return err
 }
 
 func addMatchNotes(match *pb.MatchInfo) {

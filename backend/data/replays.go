@@ -81,7 +81,10 @@ func parseAndSaveReplay(replay_name string, replay_data []byte, existing_jsons [
 		if err != nil {
 			return err
 		}
-		s3.AddDataToS3(jsonPath+"/"+json_name, []byte(parsed))
+		err = s3.AddDataToS3(jsonPath+"/"+json_name, []byte(parsed))
+		if err != nil {
+			return err
+		}
 
 	}
 	return nil
@@ -106,7 +109,7 @@ func SaveReplays(since time.Time) (savecount int, fail error) {
 		})
 		log.Infof("Already in the list? %v", exists)
 		if !exists {
-			s3.AddDataToS3(replayPath+"/"+scraped_name, scraped_data)
+			err = s3.AddDataToS3(replayPath+"/"+scraped_name, scraped_data)
 			save_count += 1
 		}
 		// parse it to json

@@ -418,29 +418,29 @@ func PairStats(matches *pb.Matches) *pb.TeamPairs {
 
 	for _, m := range matches.Matches {
 		for _, p := range getPairs(m) {
-			gmap, prs := teamMap[p.team]
+			_, prs := teamMap[p.team]
 			if !prs {
 				teamMap[p.team] = make(map[genpair]*pb.WinLoss)
 			}
-			gmap = teamMap[p.team]
-			wl, prs := gmap[p.pair]
+			gmap := teamMap[p.team]
+			_, prs = gmap[p.pair]
 			if !prs {
 				gmap[p.pair] = &pb.WinLoss{}
 			}
-			wl = gmap[p.pair]
+			wl := gmap[p.pair]
 			if p.won {
 				wl.Wins += 1
 			} else {
 				wl.Losses += 1
 			}
 			// no same for faction pairs
-			fmap, prs := factionMap[p.team]
+			_, prs = factionMap[p.team]
 			if !prs {
 				factionMap[p.team] = make(map[factionpair]*pb.WinLoss)
 			}
-			fmap = factionMap[p.team]
+			fmap := factionMap[p.team]
 			fpair := pairToFpair(p)
-			wl, prs = fmap[fpair.pair]
+			_, prs = fmap[fpair.pair]
 			if !prs {
 				fmap[fpair.pair] = &pb.WinLoss{}
 			}
