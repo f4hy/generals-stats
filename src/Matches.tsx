@@ -237,7 +237,7 @@ export default function DisplayMatches() {
       {Object.entries(byDate).map(([date, group], idx) => (
         <Accordion defaultExpanded={idx === 0}>
           <AccordionSummary expandIcon={<ArrowDownwardIcon />}>
-            <Typography>{date}</Typography>
+            <Typography>{date + ": " + group.length + " Matches"} </Typography>
           </AccordionSummary>
           <AccordionDetails>
             {group.map((m, idx) => (

@@ -9,18 +9,18 @@ import Typography from "@mui/material/Typography"
 import _ from "lodash"
 import * as React from "react"
 import {
-	Bar,
-	BarChart,
-	CartesianGrid,
-	LabelList,
-	Legend,
-	Line,
-	LineChart,
-	ReferenceLine,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  Legend,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts"
 import { TeamColor } from "./Colors"
 import { DateMessage, Faction, TeamStat, TeamStats } from "./proto/match"
@@ -61,7 +61,7 @@ function datemsgtoString(datemsg: DateMessage | undefined) {
 }
 function datemsgtoDate(datemsg: DateMessage | undefined): Date {
   if (datemsg) {
-    return new Date(datemsg.Year, datemsg.Month -1, datemsg.Day - 1)
+    return new Date(datemsg.Year, datemsg.Month - 1, datemsg.Day - 1)
   }
   return new Date()
 }
@@ -192,9 +192,7 @@ function RecordOverTime(props: { stats: TeamStats }) {
             ticks={ticks}
           />
           <YAxis />
-          <Tooltip
-            labelFormatter={timeFmt}
-          />
+          <Tooltip labelFormatter={timeFmt} />
           <Legend />
           <Line dataKey="team1" stroke={TeamColor("1")} strokeWidth={3} />
           <Line dataKey="team3" stroke={TeamColor("3")} strokeWidth={3} />
