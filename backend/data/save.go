@@ -5,7 +5,7 @@ import (
 	pb "github.com/f4hy/generals-stats/backend/proto"
 	s3 "github.com/f4hy/generals-stats/backend/s3"
 	log "github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"os"
 	"path/filepath"
 	"sort"
