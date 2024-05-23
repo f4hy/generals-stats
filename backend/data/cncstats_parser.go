@@ -404,6 +404,8 @@ func winnerOverride(matchId int64) (pb.Team, bool) {
 		4018143823: pb.Team_ONE,
 		2814791583: pb.Team_ONE,
 		2588838602: pb.Team_ONE,
+		190779906: pb.Team_THREE,
+		4166728131: pb.Team_ONE,
 	}
 	team, prs := overrides[matchId]
 	return team, prs
