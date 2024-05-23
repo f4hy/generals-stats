@@ -495,7 +495,7 @@ func ParseJsons(all bool) {
 	results := make(chan match_and_details, numJobs)
 	failures := make(chan string, numJobs)
 
-	for w := 1; w <= 4; w++ {
+	for w := 1; w <= 2; w++ {
 		jobGroup.Add(1)
 		go parseWorker(w, jobs, results, failures, &jobGroup)
 	}
