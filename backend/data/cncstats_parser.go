@@ -75,7 +75,7 @@ func getPlayer(psummary *object.PlayerSummary) (*pb.Player, error) {
 }
 
 func getBuildings(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
-	ret := []*pb.Costs_BuiltObject{}
+	ret := make([]*pb.Costs_BuiltObject, 0, len(psummary.BuildingsBuilt))
 	for bname, building := range psummary.BuildingsBuilt {
 		built := pb.Costs_BuiltObject{
 			Name:       bname,
@@ -83,13 +83,12 @@ func getBuildings(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 			TotalSpent: int32(building.TotalSpent),
 		}
 		ret = append(ret, &built)
-
 	}
 	return ret
 }
 
 func getUnits(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
-	ret := []*pb.Costs_BuiltObject{}
+	ret := make([]*pb.Costs_BuiltObject, 0, len(psummary.UnitsCreated))
 	for uname, unit := range psummary.UnitsCreated {
 		created_unit := pb.Costs_BuiltObject{
 			Name:       uname,
@@ -102,7 +101,7 @@ func getUnits(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 }
 
 func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
-	ret := []*pb.Costs_BuiltObject{}
+	ret := make([]*pb.Costs_BuiltObject, 0, len(psummary.UpgradesBuilt))
 	for uname, unit := range psummary.UpgradesBuilt {
 		created_unit := pb.Costs_BuiltObject{
 			Name:       uname,
@@ -114,9 +113,16 @@ func getUpgradesummary(psummary *object.PlayerSummary) []*pb.Costs_BuiltObject {
 	return ret
 }
 
+
+var apmPool = sync.Pool{
+	New: func() interface{} {
+		return new(pb.APM)
+	},
+}
+
 func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timesteps int64) ([]*pb.APM, map[string]*pb.Upgrades, int64, error) {
 	counts := make(map[string]int64)
-	apms := []*pb.APM{}
+	apms := make([]*pb.APM, 0, len(body)) // Pre-allocate with the expected size
 	minutePerTimestemp := minutes / float64(timesteps)
 	upgrades := getUpgradeEvents(body, minutePerTimestemp)
 	var id int64
@@ -137,27 +143,25 @@ func processBody(body []*body.BodyChunkEasyUnmarshall, minutes float64, timestep
 		}
 	}
 	for player_name, count := range counts {
-		apm := &pb.APM{
-			PlayerName:  player_name,
-			ActionCount: count,
-			Minutes:     minutes,
-			Apm:         float64(count) / minutes,
-		}
+		apm := apmPool.Get().(*pb.APM)
+		apm.PlayerName = player_name
+		apm.ActionCount = count
+		apm.Minutes = minutes
+		apm.Apm = float64(count) / minutes
 		apms = append(apms, apm)
 	}
 
 	return apms, upgrades, id, nil
 }
 
+
 func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float64) map[string]*pb.Upgrades {
-	// log.Println("Parsing the body")
 	upgrades := make(map[string]*pb.Upgrades)
 	for _, b := range body {
-		playername, _ := player_parse(b.PlayerName)
 		if strings.Contains(b.OrderName, "Upgrade") {
+			playername, _ := player_parse(b.PlayerName)
 			player := playername
-			_, prs := upgrades[player]
-			if !prs {
+			if _, prs := upgrades[player]; !prs {
 				upgrades[player] = &pb.Upgrades{}
 			}
 			details := b.Details
@@ -171,7 +175,6 @@ func getUpgradeEvents(body []*body.BodyChunkEasyUnmarshall, minPerTimestep float
 			upgrades[player].Upgrades = append(upgrades[player].Upgrades, &upgrade)
 		}
 	}
-	// log.Println("done parsing upgrades")
 	return upgrades
 }
 
