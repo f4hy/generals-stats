@@ -1,7 +1,6 @@
 package data
 
 import (
-	"log"
 	"sort"
 	"time"
 
@@ -10,13 +9,14 @@ import (
 )
 
 func getFaction(general pb.General) pb.Faction {
-	if general == pb.General_AIR || general == pb.General_LASER || general == pb.General_SUPER || general == pb.General_USA {
+	switch general {
+	case pb.General_AIR, pb.General_LASER, pb.General_SUPER, pb.General_USA:
 		return pb.Faction_ANYUSA
-	}
-	if general == pb.General_INFANTRY || general == pb.General_NUKE || general == pb.General_TANK || general == pb.General_CHINA {
+	case pb.General_INFANTRY, pb.General_NUKE, pb.General_TANK, pb.General_CHINA:
 		return pb.Faction_ANYCHINA
+	default:
+		return pb.Faction_ANYGLA
 	}
-	return pb.Faction_ANYGLA
 }
 
 func timeToDate(date time.Time) pb.Date {
@@ -26,10 +26,9 @@ func timeToDate(date time.Time) pb.Date {
 func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 	var playerstats pb.PlayerStats
 
-	player_stat_map := make(map[string]map[pb.General]*pb.WinLoss)
-	player_faction_stat_map := make(map[string]map[pb.Faction]*pb.WinLoss)
-
-	over_time := make(map[string]map[pb.General]([]*pb.PlayerRateOverTime))
+	playerStatMap := make(map[string]map[pb.General]*pb.WinLoss)
+	playerFactionStatMap := make(map[string]map[pb.Faction]*pb.WinLoss)
+	overTime := make(map[string]map[pb.General][]*pb.PlayerRateOverTime)
 
 	sort.Slice(matches.Matches, func(i, j int) bool {
 		return matches.Matches[i].Timestamp.Seconds < matches.Matches[j].Timestamp.Seconds
@@ -38,58 +37,54 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 	for _, m := range matches.Matches {
 		for _, p := range m.Players {
 			faction := getFaction(p.General)
-			_, prs := player_stat_map[p.Name]
-			if !prs {
-				player_stat_map[p.Name] = make(map[pb.General]*pb.WinLoss)
+			if _, exists := playerStatMap[p.Name]; !exists {
+				playerStatMap[p.Name] = make(map[pb.General]*pb.WinLoss)
 			}
-			_, exists := player_stat_map[p.Name][p.General]
-			if !exists {
-				player_stat_map[p.Name][p.General] = &pb.WinLoss{}
+			if _, exists := playerStatMap[p.Name][p.General]; !exists {
+				playerStatMap[p.Name][p.General] = &pb.WinLoss{}
 			}
-			_, fprs := player_faction_stat_map[p.Name]
-			if !fprs {
-				player_faction_stat_map[p.Name] = make(map[pb.Faction]*pb.WinLoss)
+			if _, exists := playerFactionStatMap[p.Name]; !exists {
+				playerFactionStatMap[p.Name] = make(map[pb.Faction]*pb.WinLoss)
 			}
-			_, fexists := player_faction_stat_map[p.Name][faction]
-			if !fexists {
-				player_faction_stat_map[p.Name][faction] = &pb.WinLoss{}
+			if _, exists := playerFactionStatMap[p.Name][faction]; !exists {
+				playerFactionStatMap[p.Name][faction] = &pb.WinLoss{}
 			}
 
 			if m.WinningTeam == p.Team {
-				player_stat_map[p.Name][p.General].Wins += 1
-				player_faction_stat_map[p.Name][faction].Wins += 1
+				playerStatMap[p.Name][p.General].Wins++
+				playerFactionStatMap[p.Name][faction].Wins++
 			} else {
-				player_stat_map[p.Name][p.General].Losses += 1
-				player_faction_stat_map[p.Name][faction].Losses += 1
+				playerStatMap[p.Name][p.General].Losses++
+				playerFactionStatMap[p.Name][faction].Losses++
 			}
 
-			_, ot_exists := over_time[p.Name]
-			if !ot_exists {
-				over_time[p.Name] = make(map[pb.General]([]*pb.PlayerRateOverTime))
+			if _, exists := overTime[p.Name]; !exists {
+				overTime[p.Name] = make(map[pb.General][]*pb.PlayerRateOverTime)
 			}
-			p_ot := over_time[p.Name]
-			ot := p_ot[p.General]
 			date := m.Timestamp.AsTime()
 			pbdate := timeToDate(date)
-			prev := &pb.PlayerRateOverTime{
-				Wl: &pb.GeneralWL{
-					General: p.General,
-					WinLoss: &pb.WinLoss{},
-				},
-			}
+			ot := overTime[p.Name][p.General]
+
+			var prev *pb.PlayerRateOverTime
 			if len(ot) > 0 {
 				prev = ot[len(ot)-1]
+			} else {
+				prev = &pb.PlayerRateOverTime{
+					Wl: &pb.GeneralWL{
+						General: p.General,
+						WinLoss: &pb.WinLoss{},
+					},
+				}
 			}
+
 			if prev.Date != nil && prev.Date.Year == pbdate.Year && prev.Date.Month == pbdate.Month && prev.Date.Day == pbdate.Day {
 				if m.WinningTeam == p.Team {
-					prev.Wl.WinLoss.Wins += 1
+					prev.Wl.WinLoss.Wins++
 				} else {
-					prev.Wl.WinLoss.Losses += 1
+					prev.Wl.WinLoss.Losses++
 				}
-
 			} else {
-
-				next := pb.PlayerRateOverTime{
+				next := &pb.PlayerRateOverTime{
 					Date: &pbdate,
 					Wl: &pb.GeneralWL{
 						General: p.General,
@@ -100,27 +95,28 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 					},
 				}
 				if m.WinningTeam == p.Team {
-					next.Wl.WinLoss.Wins += 1
+					next.Wl.WinLoss.Wins++
 				} else {
-					next.Wl.WinLoss.Losses += 1
+					next.Wl.WinLoss.Losses++
 				}
-				ot = append(ot, &next)
+				ot = append(ot, next)
 			}
-			p_ot[p.General] = ot
-
+			overTime[p.Name][p.General] = ot
 		}
 	}
 
-	for player, g_wl := range player_stat_map {
+	for player, g_wl := range playerStatMap {
 		var generalWL []*pb.GeneralWL
 		var factionWL []*pb.PlayerStat_FactionWL
+
 		for general, winloss := range g_wl {
 			generalWL = append(generalWL, &pb.GeneralWL{
 				General: general,
 				WinLoss: winloss,
 			})
+
 			faction := getFaction(general)
-			f_wl := player_faction_stat_map[player][faction]
+			f_wl := playerFactionStatMap[player][faction]
 			_, prs := lo.Find(factionWL, func(ps *pb.PlayerStat_FactionWL) bool {
 				return ps.Faction == faction
 			})
@@ -131,58 +127,56 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 				})
 			}
 		}
-		pot := over_time[player]
-		over_time := []*pb.PlayerRateOverTime{}
-		log.Printf("pot %v", pot)
 
-		for _, ot := range pot {
-			over_time = append(over_time, ot...)
+		var overTimeList []*pb.PlayerRateOverTime
+		for _, ot := range overTime[player] {
+			overTimeList = append(overTimeList, ot...)
 		}
+
 		playerstat := pb.PlayerStat{
 			PlayerName:   player,
 			Stats:        generalWL,
 			FactionStats: factionWL,
-			OverTime:     over_time,
+			OverTime:     overTimeList,
 		}
 		playerstats.PlayerStats = append(playerstats.PlayerStats, &playerstat)
 	}
+
 	sort.Slice(playerstats.PlayerStats, func(i, j int) bool {
 		return playerstats.PlayerStats[i].PlayerName < playerstats.PlayerStats[j].PlayerName
 	})
+
 	return &playerstats
 }
 
 func GeneralStats(matches *pb.Matches) *pb.GeneralStats {
 	var generalstats pb.GeneralStats
 
-	general_stat_map := make(map[pb.General]map[string]*pb.WinLoss)
+	generalStatMap := make(map[pb.General]map[string]*pb.WinLoss)
 	overall := make(map[pb.General]*pb.WinLoss)
+
 	for _, m := range matches.Matches {
 		for _, p := range m.Players {
-			_, prs := general_stat_map[p.General]
-			if !prs {
-				general_stat_map[p.General] = make(map[string]*pb.WinLoss)
+			if _, exists := generalStatMap[p.General]; !exists {
+				generalStatMap[p.General] = make(map[string]*pb.WinLoss)
 			}
-			_, exists := general_stat_map[p.General][p.Name]
-			if !exists {
-				general_stat_map[p.General][p.Name] = &pb.WinLoss{}
+			if _, exists := generalStatMap[p.General][p.Name]; !exists {
+				generalStatMap[p.General][p.Name] = &pb.WinLoss{}
 			}
-			_, oex := overall[p.General]
-			if !oex {
+			if _, exists := overall[p.General]; !exists {
 				overall[p.General] = &pb.WinLoss{}
 			}
 			if m.WinningTeam == p.Team {
-				general_stat_map[p.General][p.Name].Wins += 1
-				overall[p.General].Wins += 1
+				generalStatMap[p.General][p.Name].Wins++
+				overall[p.General].Wins++
 			} else {
-				general_stat_map[p.General][p.Name].Losses += 1
-				overall[p.General].Losses += 1
+				generalStatMap[p.General][p.Name].Losses++
+				overall[p.General].Losses++
 			}
-
 		}
 	}
 
-	for general, p_wl := range general_stat_map {
+	for general, p_wl := range generalStatMap {
 		var playerWL []*pb.GeneralStat_PlayerWL
 		for player, winloss := range p_wl {
 			playerWL = append(playerWL, &pb.GeneralStat_PlayerWL{
@@ -190,13 +184,14 @@ func GeneralStats(matches *pb.Matches) *pb.GeneralStats {
 				WinLoss:    winloss,
 			})
 		}
-		playerstat := pb.GeneralStat{
+		generalstat := pb.GeneralStat{
 			General: general,
 			Stats:   playerWL,
 			Total:   overall[general],
 		}
-		generalstats.GeneralStats = append(generalstats.GeneralStats, &playerstat)
+		generalstats.GeneralStats = append(generalstats.GeneralStats, &generalstat)
 	}
+
 	return &generalstats
 }
 
@@ -213,16 +208,17 @@ func TeamStats(matches *pb.Matches) *pb.TeamStats {
 	for _, m := range matches.Matches {
 		winner := m.GetWinningTeam()
 		date := m.Timestamp.AsTime()
-		pbdate := pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
+		pbdate := timeToDate(date)
+
 		match, exists := lo.Find(teamstats.TeamStats, func(p *pb.TeamStat) bool {
-			dateEq := (pbdate.Year == p.Date.Year && pbdate.Month == p.Date.Month && pbdate.Day == p.Date.Day)
-			return p.Team == winner && dateEq
+			return p.Team == winner && p.Date.Year == pbdate.Year && p.Date.Month == pbdate.Month && p.Date.Day == pbdate.Day
 		})
+
 		if exists {
-			match.Wins += 1
+			match.Wins++
 		} else {
 			for _, t := range getTeams(m) {
-				ts := pb.TeamStat{
+				ts := &pb.TeamStat{
 					Date: &pbdate,
 					Team: t,
 					Wins: 0,
@@ -230,15 +226,17 @@ func TeamStats(matches *pb.Matches) *pb.TeamStats {
 				if t == winner {
 					ts.Wins = 1
 				}
-				teamstats.TeamStats = append(teamstats.TeamStats, &ts)
+				teamstats.TeamStats = append(teamstats.TeamStats, ts)
 			}
 		}
 	}
+
 	sort.Slice(teamstats.TeamStats, func(i, j int) bool {
 		di := teamstats.TeamStats[i].Date
 		dj := teamstats.TeamStats[j].Date
 		return (di.Year*1000 + di.Month*100 + di.Day) < (dj.Year*1000 + dj.Month*100 + dj.Day)
 	})
+
 	return &teamstats
 }
 
@@ -252,39 +250,38 @@ type TeamStatFilter struct {
 	Players   map[string]*pb.Faction
 }
 
+
 func TeamStatsFiltered(matches *pb.Matches, filters *TeamStatFilter) *pb.TeamStats {
 	var teamstats pb.TeamStats
 
-	filtered := lo.Filter(matches.Matches, func(match *pb.MatchInfo, index int) bool {
+	filtered := lo.Filter(matches.Matches, func(match *pb.MatchInfo, _ int) bool {
 		if filters.Playedmap != "" && filters.Playedmap != match.Map {
-			log.Print("Dropping match due to map")
 			return false
 		}
 		for filterPlayerName, filterGen := range filters.Players {
 			for _, player := range match.Players {
-				if player.Name == filterPlayerName && getFaction(player.General).Number() != filterGen.Number() {
-					log.Printf("Dropping match player %v not matching %v : %v", player.Name, &player.General, filterGen)
+				if player.Name == filterPlayerName && getFaction(player.General) != *filterGen {
 					return false
 				}
 			}
 		}
 		return true
 	})
-	log.Printf("filtered %v down to %v", len(matches.Matches), len(filtered))
 
 	for _, m := range filtered {
 		winner := m.GetWinningTeam()
 		date := m.Timestamp.AsTime()
-		pbdate := pb.Date{Year: int32(date.Year()), Month: int32(date.Month()), Day: int32(date.Day())}
+		pbdate := timeToDate(date)
+
 		match, exists := lo.Find(teamstats.TeamStats, func(p *pb.TeamStat) bool {
-			dateEq := (pbdate.Year == p.Date.Year && pbdate.Month == p.Date.Month && pbdate.Day == p.Date.Day)
-			return p.Team == winner && dateEq
+			return p.Team == winner && p.Date.Year == pbdate.Year && p.Date.Month == pbdate.Month && p.Date.Day == pbdate.Day
 		})
+
 		if exists {
-			match.Wins += 1
+			match.Wins++
 		} else {
 			for _, t := range getTeams(m) {
-				ts := pb.TeamStat{
+				ts := &pb.TeamStat{
 					Date: &pbdate,
 					Team: t,
 					Wins: 0,
@@ -292,15 +289,17 @@ func TeamStatsFiltered(matches *pb.Matches, filters *TeamStatFilter) *pb.TeamSta
 				if t == winner {
 					ts.Wins = 1
 				}
-				teamstats.TeamStats = append(teamstats.TeamStats, &ts)
+				teamstats.TeamStats = append(teamstats.TeamStats, ts)
 			}
 		}
 	}
+
 	sort.Slice(teamstats.TeamStats, func(i, j int) bool {
 		di := teamstats.TeamStats[i].Date
 		dj := teamstats.TeamStats[j].Date
 		return (di.Year*1000 + di.Month*100 + di.Day) < (dj.Year*1000 + dj.Month*100 + dj.Day)
 	})
+
 	return &teamstats
 }
 
@@ -311,17 +310,15 @@ type team_and_map struct {
 
 func MapStats(matches *pb.Matches) *pb.MapStats {
 	var teamstats pb.MapStats
-	over_time := make(map[string]*pb.MapResults)
-	team_map_map := make(map[team_and_map]int)
+	overTime := make(map[string]*pb.MapResults)
+	teamMapMap := make(map[team_and_map]int)
 
 	for _, m := range matches.Matches {
 		tam := team_and_map{team: m.WinningTeam, played_map: m.Map}
-		team_map_map[tam] += 1
-		_, prs := over_time[m.Map]
-		if !prs {
-			empt := make([]*pb.MapResult, 0, 1)
-			over_time[m.Map] = &pb.MapResults{
-				Results: empt,
+		teamMapMap[tam]++
+		if _, exists := overTime[m.Map]; !exists {
+			overTime[m.Map] = &pb.MapResults{
+				Results: make([]*pb.MapResult, 0, 1),
 			}
 		}
 		date := timeToDate(m.Timestamp.AsTime())
@@ -330,9 +327,10 @@ func MapStats(matches *pb.Matches) *pb.MapStats {
 			Date:   &date,
 			Winner: m.WinningTeam,
 		}
-		over_time[m.Map].Results = append(over_time[m.Map].Results, next)
+		overTime[m.Map].Results = append(overTime[m.Map].Results, next)
 	}
-	for t_and_m, wins := range team_map_map {
+
+	for t_and_m, wins := range teamMapMap {
 		mapstats := &pb.MapStat{
 			Map:  t_and_m.played_map,
 			Team: t_and_m.team,
@@ -340,7 +338,8 @@ func MapStats(matches *pb.Matches) *pb.MapStats {
 		}
 		teamstats.MapStats = append(teamstats.MapStats, mapstats)
 	}
-	teamstats.OverTime = over_time
+	teamstats.OverTime = overTime
+
 	return &teamstats
 }
 
@@ -359,6 +358,7 @@ type pairResult struct {
 	pair genpair
 	won  bool
 }
+
 type pairFactionResult struct {
 	team pb.Team
 	pair factionpair
@@ -389,69 +389,65 @@ func getPairs(match *pb.MatchInfo) []pairResult {
 	sort.Slice(losing, func(i, j int) bool {
 		return losing[i].General.Number() < losing[j].General.Number()
 	})
-	p1 := pairResult{
-		team: winning[0].Team,
-		pair: genpair{
-			gen1: winning[0].General,
-			gen2: winning[1].General,
+	return []pairResult{
+		{
+			team: winning[0].Team,
+			pair: genpair{
+				gen1: winning[0].General,
+				gen2: winning[1].General,
+			},
+			won: true,
 		},
-		won: true,
-	}
-	p2 := pairResult{
-		team: losing[0].Team,
-		pair: genpair{
-			gen1: losing[0].General,
-			gen2: losing[1].General,
+		{
+			team: losing[0].Team,
+			pair: genpair{
+				gen1: losing[0].General,
+				gen2: losing[1].General,
+			},
+			won: false,
 		},
-		won: false,
 	}
-	return []pairResult{p1, p2}
-
 }
 
 func PairStats(matches *pb.Matches) *pb.TeamPairs {
 	var pairstats pb.TeamPairs
 	pairstats.TeamPairs = make(map[string]*pb.PairsWinLosses)
 	pairstats.FactionPairs = make(map[string]*pb.PairFactionWinLosses)
+
 	teamMap := make(map[pb.Team]map[genpair]*pb.WinLoss)
 	factionMap := make(map[pb.Team]map[factionpair]*pb.WinLoss)
 
 	for _, m := range matches.Matches {
 		for _, p := range getPairs(m) {
-			_, prs := teamMap[p.team]
-			if !prs {
+			if _, exists := teamMap[p.team]; !exists {
 				teamMap[p.team] = make(map[genpair]*pb.WinLoss)
 			}
-			gmap := teamMap[p.team]
-			_, prs = gmap[p.pair]
-			if !prs {
-				gmap[p.pair] = &pb.WinLoss{}
+			if _, exists := teamMap[p.team][p.pair]; !exists {
+				teamMap[p.team][p.pair] = &pb.WinLoss{}
 			}
-			wl := gmap[p.pair]
+			wl := teamMap[p.team][p.pair]
 			if p.won {
-				wl.Wins += 1
+				wl.Wins++
 			} else {
-				wl.Losses += 1
+				wl.Losses++
 			}
-			// no same for faction pairs
-			_, prs = factionMap[p.team]
-			if !prs {
-				factionMap[p.team] = make(map[factionpair]*pb.WinLoss)
-			}
-			fmap := factionMap[p.team]
+
 			fpair := pairToFpair(p)
-			_, prs = fmap[fpair.pair]
-			if !prs {
-				fmap[fpair.pair] = &pb.WinLoss{}
+			if _, exists := factionMap[fpair.team]; !exists {
+				factionMap[fpair.team] = make(map[factionpair]*pb.WinLoss)
 			}
-			wl = fmap[fpair.pair]
-			if p.won {
-				wl.Wins += 1
+			if _, exists := factionMap[fpair.team][fpair.pair]; !exists {
+				factionMap[fpair.team][fpair.pair] = &pb.WinLoss{}
+			}
+			fwl := factionMap[fpair.team][fpair.pair]
+			if fpair.won {
+				fwl.Wins++
 			} else {
-				wl.Losses += 1
+				fwl.Losses++
 			}
 		}
 	}
+
 	for team, pairmap := range teamMap {
 		pairwinlosses := pb.PairsWinLosses{}
 		for pair, wl := range pairmap {
@@ -461,8 +457,7 @@ func PairStats(matches *pb.Matches) *pb.TeamPairs {
 				Winloss:  wl,
 			})
 		}
-		teamstr := team.String()
-		pairstats.TeamPairs[teamstr] = &pairwinlosses
+		pairstats.TeamPairs[team.String()] = &pairwinlosses
 	}
 
 	for team, pairmap := range factionMap {
@@ -474,120 +469,112 @@ func PairStats(matches *pb.Matches) *pb.TeamPairs {
 				Winloss:  wl,
 			})
 		}
-		teamstr := team.String()
-		pairstats.FactionPairs[teamstr] = &pairwinlosses
+		pairstats.FactionPairs[team.String()] = &pairwinlosses
 	}
-	log.Print("pair stats")
+
 	return &pairstats
 }
 
 func winRate(wl *pb.WinLoss) float64 {
 	games := wl.Wins + wl.Losses
 	if games == 0 {
-		return 0.
+		return 0
 	}
 	return float64(wl.Wins) / float64(games)
 }
 
-func unitNameFormat(name string) string {
-	return name
-	// split := strings.Split(name, "_")
-	// if len(split) == 1 {
-	//      return name
-	// }
-	// return split[1]
-}
-
 func Wrapped(matches *pb.Matches, player string) (*pb.Wrapped, error) {
-
-	games_played := 0
-	hours_played := 0.0
-	general_count := make(map[pb.General]int32)
-	general_rates := make(map[pb.General]*pb.WinLoss)
-	all_general_rates := make(map[pb.General]*pb.WinLoss)
-
-	units_built := make(map[string]int32)
-	units_built_each := make(map[string]map[string]int32)
-	units_spent := make(map[string]float64)
+	gamesPlayed := 0
+	hoursPlayed := 0.0
+	generalCount := make(map[pb.General]int32)
+	generalRates := make(map[pb.General]*pb.WinLoss)
+	allGeneralRates := make(map[pb.General]*pb.WinLoss)
+	unitsBuilt := make(map[string]int32)
+	unitsBuiltEach := make(map[string]map[string]int32)
+	unitsSpent := make(map[string]float64)
 
 	for _, m := range matches.Matches {
+		gamesPlayed++
+		hoursPlayed += m.DurationMinutes / 60
 
-		games_played += 1
-		hours_played += m.DurationMinutes / 60.
 		for _, p := range m.Players {
-			log.Print(p.Name)
 			if p.Name == player {
-				general_count[p.General] += 1
-				_, ex := general_rates[p.General]
-				if !ex {
-					general_rates[p.General] = &pb.WinLoss{}
+				generalCount[p.General]++
+				if _, exists := generalRates[p.General]; !exists {
+					generalRates[p.General] = &pb.WinLoss{}
 				}
 				if m.WinningTeam == p.Team {
-					general_rates[p.General].Wins += 1
+					generalRates[p.General].Wins++
 				} else {
-					general_rates[p.General].Losses += 1
+					generalRates[p.General].Losses++
 				}
 			}
-			_, ex := all_general_rates[p.General]
-			if !ex {
-				all_general_rates[p.General] = &pb.WinLoss{}
+
+			if _, exists := allGeneralRates[p.General]; !exists {
+				allGeneralRates[p.General] = &pb.WinLoss{}
 			}
 			if m.WinningTeam == p.Team {
-				all_general_rates[p.General].Wins += 1
+				allGeneralRates[p.General].Wins++
 			} else {
-				all_general_rates[p.General].Losses += 1
+				allGeneralRates[p.General].Losses++
 			}
-
 		}
+
 		details, err := GetDetails(m.Id)
 		if err != nil {
-			return &pb.Wrapped{}, err
+			return nil, err
 		}
+
 		for _, c := range details.Costs {
 			if c.Player.Name == player {
 				for _, u := range c.Units {
 					name := unitNameFormat(u.Name)
-					units_built[name] += int32(u.Count)
-					units_spent[name] += float64(u.TotalSpent)
+					unitsBuilt[name] += int32(u.Count)
+					unitsSpent[name] += float64(u.TotalSpent)
 				}
 			}
 			for _, u := range c.Units {
 				name := unitNameFormat(u.Name)
-				_, prs := units_built_each[name]
-				if !prs {
-					units_built_each[name] = make(map[string]int32)
+				if _, exists := unitsBuiltEach[name]; !exists {
+					unitsBuiltEach[name] = make(map[string]int32)
 				}
-				units_built_each[name][c.Player.Name] += int32(u.Count)
+				unitsBuiltEach[name][c.Player.Name] += int32(u.Count)
 			}
 		}
 	}
-	generals := lo.Keys(general_count)
+
+	generals := lo.Keys(generalCount)
 	mostPlayed := lo.MaxBy(generals, func(item pb.General, max pb.General) bool {
-		return general_count[item] > general_count[max]
+		return generalCount[item] > generalCount[max]
 	})
 
-	units := lo.Keys(units_built)
+	units := lo.Keys(unitsBuilt)
 	mostBuilt := lo.MaxBy(units, func(item string, max string) bool {
-		return units_built[item] > units_built[max]
+		return unitsBuilt[item] > unitsBuilt[max]
 	})
 
-	others := lo.Values(units_built_each[mostBuilt])
-	others_wo := lo.Without(others, units_built[mostBuilt])
+	others := lo.Values(unitsBuiltEach[mostBuilt])
+	othersWithoutMostBuilt := lo.Without(others, unitsBuilt[mostBuilt])
 
 	bestGeneral := lo.MaxBy(generals, func(item pb.General, max pb.General) bool {
-		return winRate(general_rates[item])-winRate(all_general_rates[item]) > winRate(general_rates[max])-winRate(all_general_rates[max])
+		return winRate(generalRates[item])-winRate(allGeneralRates[item]) > winRate(generalRates[max])-winRate(allGeneralRates[max])
 	})
+
 	return &pb.Wrapped{
-		GamesPlayed:       int32(games_played),
-		HoursPlayed:       hours_played,
+		GamesPlayed:       int32(gamesPlayed),
+		HoursPlayed:       hoursPlayed,
 		MostPlayed:        mostPlayed,
-		MostPlayedWinrate: winRate(general_rates[mostPlayed]),
+		MostPlayedWinrate: winRate(generalRates[mostPlayed]),
 		MostBuilt:         mostBuilt,
-		MostBuiltCount:    units_built[mostBuilt],
-		MostBuiltSpent:    (units_spent[mostBuilt]),
-		MostBuiltMore:     units_built[mostBuilt] - (lo.Max(others_wo)),
+		MostBuiltCount:    unitsBuilt[mostBuilt],
+		MostBuiltSpent:    unitsSpent[mostBuilt],
+		MostBuiltMore:     unitsBuilt[mostBuilt] - lo.Max(othersWithoutMostBuilt),
 		BestGeneral:       bestGeneral,
-		BestWinrate:       winRate(general_rates[bestGeneral]),
-		BestAverage:       winRate(all_general_rates[bestGeneral]),
+		BestWinrate:       winRate(generalRates[bestGeneral]),
+		BestAverage:       winRate(allGeneralRates[bestGeneral]),
 	}, nil
+}
+
+func unitNameFormat(name string) string {
+	return name
 }
