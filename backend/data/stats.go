@@ -116,10 +116,14 @@ func PlayerStats(matches *pb.Matches) *pb.PlayerStats {
 			})
 
 			faction := getFaction(general)
-			if _, exists := playerFactionStatMap[player][faction]; exists {
+			f_wl := playerFactionStatMap[player][faction]
+			_, prs := lo.Find(factionWL, func(ps *pb.PlayerStat_FactionWL) bool {
+				return ps.Faction == faction
+			})
+			if !prs {
 				factionWL = append(factionWL, &pb.PlayerStat_FactionWL{
 					Faction: faction,
-					WinLoss: playerFactionStatMap[player][faction],
+					WinLoss: f_wl,
 				})
 			}
 		}
